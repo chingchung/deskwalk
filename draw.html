@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>deskwalk · 抽題 demo</title>
+    <style>
+      :root {
+        --bg: #f5f5f0;
+        --surface: #ffffff;
+        --ink: #1a1a1a;
+        --ink-soft: #5a5a5a;
+        --line: #e5e3da;
+        --l1: #4a8a5e;
+        --l2: #c89a5b;
+        --l3: #a04a6e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: "Helvetica Neue", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1.25rem;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+      header h1 {
+        font-size: 1.75rem;
+        margin: 0 0 0.25rem;
+      }
+      header p {
+        color: var(--ink-soft);
+        margin: 0;
+        font-size: 0.95rem;
+      }
+      .levels {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .level-btn {
+        background: var(--surface);
+        border: 2px solid var(--line);
+        border-radius: 999px;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.95rem;
+        cursor: pointer;
+        color: var(--ink-soft);
+        transition: all 0.15s;
+        font-family: inherit;
+      }
+      .level-btn:hover { border-color: var(--ink-soft); }
+      .level-btn.active[data-level="1"] { border-color: var(--l1); color: var(--l1); background: #eef5ef; }
+      .level-btn.active[data-level="2"] { border-color: var(--l2); color: var(--l2); background: #faf4ea; }
+      .level-btn.active[data-level="3"] { border-color: var(--l3); color: var(--l3); background: #f5ecf0; }
+
+      .card {
+        width: 100%;
+        max-width: 480px;
+        min-height: 280px;
+        background: var(--surface);
+        border-radius: 14px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        padding: 2rem 1.75rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 1.5rem;
+        position: relative;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+      .card.flip { transform: translateY(8px); opacity: 0.3; }
+      .card-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+      }
+      .card[data-level="1"] .card-badge { background: #eef5ef; color: var(--l1); }
+      .card[data-level="2"] .card-badge { background: #faf4ea; color: var(--l2); }
+      .card[data-level="3"] .card-badge { background: #f5ecf0; color: var(--l3); }
+
+      .question {
+        font-size: 1.45rem;
+        line-height: 1.55;
+        margin: 0;
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .count {
+        display: inline-block;
+        padding: 0 0.15rem;
+        font-weight: 700;
+        font-size: 1.7rem;
+      }
+      .card[data-level="1"] .count { color: var(--l1); }
+      .card[data-level="2"] .count { color: var(--l2); }
+      .card[data-level="3"] .count { color: var(--l3); }
+
+      .hint {
+        color: var(--ink-soft);
+        font-size: 0.85rem;
+        margin-top: 1.25rem;
+      }
+      .empty {
+        color: var(--ink-soft);
+        font-style: italic;
+      }
+      .draw-btn {
+        background: var(--ink);
+        color: white;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        font-size: 1.05rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: transform 0.1s;
+        letter-spacing: 0.05em;
+      }
+      .draw-btn:hover { transform: translateY(-1px); }
+      .draw-btn:active { transform: translateY(0); }
+
+      .footer-nav {
+        margin-top: 2.5rem;
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+      }
+      .footer-nav a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line); }
+      .footer-nav a:hover { color: var(--ink); }
+
+      .rules {
+        max-width: 480px;
+        margin-top: 2rem;
+        padding: 1.25rem 1.5rem;
+        background: rgba(255,255,255,0.5);
+        border-left: 3px solid var(--line);
+        border-radius: 0 8px 8px 0;
+        font-size: 0.9rem;
+        color: var(--ink-soft);
+        line-height: 1.7;
+      }
+      .rules strong { color: var(--ink); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>抽題 demo</h1>
+      <p>Hive Mind 機制 · 同步寫答案，跟其他人越同頻越高分</p>
+    </header>
+
+    <div class="levels">
+      <button class="level-btn active" data-level="1" onclick="setLevel(1)">Level 1 · 文化常識</button>
+      <button class="level-btn" data-level="2" onclick="setLevel(2)">Level 2 · 創意聯想</button>
+      <button class="level-btn" data-level="3" onclick="setLevel(3)">Level 3 · 桌上玩家</button>
+    </div>
+
+    <div class="card" id="card" data-level="1">
+      <span class="card-badge" id="badge">LEVEL 1</span>
+      <p class="question empty" id="question">按下抽題開始</p>
+      <p class="hint" id="hint"></p>
+    </div>
+
+    <button class="draw-btn" onclick="draw()">抽 題</button>
+
+    <div class="rules">
+      <strong>Hive Mind 玩法：</strong>所有人在 30 秒內同步寫下答案。揭曉時，跟你寫一樣的人越多，分數越高。每答案 +1（每多一人跟你同），冷門答案 0 分。
+      <br><br>
+      <strong>三個 Level：</strong>難度從外部知識 → 創意聯想 → 對玩家的觀察，越往下越曖昧、越能引發對話。
+    </div>
+
+    <p class="footer-nav">
+      <a href="index.html">← 回到 deskwalk 主頁</a>
+    </p>
+
+    <script>
+      const BANK = {
+        1: [
+          { q: "寫出 #{n} 首代表香港的歌", n: 3 },
+          { q: "寫出 #{n} 部小時候必看的卡通", n: 2 },
+          { q: "寫出 #{n} 間最有香港味的茶餐廳食物", n: 3 },
+          { q: "寫出 #{n} 個一定要帶外國朋友去的香港地點", n: 3 },
+          { q: "寫出 #{n} 部最代表香港的電影", n: 2 },
+          { q: "寫出 #{n} 個你覺得最香港的食物", n: 3 },
+          { q: "寫出 #{n} 個讓你哭過的廣告", n: 2 },
+          { q: "寫出 #{n} 個香港人最常用的口頭禪", n: 3 },
+          { q: "寫出 #{n} 首婚禮必播的歌", n: 2 },
+          { q: "寫出 #{n} 個夜深會去吃的宵夜", n: 3 },
+        ],
+        2: [
+          { q: "寫出 #{n} 個適合做名字的水果", n: 2 },
+          { q: "寫出 #{n} 個聽起來很貴但其實便宜的東西", n: 3 },
+          { q: "寫出 #{n} 個適合當寵物名字的食物", n: 2 },
+          { q: "寫出 #{n} 個最浪漫的家具", n: 2 },
+          { q: "寫出 #{n} 個最像天氣的情緒", n: 2 },
+          { q: "寫出 #{n} 個最適合做暗號的詞", n: 3 },
+          { q: "寫出 #{n} 個最像愛情的飲料", n: 2 },
+          { q: "寫出 #{n} 個最不該出現在喪禮的歌", n: 2 },
+          { q: "寫出 #{n} 個最像星期一的食物", n: 2 },
+          { q: "寫出 #{n} 個如果是顏色會是紫色的職業", n: 2 },
+          { q: "寫出 #{n} 種你願意當的動物", n: 2 },
+          { q: "寫出 #{n} 個最像「孤獨」的物件", n: 2 },
+        ],
+        3: [
+          { q: "寫出 #{n} 個最可能參加全民造星的玩家", n: 2 },
+          { q: "寫出 #{n} 個最會煮飯的玩家", n: 2 },
+          { q: "寫出 #{n} 個最像貓的玩家", n: 2 },
+          { q: "寫出 #{n} 個最會說故事的玩家", n: 2 },
+          { q: "寫出 #{n} 個半夜會打給你的玩家", n: 2 },
+          { q: "寫出 #{n} 個能跟你環島旅行的玩家", n: 2 },
+          { q: "寫出 #{n} 個最像 ChatGPT 的玩家", n: 1 },
+          { q: "寫出 #{n} 個最不適合當老師的玩家", n: 1 },
+          { q: "寫出 #{n} 個最會在感情裡先道歉的玩家", n: 1 },
+          { q: "寫出 #{n} 個最可能突然失蹤一週的玩家", n: 1 },
+          { q: "寫出 #{n} 個 10 年後最可能變有錢的玩家", n: 2 },
+          { q: "寫出 #{n} 個最會在 KTV 點冷門歌的玩家", n: 2 },
+          { q: "寫出 #{n} 個你想跟他一起出櫃的玩家（任何意義的櫃）", n: 1 },
+          { q: "寫出 #{n} 個最像 90 年代偶像的玩家", n: 1 },
+        ]
+      };
+
+      let currentLevel = 1;
+      let lastQuestion = null;
+
+      function setLevel(lv) {
+        currentLevel = lv;
+        document.querySelectorAll('.level-btn').forEach(b => {
+          b.classList.toggle('active', Number(b.dataset.level) === lv);
+        });
+        const card = document.getElementById('card');
+        card.dataset.level = lv;
+        document.getElementById('badge').textContent = `LEVEL ${lv}`;
+      }
+
+      function draw() {
+        const bank = BANK[currentLevel];
+        let pick;
+        do {
+          pick = bank[Math.floor(Math.random() * bank.length)];
+        } while (bank.length > 1 && pick === lastQuestion);
+        lastQuestion = pick;
+
+        const card = document.getElementById('card');
+        const qEl = document.getElementById('question');
+        const hintEl = document.getElementById('hint');
+
+        card.classList.add('flip');
+        setTimeout(() => {
+          qEl.classList.remove('empty');
+          qEl.innerHTML = pick.q.replace('#{n}', `<span class="count">${pick.n}</span>`);
+          hintEl.textContent = `同步寫 ${pick.n} 個答案 · 跟別人重複越多越高分`;
+          card.classList.remove('flip');
+        }, 200);
+      }
+    </script>
+  </body>
+</html>
