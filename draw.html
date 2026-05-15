@@ -516,6 +516,264 @@
       .stage[data-level="3"] .question {
         font-size: clamp(1.5rem, 4.5vw, 1.85rem);
       }
+
+      /* ── Mobile: fit header + card + actions above the fold ── */
+      @media (max-width: 540px) {
+        html {
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+
+        body {
+          min-height: 100dvh;
+        }
+
+        .stage {
+          max-width: none;
+          width: 100%;
+          height: 100dvh;
+          max-height: 100dvh;
+          min-height: 0;
+          padding:
+            max(0.65rem, env(safe-area-inset-top))
+            max(1rem, env(safe-area-inset-right))
+            calc(2.75rem + env(safe-area-inset-bottom))
+            max(1rem, env(safe-area-inset-left));
+          display: grid;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          gap: 0.35rem;
+          overflow: hidden;
+        }
+
+        .head {
+          margin-bottom: 0;
+          gap: 0.75rem;
+          align-items: center;
+        }
+
+        .counter .num {
+          font-size: 2rem;
+        }
+
+        .counter .num-label {
+          font-size: 0.65rem;
+          letter-spacing: 0.16em;
+        }
+
+        .progress {
+          gap: 0.35rem;
+        }
+
+        .journey {
+          gap: 0.5rem;
+        }
+
+        .leg {
+          gap: 0.35rem;
+        }
+
+        .dot {
+          width: 0.55rem;
+          height: 0.55rem;
+        }
+
+        .leg[data-level="3"] .dot {
+          width: 0.62rem;
+          height: 0.62rem;
+        }
+
+        .threshold {
+          font-size: 0.68rem;
+          max-width: 9.5rem;
+          line-height: 1.25;
+        }
+
+        .question-block {
+          flex: none;
+          min-height: 0;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0;
+          overflow: hidden;
+        }
+
+        .eyebrow {
+          font-size: 0.65rem;
+          letter-spacing: 0.22em;
+          flex-shrink: 0;
+        }
+
+        .deck {
+          --deck-max-h: min(36dvh, 15.5rem, calc(100dvh - 13.5rem));
+          width: min(72vw, 16.5rem, calc(var(--deck-max-h) * 5 / 7));
+          height: auto;
+          aspect-ratio: 5 / 7;
+          max-height: var(--deck-max-h);
+          flex-shrink: 1;
+        }
+
+        .card.active {
+          padding: 0.85rem 1rem 1rem;
+        }
+
+        .card-symbol svg {
+          width: 58%;
+          max-width: 7.5rem;
+        }
+
+        .card-divider {
+          margin: 0.2rem auto 0.45rem;
+        }
+
+        .question {
+          font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+          line-height: 1.45;
+          max-width: 100%;
+          max-height: 5.5em;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        }
+
+        .stage[data-level="3"] .question {
+          font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+          max-height: 4.5em;
+        }
+
+        .hint {
+          font-size: 0.78rem;
+          margin: 0.15rem 0 0;
+          flex-shrink: 0;
+        }
+
+        .actions {
+          margin-top: 0;
+          gap: 0.65rem;
+          flex-shrink: 0;
+        }
+
+        .btn {
+          font-size: 0.82rem;
+          padding: 0.72rem 1.5rem;
+          letter-spacing: 0.1em;
+          min-height: 2.75rem;
+        }
+
+        .verdict {
+          gap: 0.45rem;
+          width: 100%;
+        }
+
+        .verdict .btn {
+          flex: 1 1 auto;
+          min-width: 0;
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+
+        .footer-info {
+          bottom: max(0.5rem, env(safe-area-inset-bottom));
+          font-size: 0.62rem;
+          letter-spacing: 0.14em;
+        }
+
+        .reset {
+          margin-left: 0.85rem;
+        }
+
+        .overlay-inner {
+          padding: 1.25rem;
+          max-width: 92vw;
+        }
+
+        .overlay-title {
+          font-size: 2rem;
+        }
+
+        .overlay-glyph {
+          width: 3.25rem;
+          height: 3.25rem;
+          margin-bottom: 1rem;
+        }
+
+        .finale-count {
+          font-size: 3.5rem;
+        }
+      }
+
+      /* Very short screens (e.g. iPhone SE, landscape phone) */
+      @media (max-width: 540px) and (max-height: 680px) {
+        .stage {
+          padding-top: max(0.4rem, env(safe-area-inset-top));
+          gap: 0.2rem;
+        }
+
+        .counter .num {
+          font-size: 1.65rem;
+        }
+
+        .deck {
+          --deck-max-h: min(32dvh, 13rem, calc(100dvh - 11.5rem));
+          width: min(64vw, 14rem, calc(var(--deck-max-h) * 5 / 7));
+          max-height: var(--deck-max-h);
+        }
+
+        .eyebrow {
+          display: none;
+        }
+
+        .hint {
+          font-size: 0.72rem;
+        }
+
+        .card.active {
+          padding: 0.65rem 0.85rem 0.75rem;
+        }
+
+        .card-symbol svg {
+          width: 50%;
+        }
+      }
+
+      @media (max-width: 540px) and (orientation: landscape) {
+        .stage {
+          grid-template-columns: minmax(0, 1fr) auto;
+          grid-template-rows: auto 1fr;
+          grid-template-areas:
+            "head head"
+            "card actions";
+          column-gap: 0.75rem;
+          align-content: stretch;
+        }
+
+        .head {
+          grid-area: head;
+        }
+
+        .question-block {
+          grid-area: card;
+          align-items: flex-start;
+        }
+
+        .deck {
+          --deck-max-h: min(52dvh, 12rem, calc(100dvh - 5rem));
+          width: min(38vw, 11rem, calc(var(--deck-max-h) * 5 / 7));
+          max-height: var(--deck-max-h);
+          margin: 0;
+        }
+
+        .eyebrow,
+        .hint {
+          display: none;
+        }
+
+        .actions {
+          grid-area: actions;
+          justify-content: center;
+          align-self: center;
+          margin-top: 0;
+        }
+      }
     </style>
   </head>
   <body>
