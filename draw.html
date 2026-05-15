@@ -3,317 +3,456 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>deskwalk · 抽題 demo</title>
+    <title>心靈共感 · deskwalk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --bg: #f5f5f0;
-        --surface: #ffffff;
-        --ink: #1a1a1a;
-        --ink-soft: #5a5a5a;
-        --line: #e5e3da;
-        --l1: #4a8a5e;
-        --l2: #c89a5b;
-        --l3: #a04a6e;
+        /* Tinted neutrals toward violet hue 305 */
+        --bg: oklch(0.16 0.018 305);
+        --bg-deep: oklch(0.11 0.022 305);
+        --surface: oklch(0.21 0.022 305);
+        --ink: oklch(0.94 0.012 80);
+        --ink-soft: oklch(0.68 0.018 305);
+        --ink-faint: oklch(0.45 0.02 305);
+        --line: oklch(0.28 0.022 305);
+        /* Level moods: dusk → ember → midnight */
+        --l1: oklch(0.78 0.09 175);  /* dusk jade */
+        --l2: oklch(0.82 0.13 75);   /* ember amber */
+        --l3: oklch(0.74 0.18 320);  /* midnight violet */
+        --accent: oklch(0.74 0.18 320);
+        --glow: oklch(0.74 0.18 320 / 0.35);
+        --serif: "Cormorant Garamond", "Songti TC", "Noto Serif TC", serif;
+        --sans: "Inter", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
       }
       * { box-sizing: border-box; }
+      html, body { height: 100%; }
       body {
-        font-family: "Helvetica Neue", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+        font-family: var(--sans);
         background: var(--bg);
         color: var(--ink);
         margin: 0;
+        font-size: 16px;
+        font-weight: 300;
+        letter-spacing: 0.01em;
+        overflow-x: hidden;
+        position: relative;
         min-height: 100vh;
+      }
+      /* Ambient vignette — radial warmth from center, deep edges */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 35%,
+          oklch(0.24 0.04 320) 0%,
+          var(--bg) 40%,
+          var(--bg-deep) 100%
+        );
+        z-index: -1;
+        pointer-events: none;
+      }
+      /* Subtle starlit grain — pure CSS, no images */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(1px 1px at 17% 23%, oklch(0.9 0.05 80 / 0.5) 50%, transparent 100%),
+          radial-gradient(1px 1px at 64% 12%, oklch(0.85 0.08 320 / 0.4) 50%, transparent 100%),
+          radial-gradient(1px 1px at 84% 71%, oklch(0.9 0.05 80 / 0.4) 50%, transparent 100%),
+          radial-gradient(1px 1px at 23% 84%, oklch(0.85 0.08 320 / 0.3) 50%, transparent 100%),
+          radial-gradient(1px 1px at 47% 56%, oklch(0.9 0.05 80 / 0.25) 50%, transparent 100%),
+          radial-gradient(1px 1px at 91% 33%, oklch(0.9 0.05 80 / 0.4) 50%, transparent 100%);
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      .stage {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 3rem 1.75rem 6rem;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: 2rem 1.25rem;
+        align-items: stretch;
+        min-height: 100vh;
       }
-      header {
-        text-align: center;
-        margin-bottom: 2rem;
+
+      /* HEADER — counter + progress */
+      .head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 4rem;
+        gap: 2rem;
       }
-      header h1 {
-        font-size: 1.75rem;
-        margin: 0 0 0.25rem;
+      .counter {
+        display: flex;
+        align-items: baseline;
+        gap: 0.65rem;
       }
-      header p {
-        color: var(--ink-soft);
-        margin: 0;
-        font-size: 0.95rem;
+      .counter .num {
+        font-family: var(--serif);
+        font-size: 2.75rem;
+        font-weight: 300;
+        line-height: 1;
+        color: var(--ink);
+        font-variant-numeric: lining-nums tabular-nums;
+        transition: color 0.6s ease;
       }
-      .levels {
+      .counter .num.pop {
+        color: var(--accent);
+      }
+      .counter .num-label {
+        font-size: 0.74rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 400;
+      }
+      .progress {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+      }
+      .level-dots {
         display: flex;
         gap: 0.5rem;
-        margin-bottom: 1.5rem;
       }
-      .level-btn {
-        background: var(--surface);
-        border: 2px solid var(--line);
-        border-radius: 999px;
-        padding: 0.5rem 1.1rem;
+      .dot {
+        font-family: var(--serif);
+        font-style: italic;
         font-size: 0.95rem;
-        cursor: pointer;
-        color: var(--ink-soft);
-        transition: all 0.15s;
-        font-family: inherit;
+        color: var(--ink-faint);
+        width: 1.5rem;
+        height: 1.5rem;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
       }
-      .level-btn:hover { border-color: var(--ink-soft); }
-      .level-btn.active[data-level="1"] { border-color: var(--l1); color: var(--l1); background: #eef5ef; }
-      .level-btn.active[data-level="2"] { border-color: var(--l2); color: var(--l2); background: #faf4ea; }
-      .level-btn.active[data-level="3"] { border-color: var(--l3); color: var(--l3); background: #f5ecf0; }
+      .dot.active {
+        color: var(--bg-deep);
+        background: var(--ink);
+        border-color: var(--ink);
+      }
+      .dot.done {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: transparent;
+      }
+      .phase-label {
+        font-size: 0.74rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .threshold {
+        font-size: 0.78rem;
+        color: var(--ink-faint);
+        margin-top: 0.25rem;
+        font-style: italic;
+        font-family: var(--serif);
+      }
 
-      .card {
-        width: 100%;
-        max-width: 480px;
-        min-height: 280px;
-        background: var(--surface);
-        border-radius: 14px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-        padding: 2rem 1.75rem;
+      /* QUESTION */
+      .question-block {
+        flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
         text-align: center;
-        margin-bottom: 1.5rem;
-        position: relative;
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        gap: 1.5rem;
+        padding: 1rem 0;
+        transition: opacity 0.4s ease;
       }
-      .card.flip { transform: translateY(8px); opacity: 0.3; }
-      .card-badge {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.65rem;
-        border-radius: 999px;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-      }
-      .card[data-level="1"] .card-badge { background: #eef5ef; color: var(--l1); }
-      .card[data-level="2"] .card-badge { background: #faf4ea; color: var(--l2); }
-      .card[data-level="3"] .card-badge { background: #f5ecf0; color: var(--l3); }
-
-      .question {
-        font-size: 1.45rem;
-        line-height: 1.55;
+      .question-block.dim { opacity: 0.25; }
+      .eyebrow {
+        font-size: 0.74rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
         margin: 0;
+      }
+      .question {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: clamp(2rem, 6vw, 2.85rem);
+        line-height: 1.3;
         color: var(--ink);
-        font-weight: 500;
+        margin: 0;
+        max-width: 22ch;
+        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      .count {
-        display: inline-block;
-        padding: 0 0.15rem;
-        font-weight: 700;
-        font-size: 1.7rem;
+      .question .count {
+        font-style: italic;
+        font-weight: 400;
+        color: var(--accent);
+        padding: 0 0.05em;
       }
-      .card[data-level="1"] .count { color: var(--l1); }
-      .card[data-level="2"] .count { color: var(--l2); }
-      .card[data-level="3"] .count { color: var(--l3); }
-      .card[data-level="3"] .question {
-        font-size: 1.75rem;
-        font-weight: 600;
+      .question.flip {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      .hint {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 0.95rem;
+        color: var(--ink-soft);
+        margin: 0;
         letter-spacing: 0.04em;
       }
-      .card[data-level="3"] {
-        background: linear-gradient(180deg, #ffffff 0%, #faf4f7 100%);
+      .placeholder {
+        font-family: var(--serif);
+        font-style: italic;
+        color: var(--ink-faint);
       }
 
-      .hint {
-        color: var(--ink-soft);
-        font-size: 0.85rem;
-        margin-top: 1.25rem;
+      /* ACTIONS */
+      .actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+        margin-top: 2rem;
       }
-      .empty {
-        color: var(--ink-soft);
-        font-style: italic;
+      .verdict {
+        display: none;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
       }
-      .draw-btn {
-        background: var(--ink);
-        color: white;
-        border: none;
-        padding: 0.85rem 2.5rem;
-        font-size: 1.05rem;
+      .verdict.show { display: flex; }
+      .btn {
+        font-family: var(--sans);
+        font-size: 0.95rem;
+        font-weight: 400;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 0.95rem 2rem;
         border-radius: 999px;
         cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         font-family: inherit;
-        transition: transform 0.1s;
-        letter-spacing: 0.05em;
       }
-      .draw-btn:hover { transform: translateY(-1px); }
-      .draw-btn:active { transform: translateY(0); }
-
-      .footer-nav {
-        margin-top: 2.5rem;
-        font-size: 0.85rem;
-        color: var(--ink-soft);
+      .btn-primary {
+        background: var(--ink);
+        color: var(--bg-deep);
+        border: 1px solid var(--ink);
+        box-shadow: 0 0 0 0 var(--glow);
       }
-      .footer-nav a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line); }
-      .footer-nav a:hover { color: var(--ink); }
-
-      .rules {
-        max-width: 480px;
-        margin-top: 2rem;
-        padding: 1.25rem 1.5rem;
-        background: rgba(255,255,255,0.5);
-        border-left: 3px solid var(--line);
-        border-radius: 0 8px 8px 0;
-        font-size: 0.9rem;
-        color: var(--ink-soft);
-        line-height: 1.7;
-      }
-      .rules strong { color: var(--ink); }
-
-      .counter {
-        width: 100%;
-        max-width: 480px;
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1rem;
-      }
-      .counter-total {
-        display: flex;
-        align-items: baseline;
-        gap: 0.5rem;
-      }
-      .counter-total .big {
-        font-size: 2.25rem;
-        font-weight: 700;
-        line-height: 1;
+      .btn-primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
         color: var(--ink);
-        font-variant-numeric: tabular-nums;
+        box-shadow: 0 0 32px -4px var(--glow);
       }
-      .counter-total .label {
-        font-size: 0.85rem;
+      .btn-ghost {
+        background: transparent;
         color: var(--ink-soft);
+        border: 1px solid var(--line);
       }
-      .counter-breakdown {
+      .btn-ghost:hover {
+        color: var(--ink);
+        border-color: var(--ink-soft);
+      }
+
+      /* OVERLAYS */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: oklch(0.11 0.02 305 / 0.92);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .overlay.show { opacity: 1; pointer-events: auto; }
+      .overlay-inner {
+        text-align: center;
+        max-width: 28rem;
+        padding: 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+                    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+      }
+      .overlay.show .overlay-inner { opacity: 1; transform: translateY(0); }
+      .overlay-eyebrow {
+        font-size: 0.78rem;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin: 0 0 1.5rem;
+      }
+      .overlay-title {
+        font-family: var(--serif);
+        font-weight: 300;
+        font-size: 3rem;
+        line-height: 1.2;
+        margin: 0 0 0.5rem;
+        color: var(--ink);
+      }
+      .overlay-title .roman {
+        font-style: italic;
+        color: var(--accent);
+      }
+      .overlay-sub {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 1.1rem;
+        color: var(--ink-soft);
+        margin: 0;
+      }
+
+      /* FINALE */
+      .finale-count {
+        font-family: var(--serif);
+        font-size: 5.5rem;
+        font-weight: 300;
+        color: var(--accent);
+        margin: 1.5rem 0 0.5rem;
+        line-height: 1;
+      }
+      .finale-caption {
+        font-family: var(--serif);
+        font-size: 1.15rem;
+        font-style: italic;
+        color: var(--ink-soft);
+        margin: 0 0 2rem;
+      }
+      .finale-stars {
         display: flex;
         gap: 0.4rem;
-        font-size: 0.78rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 1rem 0 2.5rem;
+        max-width: 22rem;
       }
-      .pill {
-        padding: 0.3rem 0.6rem;
-        border-radius: 999px;
-        font-variant-numeric: tabular-nums;
-        font-weight: 600;
-        background: #f4f4ef;
-        color: var(--ink-soft);
+      .finale-stars svg {
+        width: 1.5rem;
+        height: 1.5rem;
+        filter: drop-shadow(0 0 8px var(--glow));
+        opacity: 0;
+        animation: starFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
-      .pill[data-level="1"] { background: #eef5ef; color: var(--l1); }
-      .pill[data-level="2"] { background: #faf4ea; color: var(--l2); }
-      .pill[data-level="3"] { background: #f5ecf0; color: var(--l3); }
+      @keyframes starFadeIn {
+        from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
+        to   { opacity: 1; transform: scale(1) rotate(0); }
+      }
+
+      /* FOOTER */
+      .footer-info {
+        position: fixed;
+        bottom: 1.25rem;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        pointer-events: none;
+      }
+      .footer-info a {
+        color: inherit;
+        text-decoration: none;
+        pointer-events: auto;
+        border-bottom: 1px solid transparent;
+        padding-bottom: 1px;
+        transition: border-color 0.2s;
+      }
+      .footer-info a:hover { border-color: var(--ink-soft); color: var(--ink-soft); }
       .reset {
         background: none;
         border: none;
-        color: var(--ink-soft);
-        font-size: 0.78rem;
+        color: inherit;
+        font: inherit;
         cursor: pointer;
-        text-decoration: underline;
-        padding: 0;
-        font-family: inherit;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        pointer-events: auto;
+        margin-left: 1.5rem;
       }
-      .reset:hover { color: var(--ink); }
+      .reset:hover { color: var(--ink-soft); }
 
-      .verdict {
-        display: none;
-        gap: 0.6rem;
-        margin-bottom: 1.5rem;
-      }
-      .verdict.show { display: flex; }
-      .verdict button {
-        padding: 0.7rem 1.4rem;
-        font-size: 0.95rem;
-        border-radius: 999px;
-        cursor: pointer;
-        font-family: inherit;
-        border: 2px solid transparent;
-        transition: transform 0.1s;
-      }
-      .verdict button:hover { transform: translateY(-1px); }
-      .verdict .yes {
-        background: var(--ink);
-        color: white;
-      }
-      .verdict .no {
-        background: transparent;
-        border-color: var(--line);
-        color: var(--ink-soft);
-      }
-      .verdict .no:hover { border-color: var(--ink-soft); color: var(--ink); }
-
-      .stars {
-        font-size: 1rem;
-        color: var(--warm, #c89a5b);
-        margin-top: 0.3rem;
-        letter-spacing: 0.15em;
-      }
-
-      @keyframes pop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.25); }
-        100% { transform: scale(1); }
-      }
-      .counter-total .big.pop {
-        animation: pop 0.35s ease;
-        color: var(--warm, #c89a5b);
+      /* Phase tint applied to active question */
+      .stage[data-level="1"] .question .count { color: var(--l1); }
+      .stage[data-level="2"] .question .count { color: var(--l2); }
+      .stage[data-level="3"] .question .count { color: var(--l3); }
+      .stage[data-level="3"] .question {
+        font-style: italic;
+        font-size: clamp(2.2rem, 7vw, 3.25rem);
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>心靈共感</h1>
-      <p>所有人合作 · 達成至少一個共同答案才算過關</p>
-    </header>
+    <div class="stage" id="stage" data-level="1">
 
-    <div class="counter">
-      <div class="counter-total">
-        <span class="big" id="totalCount">0</span>
-        <span class="label">個共感<br><span class="stars" id="stars"></span></span>
+      <header class="head">
+        <div class="counter">
+          <span class="num" id="totalCount">0</span>
+          <span class="num-label">共感</span>
+        </div>
+        <div class="progress">
+          <div class="level-dots">
+            <span class="dot active" data-level="1">I</span>
+            <span class="dot" data-level="2">II</span>
+            <span class="dot" data-level="3">III</span>
+          </div>
+          <span class="threshold" id="thresholdText">再 1 個共感 進入第二階段</span>
+        </div>
+      </header>
+
+      <div class="question-block" id="qBlock">
+        <p class="eyebrow" id="phaseLabel">第一階段 · 暖身</p>
+        <p class="question placeholder" id="question">準備好了嗎</p>
+        <p class="hint" id="hint">按下方開始</p>
       </div>
-      <div class="counter-breakdown">
-        <span class="pill" data-level="1">L1 <span id="c1">0</span></span>
-        <span class="pill" data-level="2">L2 <span id="c2">0</span></span>
-        <span class="pill" data-level="3">L3 <span id="c3">0</span></span>
+
+      <div class="actions">
+        <div class="verdict" id="verdict">
+          <button class="btn btn-primary" onclick="record(true)">共感達成</button>
+          <button class="btn btn-ghost" onclick="record(false)">下一題</button>
+        </div>
+        <button class="btn btn-primary" id="drawBtn" onclick="draw()">抽 題</button>
       </div>
-      <button class="reset" onclick="resetSession()">重新開始</button>
+
     </div>
 
-    <div class="levels">
-      <button class="level-btn active" data-level="1" onclick="setLevel(1)">L1 · 暖身（寫 3）</button>
-      <button class="level-btn" data-level="2" onclick="setLevel(2)">L2 · 升溫（寫 2）</button>
-      <button class="level-btn" data-level="3" onclick="setLevel(3)">L3 · 共感（寫 1）</button>
+    <!-- Transition overlay between levels -->
+    <div class="overlay" id="transition">
+      <div class="overlay-inner">
+        <p class="overlay-eyebrow">你們進入</p>
+        <p class="overlay-title">第<span class="roman" id="transitionRoman">二</span>階段</p>
+        <p class="overlay-sub" id="transitionSub">升溫</p>
+      </div>
     </div>
 
-    <div class="card" id="card" data-level="1">
-      <span class="card-badge" id="badge">LEVEL 1</span>
-      <p class="question empty" id="question">按下抽題開始</p>
-      <p class="hint" id="hint"></p>
+    <!-- Finale overlay -->
+    <div class="overlay" id="finale">
+      <div class="overlay-inner">
+        <p class="overlay-eyebrow">這場儀式完成</p>
+        <p class="finale-count" id="finalCount">0</p>
+        <p class="finale-caption">個共感被你們共同寫下</p>
+        <div class="finale-stars" id="finalStars"></div>
+        <button class="btn btn-ghost" onclick="restart()">再走一次</button>
+      </div>
     </div>
 
-    <div class="verdict" id="verdict">
-      <button class="yes" onclick="record(true)">✓ 共感達成</button>
-      <button class="no" onclick="record(false)">沒中，下一題</button>
-    </div>
-
-    <button class="draw-btn" id="drawBtn" onclick="draw()">抽 題</button>
-
-    <div class="rules">
-      <strong>玩法：</strong>全員合作達成「心靈共感」。每一輪同步寫答案，揭曉時——只要 <strong>至少一個答案是全員都寫了的</strong>，就過關。沒有勝負，只有「我們有沒有在同一頻率上」。
-      <br><br>
-      <strong>三個 Level 是一場儀式：</strong>
-      <br>L1 寫 3 個——暖身，靠共同文化的網大撈一筆。
-      <br>L2 寫 2 個——升溫，靠想像力的偏好對齊。
-      <br>L3 寫 1 個——共感試煉，題目抽象，全員寫一樣才成立。想像所有人最後都畫了一個星星——這是 L3 的目標。
-    </div>
-
-    <p class="footer-nav">
-      <a href="index.html">← 回到 deskwalk 主頁</a>
-    </p>
+    <footer class="footer-info">
+      <a href="index.html">deskwalk</a>
+      <button class="reset" onclick="resetSession()">重置</button>
+    </footer>
 
     <script>
       const BANK = {
@@ -353,7 +492,7 @@
           { q: "寫一個顏色", n: 1, abstract: true },
           { q: "寫一個動物", n: 1, abstract: true },
           { q: "寫一個 1 到 10 的數字", n: 1, abstract: true },
-          { q: "寫一個字代表今晚", n: 1, abstract: true },
+          { q: "寫一個字 代表今晚", n: 1, abstract: true },
           { q: "寫一個季節", n: 1, abstract: true },
           { q: "想一個聲音", n: 1, abstract: true },
           { q: "畫一個你想送給大家的禮物", n: 1, abstract: true },
@@ -367,68 +506,74 @@
         ]
       };
 
+      const THRESHOLDS = { 1: 1, 2: 2, 3: 3 };
+      const ROMAN = { 1: "一", 2: "二", 3: "三" };
+      const PHASE_NAMES = { 1: "暖身", 2: "升溫", 3: "共感" };
+      const STORAGE_KEY = "deskwalk-session";
+
       let currentLevel = 1;
       let lastQuestion = null;
-      let pendingLevel = null;  // level of currently-shown question, waiting for verdict
-      const STORAGE_KEY = 'deskwalk-session';
+      let pendingLevel = null;
+      let session = loadSession();
+      let finished = false;
 
       function loadSession() {
         try {
           const raw = sessionStorage.getItem(STORAGE_KEY);
-          return raw ? JSON.parse(raw) : { 1: 0, 2: 0, 3: 0 };
-        } catch { return { 1: 0, 2: 0, 3: 0 }; }
+          return raw ? JSON.parse(raw) : { 1: 0, 2: 0, 3: 0, level: 1, done: false };
+        } catch {
+          return { 1: 0, 2: 0, 3: 0, level: 1, done: false };
+        }
       }
-      function saveSession(s) { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
-      let session = loadSession();
+      function saveSession() { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session)); }
+
+      function total() { return session[1] + session[2] + session[3]; }
 
       function renderCounter() {
-        const total = session[1] + session[2] + session[3];
-        const totalEl = document.getElementById('totalCount');
-        totalEl.textContent = total;
-        document.getElementById('c1').textContent = session[1];
-        document.getElementById('c2').textContent = session[2];
-        document.getElementById('c3').textContent = session[3];
-        // star ribbon — one ⭐ per L3 共感, max 10
-        const stars = '⭐'.repeat(Math.min(session[3], 10));
-        document.getElementById('stars').textContent = stars;
+        document.getElementById("totalCount").textContent = total();
       }
-      renderCounter();
-
-      function record(achieved) {
-        if (pendingLevel == null) return;
-        if (achieved) {
-          session[pendingLevel] += 1;
-          saveSession(session);
-          const big = document.getElementById('totalCount');
-          renderCounter();
-          big.classList.remove('pop');
-          void big.offsetWidth;  // restart animation
-          big.classList.add('pop');
-          setTimeout(() => big.classList.remove('pop'), 400);
+      function renderDots() {
+        document.querySelectorAll(".dot").forEach(d => {
+          const lv = Number(d.dataset.level);
+          d.classList.toggle("active", lv === currentLevel && !finished);
+          d.classList.toggle("done", session[lv] >= THRESHOLDS[lv]);
+        });
+      }
+      function renderThreshold() {
+        if (finished) { document.getElementById("thresholdText").textContent = "儀式完成"; return; }
+        const need = THRESHOLDS[currentLevel] - session[currentLevel];
+        if (need <= 0) {
+          document.getElementById("thresholdText").textContent = "即將進入下一階段";
+          return;
         }
-        pendingLevel = null;
-        document.getElementById('verdict').classList.remove('show');
-        document.getElementById('drawBtn').style.display = '';
+        const next = currentLevel < 3 ? `第${ROMAN[currentLevel + 1]}階段` : "儀式終局";
+        document.getElementById("thresholdText").textContent = `再 ${need} 個共感 進入${next}`;
       }
-
-      function resetSession() {
-        if (!confirm('清空這場的共感紀錄？')) return;
-        session = { 1: 0, 2: 0, 3: 0 };
-        saveSession(session);
-        renderCounter();
+      function renderPhaseLabel() {
+        document.getElementById("phaseLabel").textContent = `第${ROMAN[currentLevel]}階段 · ${PHASE_NAMES[currentLevel]}`;
+      }
+      function renderAll() {
+        renderCounter(); renderDots(); renderThreshold(); renderPhaseLabel();
+        document.getElementById("stage").dataset.level = currentLevel;
       }
 
       function setLevel(lv) {
         currentLevel = lv;
-        document.querySelectorAll('.level-btn').forEach(b => {
-          b.classList.toggle('active', Number(b.dataset.level) === lv);
-        });
-        const card = document.getElementById('card');
-        card.dataset.level = lv;
-        document.getElementById('badge').textContent = `LEVEL ${lv}`;
+        session.level = lv;
+        saveSession();
+        renderAll();
+        // reset to "ready to draw" state on the new level
+        const qEl = document.getElementById("question");
+        qEl.classList.add("placeholder");
+        qEl.textContent = "準備好了嗎";
+        document.getElementById("hint").textContent = "按下方繼續";
+        document.getElementById("verdict").classList.remove("show");
+        document.getElementById("drawBtn").style.display = "";
+        pendingLevel = null;
       }
 
       function draw() {
+        if (finished) return;
         const bank = BANK[currentLevel];
         let pick;
         do {
@@ -436,30 +581,123 @@
         } while (bank.length > 1 && pick === lastQuestion);
         lastQuestion = pick;
 
-        const card = document.getElementById('card');
-        const qEl = document.getElementById('question');
-        const hintEl = document.getElementById('hint');
-
-        card.classList.add('flip');
+        const qEl = document.getElementById("question");
+        const hintEl = document.getElementById("hint");
+        qEl.classList.add("flip");
         setTimeout(() => {
-          qEl.classList.remove('empty');
+          qEl.classList.remove("placeholder");
           if (pick.abstract) {
             qEl.innerHTML = pick.q;
-            hintEl.textContent = `全員寫一樣才算成立 · 沒有對錯`;
+            hintEl.textContent = "全員寫一樣才算成立";
           } else {
-            qEl.innerHTML = pick.q.replace('#{n}', `<span class="count">${pick.n}</span>`);
-            const goalText = pick.n === 1
-              ? `全員寫一樣才算過關`
+            qEl.innerHTML = pick.q.replace("#{n}", `<span class="count">${pick.n}</span>`);
+            hintEl.textContent = pick.n === 1
+              ? "全員寫一樣才算過關"
               : `寫 ${pick.n} 個 · 至少 1 個全員都寫了的`;
-            hintEl.textContent = goalText;
           }
-          card.classList.remove('flip');
-          // show verdict buttons, hide draw button until verdict given
+          qEl.classList.remove("flip");
           pendingLevel = currentLevel;
-          document.getElementById('verdict').classList.add('show');
-          document.getElementById('drawBtn').style.display = 'none';
-        }, 200);
+          document.getElementById("verdict").classList.add("show");
+          document.getElementById("drawBtn").style.display = "none";
+        }, 280);
       }
+
+      function record(achieved) {
+        if (pendingLevel == null || finished) return;
+        const lv = pendingLevel;
+
+        if (achieved) {
+          session[lv] += 1;
+          saveSession();
+          renderCounter();
+          renderDots();
+          renderThreshold();
+          // celebrate count
+          const num = document.getElementById("totalCount");
+          num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
+          setTimeout(() => num.classList.remove("pop"), 700);
+
+          if (session[lv] >= THRESHOLDS[lv]) {
+            // threshold hit
+            pendingLevel = null;
+            document.getElementById("verdict").classList.remove("show");
+            if (lv < 3) {
+              showTransition(lv + 1);
+            } else {
+              showFinale();
+            }
+            return;
+          }
+        }
+
+        pendingLevel = null;
+        document.getElementById("verdict").classList.remove("show");
+        document.getElementById("drawBtn").style.display = "";
+      }
+
+      function showTransition(nextLevel) {
+        document.getElementById("qBlock").classList.add("dim");
+        document.getElementById("transitionRoman").textContent = ROMAN[nextLevel];
+        document.getElementById("transitionSub").textContent = PHASE_NAMES[nextLevel];
+        const overlay = document.getElementById("transition");
+        overlay.classList.add("show");
+        setTimeout(() => {
+          overlay.classList.remove("show");
+          setTimeout(() => {
+            setLevel(nextLevel);
+            document.getElementById("qBlock").classList.remove("dim");
+          }, 600);
+        }, 2400);
+      }
+
+      function showFinale() {
+        finished = true;
+        session.done = true;
+        saveSession();
+        renderAll();
+        document.getElementById("finalCount").textContent = total();
+        const starsEl = document.getElementById("finalStars");
+        starsEl.innerHTML = "";
+        const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.2 7.5.4-5.8 4.8 2 7.3L12 17.7 5.8 21.7l2-7.3L2 9.6l7.5-.4z" /></svg>';
+        const count = total();
+        for (let i = 0; i < count; i++) {
+          const span = document.createElement("span");
+          span.style.color = "var(--accent)";
+          span.style.animationDelay = (i * 0.08) + "s";
+          span.innerHTML = starSvg;
+          starsEl.appendChild(span.firstChild);
+          starsEl.lastChild.style.animationDelay = (i * 0.08) + "s";
+        }
+        // Simpler: rewrite using innerHTML for direct svg insertion
+        starsEl.innerHTML = "";
+        for (let i = 0; i < count; i++) {
+          const wrap = document.createElement("span");
+          wrap.innerHTML = starSvg;
+          const svg = wrap.firstChild;
+          svg.style.animationDelay = (i * 0.08) + "s";
+          starsEl.appendChild(svg);
+        }
+        document.getElementById("finale").classList.add("show");
+      }
+
+      function restart() {
+        session = { 1: 0, 2: 0, 3: 0, level: 1, done: false };
+        finished = false;
+        saveSession();
+        document.getElementById("finale").classList.remove("show");
+        setLevel(1);
+      }
+
+      function resetSession() {
+        if (!confirm("清空這場的共感紀錄？")) return;
+        restart();
+      }
+
+      // Init from saved state
+      currentLevel = session.level || 1;
+      finished = !!session.done;
+      renderAll();
+      if (finished) showFinale();
     </script>
   </body>
 </html>
