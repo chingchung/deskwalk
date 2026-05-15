@@ -108,6 +108,14 @@
       .card[data-level="1"] .count { color: var(--l1); }
       .card[data-level="2"] .count { color: var(--l2); }
       .card[data-level="3"] .count { color: var(--l3); }
+      .card[data-level="3"] .question {
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      .card[data-level="3"] {
+        background: linear-gradient(180deg, #ffffff 0%, #faf4f7 100%);
+      }
 
       .hint {
         color: var(--ink-soft);
@@ -157,14 +165,14 @@
   </head>
   <body>
     <header>
-      <h1>抽題 demo</h1>
-      <p>Hive Mind 機制 · 同步寫答案，跟其他人越同頻越高分</p>
+      <h1>心靈共感</h1>
+      <p>所有人合作 · 達成至少一個共同答案才算過關</p>
     </header>
 
     <div class="levels">
-      <button class="level-btn active" data-level="1" onclick="setLevel(1)">Level 1 · 文化常識</button>
-      <button class="level-btn" data-level="2" onclick="setLevel(2)">Level 2 · 創意聯想</button>
-      <button class="level-btn" data-level="3" onclick="setLevel(3)">Level 3 · 桌上玩家</button>
+      <button class="level-btn active" data-level="1" onclick="setLevel(1)">L1 · 暖身（寫 3）</button>
+      <button class="level-btn" data-level="2" onclick="setLevel(2)">L2 · 升溫（寫 2）</button>
+      <button class="level-btn" data-level="3" onclick="setLevel(3)">L3 · 共感（寫 1）</button>
     </div>
 
     <div class="card" id="card" data-level="1">
@@ -176,9 +184,12 @@
     <button class="draw-btn" onclick="draw()">抽 題</button>
 
     <div class="rules">
-      <strong>Hive Mind 玩法：</strong>所有人在 30 秒內同步寫下答案。揭曉時，跟你寫一樣的人越多，分數越高。每答案 +1（每多一人跟你同），冷門答案 0 分。
+      <strong>玩法：</strong>全員合作達成「心靈共感」。每一輪同步寫答案，揭曉時——只要 <strong>至少一個答案是全員都寫了的</strong>，就過關。沒有勝負，只有「我們有沒有在同一頻率上」。
       <br><br>
-      <strong>三個 Level：</strong>難度從外部知識 → 創意聯想 → 對玩家的觀察，越往下越曖昧、越能引發對話。
+      <strong>三個 Level 是一場儀式：</strong>
+      <br>L1 寫 3 個——暖身，靠共同文化的網大撈一筆。
+      <br>L2 寫 2 個——升溫，靠想像力的偏好對齊。
+      <br>L3 寫 1 個——共感試煉，題目抽象，全員寫一樣才成立。想像所有人最後都畫了一個星星——這是 L3 的目標。
     </div>
 
     <p class="footer-nav">
@@ -189,45 +200,51 @@
       const BANK = {
         1: [
           { q: "寫出 #{n} 首代表香港的歌", n: 3 },
-          { q: "寫出 #{n} 部小時候必看的卡通", n: 2 },
-          { q: "寫出 #{n} 間最有香港味的茶餐廳食物", n: 3 },
+          { q: "寫出 #{n} 部小時候必看的卡通", n: 3 },
+          { q: "寫出 #{n} 樣最有香港味的茶餐廳食物", n: 3 },
           { q: "寫出 #{n} 個一定要帶外國朋友去的香港地點", n: 3 },
-          { q: "寫出 #{n} 部最代表香港的電影", n: 2 },
+          { q: "寫出 #{n} 部最代表香港的電影", n: 3 },
           { q: "寫出 #{n} 個你覺得最香港的食物", n: 3 },
-          { q: "寫出 #{n} 個讓你哭過的廣告", n: 2 },
+          { q: "寫出 #{n} 個讓你哭過的廣告", n: 3 },
           { q: "寫出 #{n} 個香港人最常用的口頭禪", n: 3 },
-          { q: "寫出 #{n} 首婚禮必播的歌", n: 2 },
+          { q: "寫出 #{n} 首婚禮必播的歌", n: 3 },
           { q: "寫出 #{n} 個夜深會去吃的宵夜", n: 3 },
+          { q: "寫出 #{n} 個冬天必喝的飲料", n: 3 },
+          { q: "寫出 #{n} 個小時候放學會去的地方", n: 3 },
         ],
         2: [
           { q: "寫出 #{n} 個適合做名字的水果", n: 2 },
-          { q: "寫出 #{n} 個聽起來很貴但其實便宜的東西", n: 3 },
+          { q: "寫出 #{n} 個聽起來很貴但其實便宜的東西", n: 2 },
           { q: "寫出 #{n} 個適合當寵物名字的食物", n: 2 },
           { q: "寫出 #{n} 個最浪漫的家具", n: 2 },
           { q: "寫出 #{n} 個最像天氣的情緒", n: 2 },
-          { q: "寫出 #{n} 個最適合做暗號的詞", n: 3 },
+          { q: "寫出 #{n} 個最適合做暗號的詞", n: 2 },
           { q: "寫出 #{n} 個最像愛情的飲料", n: 2 },
           { q: "寫出 #{n} 個最不該出現在喪禮的歌", n: 2 },
           { q: "寫出 #{n} 個最像星期一的食物", n: 2 },
-          { q: "寫出 #{n} 個如果是顏色會是紫色的職業", n: 2 },
           { q: "寫出 #{n} 種你願意當的動物", n: 2 },
           { q: "寫出 #{n} 個最像「孤獨」的物件", n: 2 },
+          { q: "寫出 #{n} 個最可能在桌上玩家裡爆紅的人", n: 2 },
+          { q: "寫出 #{n} 個最像貓的桌上玩家", n: 2 },
+          { q: "寫出 #{n} 個會在半夜傳訊息給你的玩家", n: 2 },
+          { q: "寫出 #{n} 個最像深夜便利店的城市", n: 2 },
         ],
         3: [
-          { q: "寫出 #{n} 個最可能參加全民造星的玩家", n: 2 },
-          { q: "寫出 #{n} 個最會煮飯的玩家", n: 2 },
-          { q: "寫出 #{n} 個最像貓的玩家", n: 2 },
-          { q: "寫出 #{n} 個最會說故事的玩家", n: 2 },
-          { q: "寫出 #{n} 個半夜會打給你的玩家", n: 2 },
-          { q: "寫出 #{n} 個能跟你環島旅行的玩家", n: 2 },
-          { q: "寫出 #{n} 個最像 ChatGPT 的玩家", n: 1 },
-          { q: "寫出 #{n} 個最不適合當老師的玩家", n: 1 },
-          { q: "寫出 #{n} 個最會在感情裡先道歉的玩家", n: 1 },
-          { q: "寫出 #{n} 個最可能突然失蹤一週的玩家", n: 1 },
-          { q: "寫出 #{n} 個 10 年後最可能變有錢的玩家", n: 2 },
-          { q: "寫出 #{n} 個最會在 KTV 點冷門歌的玩家", n: 2 },
-          { q: "寫出 #{n} 個你想跟他一起出櫃的玩家（任何意義的櫃）", n: 1 },
-          { q: "寫出 #{n} 個最像 90 年代偶像的玩家", n: 1 },
+          { q: "畫一個圖形", n: 1, abstract: true },
+          { q: "寫一個顏色", n: 1, abstract: true },
+          { q: "寫一個動物", n: 1, abstract: true },
+          { q: "寫一個 1 到 10 的數字", n: 1, abstract: true },
+          { q: "寫一個字代表今晚", n: 1, abstract: true },
+          { q: "寫一個季節", n: 1, abstract: true },
+          { q: "想一個聲音", n: 1, abstract: true },
+          { q: "畫一個你想送給大家的禮物", n: 1, abstract: true },
+          { q: "寫一個讓人想哭的詞", n: 1, abstract: true },
+          { q: "寫一個能形容這群人的字", n: 1, abstract: true },
+          { q: "畫一個你心裡的「家」", n: 1, abstract: true },
+          { q: "寫一個天氣", n: 1, abstract: true },
+          { q: "想一個味道", n: 1, abstract: true },
+          { q: "寫一個動作", n: 1, abstract: true },
+          { q: "畫一個讓世界停下來的瞬間", n: 1, abstract: true },
         ]
       };
 
@@ -259,8 +276,16 @@
         card.classList.add('flip');
         setTimeout(() => {
           qEl.classList.remove('empty');
-          qEl.innerHTML = pick.q.replace('#{n}', `<span class="count">${pick.n}</span>`);
-          hintEl.textContent = `同步寫 ${pick.n} 個答案 · 跟別人重複越多越高分`;
+          if (pick.abstract) {
+            qEl.innerHTML = pick.q;
+            hintEl.textContent = `全員寫一樣才算成立 · 沒有對錯`;
+          } else {
+            qEl.innerHTML = pick.q.replace('#{n}', `<span class="count">${pick.n}</span>`);
+            const goalText = pick.n === 1
+              ? `全員寫一樣才算過關`
+              : `寫 ${pick.n} 個 · 至少 1 個全員都寫了的`;
+            hintEl.textContent = goalText;
+          }
           card.classList.remove('flip');
         }, 200);
       }
