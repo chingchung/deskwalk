@@ -116,74 +116,64 @@
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        gap: 0.5rem;
+        gap: 0.7rem;
       }
-      .level-dots {
+      .journey {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.85rem;
+        align-items: center;
+      }
+      .leg {
+        display: flex;
+        gap: 0.45rem;
+      }
+      .leg + .leg::before {
+        content: "";
+        align-self: center;
+        width: 0.5rem;
+        height: 1px;
+        background: var(--line);
+        margin-right: 0.3rem;
+        margin-left: -0.3rem;
       }
       .dot {
-        font-family: var(--serif);
-        font-style: italic;
-        font-size: 0.95rem;
-        color: var(--ink-faint);
-        width: 1.5rem;
-        height: 1.5rem;
-        display: grid;
-        place-items: center;
-        border: 1px solid var(--line);
+        width: 0.7rem;
+        height: 0.7rem;
         border-radius: 999px;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        cursor: default;
-      }
-      .dot.active {
-        color: var(--bg-deep);
-        background: var(--ink);
-        border-color: var(--ink);
-      }
-      .dot.done {
-        color: var(--accent);
-        border-color: var(--accent);
+        border: 1.5px solid var(--line);
         background: transparent;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      .phase-label {
-        font-size: 0.74rem;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-        color: var(--ink-faint);
+      .leg[data-level="1"] { --leg-color: var(--l1); --leg-glow: oklch(0.78 0.09 175 / 0.45); }
+      .leg[data-level="2"] { --leg-color: var(--l2); --leg-glow: oklch(0.82 0.13 75 / 0.45); }
+      .leg[data-level="3"] { --leg-color: var(--l3); --leg-glow: var(--glow); }
+      .dot.win {
+        background: var(--leg-color);
+        border-color: var(--leg-color);
+        box-shadow: 0 0 10px var(--leg-glow);
+      }
+      .dot.fail {
+        background: oklch(0.35 0.06 25);
+        border-color: oklch(0.5 0.1 25);
+        box-shadow: none;
+      }
+      .dot.current {
+        border-color: var(--leg-color);
+        animation: dotPulse 1.6s ease-in-out infinite;
+      }
+      @keyframes dotPulse {
+        0%, 100% { box-shadow: 0 0 0 0 var(--leg-glow); transform: scale(1); }
+        50%      { box-shadow: 0 0 0 5px transparent; transform: scale(1.15); }
       }
       .threshold {
         font-size: 0.78rem;
         color: var(--ink-faint);
-        margin-top: 0.25rem;
         font-style: italic;
         font-family: var(--serif);
         text-align: right;
-        max-width: 14rem;
-      }
-      .strikes {
-        display: flex;
-        gap: 0.3rem;
-        margin-top: 0.4rem;
-        align-self: flex-end;
-      }
-      .strikes .strike {
-        width: 0.4rem;
-        height: 0.4rem;
-        border-radius: 999px;
-        background: var(--line);
-        transition: background 0.4s ease;
-      }
-      .strikes .strike.lit {
-        background: var(--accent);
-        box-shadow: 0 0 6px var(--glow);
-      }
-      .strikes.warn .strike.lit {
-        background: oklch(0.74 0.2 25);
-        box-shadow: 0 0 8px oklch(0.74 0.2 25 / 0.45);
       }
 
-      /* QUESTION */
+      /* QUESTION — speech bubble */
       .question-block {
         flex: 1;
         display: flex;
@@ -192,7 +182,7 @@
         align-items: center;
         text-align: center;
         gap: 1.5rem;
-        padding: 1rem 0;
+        padding: 1rem 0 2rem;
         transition: opacity 0.4s ease;
       }
       .question-block.dim { opacity: 0.25; }
@@ -203,16 +193,51 @@
         color: var(--ink-faint);
         margin: 0;
       }
+      .bubble {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 32px;
+        padding: 2.75rem 2.25rem;
+        max-width: 26rem;
+        width: 100%;
+        box-shadow: 0 30px 60px -25px oklch(0 0 0 / 0.6),
+                    inset 0 1px 0 oklch(1 0 0 / 0.04);
+        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* tail: stacked triangles for fill + border */
+      .bubble::before, .bubble::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translateX(-50%);
+      }
+      .bubble::before {
+        bottom: -18px;
+        border-left: 18px solid transparent;
+        border-right: 18px solid transparent;
+        border-top: 18px solid var(--line);
+      }
+      .bubble::after {
+        bottom: -15px;
+        border-left: 16px solid transparent;
+        border-right: 16px solid transparent;
+        border-top: 16px solid var(--surface);
+      }
+      .bubble.flip { opacity: 0; transform: translateY(14px) scale(0.98); }
       .question {
         font-family: var(--serif);
         font-weight: 300;
-        font-size: clamp(2rem, 6vw, 2.85rem);
-        line-height: 1.3;
+        font-size: clamp(1.8rem, 5.5vw, 2.5rem);
+        line-height: 1.35;
         color: var(--ink);
         margin: 0;
         max-width: 22ch;
-        transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-left: auto;
+        margin-right: auto;
       }
       .question .count {
         font-style: italic;
@@ -220,16 +245,12 @@
         color: var(--accent);
         padding: 0 0.05em;
       }
-      .question.flip {
-        opacity: 0;
-        transform: translateY(12px);
-      }
       .hint {
         font-family: var(--serif);
         font-style: italic;
         font-size: 0.95rem;
         color: var(--ink-soft);
-        margin: 0;
+        margin: 0.5rem 0 0;
         letter-spacing: 0.04em;
       }
       .placeholder {
@@ -237,6 +258,14 @@
         font-style: italic;
         color: var(--ink-faint);
       }
+      /* Phase-tinted bubble border on L3 (climax) */
+      .stage[data-level="3"] .bubble {
+        border-color: oklch(0.36 0.08 320);
+        box-shadow: 0 30px 60px -25px oklch(0 0 0 / 0.6),
+                    0 0 32px -8px var(--glow),
+                    inset 0 1px 0 oklch(1 0 0 / 0.04);
+      }
+      .stage[data-level="3"] .bubble::before { border-top-color: oklch(0.36 0.08 320); }
 
       /* ACTIONS */
       .actions {
@@ -436,19 +465,26 @@
           <span class="num-label">共感</span>
         </div>
         <div class="progress">
-          <div class="level-dots">
-            <span class="dot active" data-level="1">I</span>
-            <span class="dot" data-level="2">II</span>
-            <span class="dot" data-level="3">III</span>
+          <div class="journey" id="journey">
+            <div class="leg" data-level="1">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <div class="leg" data-level="2">
+              <span class="dot"></span><span class="dot"></span>
+            </div>
+            <div class="leg" data-level="3">
+              <span class="dot"></span>
+            </div>
           </div>
-          <span class="threshold" id="thresholdText">第 1 / 3 題</span>
-          <span class="strikes" id="strikes" aria-hidden="true"></span>
+          <span class="threshold" id="thresholdText">第一階段 · 第 1 / 3 題</span>
         </div>
       </header>
 
       <div class="question-block" id="qBlock">
         <p class="eyebrow" id="phaseLabel">第一階段 · 暖身</p>
-        <p class="question placeholder" id="question">準備好了嗎</p>
+        <div class="bubble" id="bubble">
+          <p class="question placeholder" id="question">準備好了嗎</p>
+        </div>
         <p class="hint" id="hint">按下方開始</p>
       </div>
 
@@ -542,10 +578,16 @@
       const ROUNDS = { 1: 3, 2: 2, 3: 1 };  // 每階段題數
       const ROMAN = { 1: "一", 2: "二", 3: "三" };
       const PHASE_NAMES = { 1: "暖身", 2: "升溫", 3: "共感" };
-      const STORAGE_KEY = "deskwalk-session-v2";
+      const STORAGE_KEY = "deskwalk-session-v3";
 
       function freshSession() {
-        return { total: 0, level: 1, round: 0, fails: 0, done: false };
+        return {
+          total: 0,
+          level: 1,
+          fails: 0,
+          progress: { 1: [], 2: [], 3: [] },  // arrays of 'win' | 'fail'
+          done: false
+        };
       }
       function loadSession() {
         try {
@@ -565,42 +607,38 @@
         document.getElementById("totalCount").textContent = session.total;
       }
       function renderDots() {
-        document.querySelectorAll(".dot").forEach(d => {
-          const lv = Number(d.dataset.level);
-          d.classList.toggle("active", lv === session.level && !session.done);
-          d.classList.toggle("done", session.done && lv <= 3);
+        [1, 2, 3].forEach(lv => {
+          const leg = document.querySelector(`.leg[data-level="${lv}"]`);
+          const dots = leg.querySelectorAll(".dot");
+          const prog = session.progress[lv];
+          dots.forEach((d, i) => {
+            d.classList.remove("win", "fail", "current");
+            if (i < prog.length) {
+              d.classList.add(prog[i]);  // 'win' or 'fail'
+            } else if (lv === session.level && i === prog.length && !session.done) {
+              d.classList.add("current");
+            }
+          });
         });
       }
       function renderThreshold() {
         const tEl = document.getElementById("thresholdText");
         if (session.done) { tEl.textContent = "儀式完成"; return; }
-        const total = ROUNDS[session.level];
-        const current = Math.min(session.round + 1, total);
-        if (session.level === 3) {
+        const lv = session.level;
+        const totalRounds = ROUNDS[lv];
+        const current = Math.min(session.progress[lv].length + 1, totalRounds);
+        if (lv === 3) {
           tEl.textContent = "終局 · 一題定共感";
         } else {
-          tEl.textContent = `第 ${current} / ${total} 題`;
+          tEl.textContent = `第${ROMAN[lv]}階段 · 第 ${current} / ${totalRounds} 題`;
         }
-      }
-      function renderStrikes() {
-        const el = document.getElementById("strikes");
-        el.innerHTML = "";
-        // strikes only meaningful at L2 (2 fails = demote)
-        if (session.level !== 2 || session.done) return;
-        for (let i = 0; i < 2; i++) {
-          const dot = document.createElement("span");
-          dot.className = "strike" + (i < session.fails ? " lit" : "");
-          el.appendChild(dot);
-        }
-        el.classList.toggle("warn", session.fails >= 1);
       }
       function renderPhaseLabel() {
         document.getElementById("phaseLabel").textContent =
           `第${ROMAN[session.level]}階段 · ${PHASE_NAMES[session.level]}`;
       }
       function renderAll() {
-        renderCounter(); renderDots(); renderThreshold();
-        renderStrikes(); renderPhaseLabel();
+        renderCounter(); renderDots(); renderThreshold(); renderPhaseLabel();
         document.getElementById("stage").dataset.level = session.level;
       }
 
@@ -625,8 +663,9 @@
         lastQuestion = pick;
 
         const qEl = document.getElementById("question");
+        const bubble = document.getElementById("bubble");
         const hintEl = document.getElementById("hint");
-        qEl.classList.add("flip");
+        bubble.classList.add("flip");
         setTimeout(() => {
           qEl.classList.remove("placeholder");
           if (pick.abstract) {
@@ -638,7 +677,7 @@
               ? "全員寫一樣才算成立"
               : `寫 ${pick.n} 個 · 至少 1 個全員都寫了的`;
           }
-          qEl.classList.remove("flip");
+          bubble.classList.remove("flip");
           pendingLevel = session.level;
           document.getElementById("verdict").classList.add("show");
           document.getElementById("drawBtn").style.display = "none";
@@ -652,38 +691,35 @@
         pendingLevel = null;
         document.getElementById("verdict").classList.remove("show");
 
+        // Append outcome to this level's progress
+        session.progress[lv].push(achieved ? "win" : "fail");
         if (achieved) {
           session.total += 1;
           pulseCount();
         } else {
           session.fails += 1;
         }
-        session.round += 1;
         saveSession();
         renderCounter();
-        renderStrikes();
+        renderDots();
 
         // --- Demotion checks ---
-        // L3: any fail demotes immediately
+        // L3: any fail demotes immediately to L2
         if (lv === 3 && !achieved) {
-          saveSession();
           showDemotion(2);
           return;
         }
-        // L2: 2 fails in this attempt demotes
+        // L2: 2 fails in current L2 attempt → demote to L1
         if (lv === 2 && session.fails >= 2) {
-          saveSession();
           showDemotion(1);
           return;
         }
 
         // --- Round / level completion ---
-        if (session.round >= ROUNDS[lv]) {
-          // finished all rounds of this level → advance
+        if (session.progress[lv].length >= ROUNDS[lv]) {
           if (lv < 3) {
             showTransition(lv + 1);
           } else {
-            // L3 + achieved → finale
             showFinale();
           }
           return;
@@ -691,6 +727,7 @@
 
         // continue current level, next round
         renderThreshold();
+        renderDots();
         document.getElementById("drawBtn").style.display = "";
       }
 
@@ -713,9 +750,8 @@
         setTimeout(() => {
           overlay.classList.remove("show");
           setTimeout(() => {
-            // advance session
+            // advance to next level — preserve current level's progress arrays
             session.level = nextLevel;
-            session.round = 0;
             session.fails = 0;
             saveSession();
             renderAll();
@@ -741,8 +777,11 @@
           setTimeout(() => {
             overlay.classList.remove("demotion");
             session.level = toLevel;
-            session.round = 0;
             session.fails = 0;
+            // Reset progress arrays for every level from toLevel onwards
+            for (let lv = toLevel; lv <= 3; lv++) {
+              session.progress[lv] = [];
+            }
             saveSession();
             renderAll();
             resetQuestionToReady();
