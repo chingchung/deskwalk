@@ -104,6 +104,11 @@
       }
       .counter .num.pop {
         color: var(--accent);
+        transform: scale(1.08);
+      }
+      .counter .num.drop {
+        color: oklch(0.65 0.14 25);
+        transform: translateY(2px) scale(0.96);
       }
       .counter .num-label {
         font-size: 0.74rem;
@@ -467,13 +472,13 @@
         <div class="progress">
           <div class="journey" id="journey">
             <div class="leg" data-level="1">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="dot"></span>
             </div>
             <div class="leg" data-level="2">
               <span class="dot"></span><span class="dot"></span>
             </div>
             <div class="leg" data-level="3">
-              <span class="dot"></span>
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
           </div>
           <span class="threshold" id="thresholdText">第一階段 · 第 1 / 3 題</span>
@@ -490,10 +495,10 @@
 
       <div class="actions">
         <div class="verdict" id="verdict">
-          <button class="btn btn-primary" onclick="record(true)">共感達成</button>
-          <button class="btn btn-ghost" onclick="record(false)">下一題</button>
+          <button class="btn btn-primary" onclick="record(true)">共感</button>
+          <button class="btn btn-ghost" onclick="record(false)">未中</button>
         </div>
-        <button class="btn btn-primary" id="drawBtn" onclick="draw()">抽 題</button>
+        <button class="btn btn-primary" id="drawBtn" onclick="draw()">開始儀式</button>
       </div>
 
     </div>
@@ -575,19 +580,21 @@
         ]
       };
 
-      const ROUNDS = { 1: 3, 2: 2, 3: 1 };  // 每階段題數
+      const THRESHOLDS = { 1: 1, 2: 2, 3: 3 };  // 每階段需要的淨共感數
       const ROMAN = { 1: "一", 2: "二", 3: "三" };
       const PHASE_NAMES = { 1: "暖身", 2: "升溫", 3: "共感" };
-      const STORAGE_KEY = "deskwalk-session-v3";
+      const STORAGE_KEY = "deskwalk-session-v4";
 
       function freshSession() {
         return {
-          total: 0,
           level: 1,
-          fails: 0,
-          progress: { 1: [], 2: [], 3: [] },  // arrays of 'win' | 'fail'
-          done: false
+          net: { 1: 0, 2: 0, 3: 0 },  // net 共感 per level (wins - fails, floored)
+          done: false,
+          started: false
         };
+      }
+      function totalNet() {
+        return session.net[1] + session.net[2] + session.net[3];
       }
       function loadSession() {
         try {
@@ -604,18 +611,18 @@
 
       // --- Render -------------------------------------------------------
       function renderCounter() {
-        document.getElementById("totalCount").textContent = session.total;
+        document.getElementById("totalCount").textContent = totalNet();
       }
       function renderDots() {
         [1, 2, 3].forEach(lv => {
           const leg = document.querySelector(`.leg[data-level="${lv}"]`);
           const dots = leg.querySelectorAll(".dot");
-          const prog = session.progress[lv];
+          const filled = session.net[lv];
           dots.forEach((d, i) => {
-            d.classList.remove("win", "fail", "current");
-            if (i < prog.length) {
-              d.classList.add(prog[i]);  // 'win' or 'fail'
-            } else if (lv === session.level && i === prog.length && !session.done) {
+            d.classList.remove("win", "current");
+            if (i < filled) {
+              d.classList.add("win");
+            } else if (lv === session.level && i === filled && !session.done) {
               d.classList.add("current");
             }
           });
@@ -625,12 +632,14 @@
         const tEl = document.getElementById("thresholdText");
         if (session.done) { tEl.textContent = "儀式完成"; return; }
         const lv = session.level;
-        const totalRounds = ROUNDS[lv];
-        const current = Math.min(session.progress[lv].length + 1, totalRounds);
-        if (lv === 3) {
-          tEl.textContent = "終局 · 一題定共感";
+        const need = THRESHOLDS[lv] - session.net[lv];
+        const nextPhase = lv < 3 ? `第${ROMAN[lv + 1]}階段` : "儀式終局";
+        if (need <= 0) {
+          tEl.textContent = "即將進入下一階段";
+        } else if (lv === 3) {
+          tEl.textContent = `再 ${need} 個共感 完成儀式`;
         } else {
-          tEl.textContent = `第${ROMAN[lv]}階段 · 第 ${current} / ${totalRounds} 題`;
+          tEl.textContent = `再 ${need} 個共感 進入${nextPhase}`;
         }
       }
       function renderPhaseLabel() {
@@ -643,11 +652,13 @@
       }
 
       // --- Draw ---------------------------------------------------------
-      function resetQuestionToReady() {
+      function showReadyState() {
         const qEl = document.getElementById("question");
+        const bubble = document.getElementById("bubble");
         qEl.classList.add("placeholder");
         qEl.textContent = "準備好了嗎";
-        document.getElementById("hint").textContent = "按下方繼續";
+        document.getElementById("hint").textContent = "全員圍坐，按下方開始";
+        bubble.classList.remove("flip");
         document.getElementById("verdict").classList.remove("show");
         document.getElementById("drawBtn").style.display = "";
         pendingLevel = null;
@@ -655,6 +666,9 @@
 
       function draw() {
         if (busy || session.done) return;
+        session.started = true;
+        saveSession();
+
         const bank = BANK[session.level];
         let pick;
         do {
@@ -665,6 +679,8 @@
         const qEl = document.getElementById("question");
         const bubble = document.getElementById("bubble");
         const hintEl = document.getElementById("hint");
+        document.getElementById("drawBtn").style.display = "none";
+        document.getElementById("verdict").classList.remove("show");
         bubble.classList.add("flip");
         setTimeout(() => {
           qEl.classList.remove("placeholder");
@@ -680,7 +696,6 @@
           bubble.classList.remove("flip");
           pendingLevel = session.level;
           document.getElementById("verdict").classList.add("show");
-          document.getElementById("drawBtn").style.display = "none";
         }, 280);
       }
 
@@ -691,32 +706,23 @@
         pendingLevel = null;
         document.getElementById("verdict").classList.remove("show");
 
-        // Append outcome to this level's progress
-        session.progress[lv].push(achieved ? "win" : "fail");
         if (achieved) {
-          session.total += 1;
-          pulseCount();
+          session.net[lv] = Math.min(THRESHOLDS[lv], session.net[lv] + 1);
+          pulseCount("win");
         } else {
-          session.fails += 1;
+          if (session.net[lv] > 0) {
+            session.net[lv] -= 1;
+            pulseCount("loss");
+          }
+          // if already at 0, fail is absorbed silently
         }
         saveSession();
         renderCounter();
         renderDots();
+        renderThreshold();
 
-        // --- Demotion checks ---
-        // L3: any fail demotes immediately to L2
-        if (lv === 3 && !achieved) {
-          showDemotion(2);
-          return;
-        }
-        // L2: 2 fails in current L2 attempt → demote to L1
-        if (lv === 2 && session.fails >= 2) {
-          showDemotion(1);
-          return;
-        }
-
-        // --- Round / level completion ---
-        if (session.progress[lv].length >= ROUNDS[lv]) {
+        // Threshold check: advance to next level or finale
+        if (session.net[lv] >= THRESHOLDS[lv]) {
           if (lv < 3) {
             showTransition(lv + 1);
           } else {
@@ -725,16 +731,16 @@
           return;
         }
 
-        // continue current level, next round
-        renderThreshold();
-        renderDots();
-        document.getElementById("drawBtn").style.display = "";
+        // Auto-flow: next question after a brief beat for feedback
+        setTimeout(() => { if (!busy && !session.done) draw(); }, 750);
       }
 
-      function pulseCount() {
+      function pulseCount(kind) {
         const num = document.getElementById("totalCount");
-        num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
-        setTimeout(() => num.classList.remove("pop"), 700);
+        num.classList.remove("pop", "drop");
+        void num.offsetWidth;
+        num.classList.add(kind === "loss" ? "drop" : "pop");
+        setTimeout(() => num.classList.remove("pop", "drop"), 700);
       }
 
       // --- Transitions --------------------------------------------------
@@ -745,50 +751,19 @@
         document.getElementById("transitionRoman").textContent = ROMAN[nextLevel];
         document.getElementById("transitionSub").textContent = PHASE_NAMES[nextLevel];
         const overlay = document.getElementById("transition");
-        overlay.classList.remove("demotion");
         overlay.classList.add("show");
         setTimeout(() => {
           overlay.classList.remove("show");
           setTimeout(() => {
-            // advance to next level — preserve current level's progress arrays
             session.level = nextLevel;
-            session.fails = 0;
             saveSession();
             renderAll();
-            resetQuestionToReady();
             document.getElementById("qBlock").classList.remove("dim");
             busy = false;
+            // auto-draw first question of new level
+            draw();
           }, 600);
         }, 2400);
-      }
-
-      function showDemotion(toLevel) {
-        busy = true;
-        document.getElementById("qBlock").classList.add("dim");
-        const eyebrow = toLevel === 2 ? "緣分散了" : "心未聚";
-        const sub = toLevel === 2 ? "退回第二階段 重來" : "退回第一階段 重來";
-        document.getElementById("transitionEyebrow").textContent = eyebrow;
-        document.getElementById("transitionRoman").textContent = ROMAN[toLevel];
-        document.getElementById("transitionSub").textContent = sub;
-        const overlay = document.getElementById("transition");
-        overlay.classList.add("demotion", "show");
-        setTimeout(() => {
-          overlay.classList.remove("show");
-          setTimeout(() => {
-            overlay.classList.remove("demotion");
-            session.level = toLevel;
-            session.fails = 0;
-            // Reset progress arrays for every level from toLevel onwards
-            for (let lv = toLevel; lv <= 3; lv++) {
-              session.progress[lv] = [];
-            }
-            saveSession();
-            renderAll();
-            resetQuestionToReady();
-            document.getElementById("qBlock").classList.remove("dim");
-            busy = false;
-          }, 600);
-        }, 2800);
       }
 
       // --- Finale -------------------------------------------------------
@@ -796,11 +771,12 @@
         session.done = true;
         saveSession();
         renderAll();
-        document.getElementById("finalCount").textContent = session.total;
+        const t = totalNet();
+        document.getElementById("finalCount").textContent = t;
         const starsEl = document.getElementById("finalStars");
         starsEl.innerHTML = "";
         const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.2 7.5.4-5.8 4.8 2 7.3L12 17.7 5.8 21.7l2-7.3L2 9.6l7.5-.4z" /></svg>';
-        for (let i = 0; i < session.total; i++) {
+        for (let i = 0; i < t; i++) {
           const wrap = document.createElement("span");
           wrap.innerHTML = starSvg;
           const svg = wrap.firstChild;
@@ -815,7 +791,7 @@
         saveSession();
         document.getElementById("finale").classList.remove("show");
         renderAll();
-        resetQuestionToReady();
+        showReadyState();
       }
 
       function resetSession() {
@@ -825,7 +801,14 @@
 
       // --- Init ---------------------------------------------------------
       renderAll();
-      if (session.done) showFinale();
+      if (session.done) {
+        showFinale();
+      } else if (!session.started) {
+        showReadyState();
+      } else {
+        // Mid-session: auto-resume by drawing a new question
+        draw();
+      }
     </script>
   </body>
 </html>
