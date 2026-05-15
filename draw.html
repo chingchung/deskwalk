@@ -161,6 +161,107 @@
         line-height: 1.7;
       }
       .rules strong { color: var(--ink); }
+
+      .counter {
+        width: 100%;
+        max-width: 480px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .counter-total {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+      }
+      .counter-total .big {
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+      .counter-total .label {
+        font-size: 0.85rem;
+        color: var(--ink-soft);
+      }
+      .counter-breakdown {
+        display: flex;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+      }
+      .pill {
+        padding: 0.3rem 0.6rem;
+        border-radius: 999px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        background: #f4f4ef;
+        color: var(--ink-soft);
+      }
+      .pill[data-level="1"] { background: #eef5ef; color: var(--l1); }
+      .pill[data-level="2"] { background: #faf4ea; color: var(--l2); }
+      .pill[data-level="3"] { background: #f5ecf0; color: var(--l3); }
+      .reset {
+        background: none;
+        border: none;
+        color: var(--ink-soft);
+        font-size: 0.78rem;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        font-family: inherit;
+      }
+      .reset:hover { color: var(--ink); }
+
+      .verdict {
+        display: none;
+        gap: 0.6rem;
+        margin-bottom: 1.5rem;
+      }
+      .verdict.show { display: flex; }
+      .verdict button {
+        padding: 0.7rem 1.4rem;
+        font-size: 0.95rem;
+        border-radius: 999px;
+        cursor: pointer;
+        font-family: inherit;
+        border: 2px solid transparent;
+        transition: transform 0.1s;
+      }
+      .verdict button:hover { transform: translateY(-1px); }
+      .verdict .yes {
+        background: var(--ink);
+        color: white;
+      }
+      .verdict .no {
+        background: transparent;
+        border-color: var(--line);
+        color: var(--ink-soft);
+      }
+      .verdict .no:hover { border-color: var(--ink-soft); color: var(--ink); }
+
+      .stars {
+        font-size: 1rem;
+        color: var(--warm, #c89a5b);
+        margin-top: 0.3rem;
+        letter-spacing: 0.15em;
+      }
+
+      @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+      }
+      .counter-total .big.pop {
+        animation: pop 0.35s ease;
+        color: var(--warm, #c89a5b);
+      }
     </style>
   </head>
   <body>
@@ -168,6 +269,19 @@
       <h1>心靈共感</h1>
       <p>所有人合作 · 達成至少一個共同答案才算過關</p>
     </header>
+
+    <div class="counter">
+      <div class="counter-total">
+        <span class="big" id="totalCount">0</span>
+        <span class="label">個共感<br><span class="stars" id="stars"></span></span>
+      </div>
+      <div class="counter-breakdown">
+        <span class="pill" data-level="1">L1 <span id="c1">0</span></span>
+        <span class="pill" data-level="2">L2 <span id="c2">0</span></span>
+        <span class="pill" data-level="3">L3 <span id="c3">0</span></span>
+      </div>
+      <button class="reset" onclick="resetSession()">重新開始</button>
+    </div>
 
     <div class="levels">
       <button class="level-btn active" data-level="1" onclick="setLevel(1)">L1 · 暖身（寫 3）</button>
@@ -181,7 +295,12 @@
       <p class="hint" id="hint"></p>
     </div>
 
-    <button class="draw-btn" onclick="draw()">抽 題</button>
+    <div class="verdict" id="verdict">
+      <button class="yes" onclick="record(true)">✓ 共感達成</button>
+      <button class="no" onclick="record(false)">沒中，下一題</button>
+    </div>
+
+    <button class="draw-btn" id="drawBtn" onclick="draw()">抽 題</button>
 
     <div class="rules">
       <strong>玩法：</strong>全員合作達成「心靈共感」。每一輪同步寫答案，揭曉時——只要 <strong>至少一個答案是全員都寫了的</strong>，就過關。沒有勝負，只有「我們有沒有在同一頻率上」。
@@ -250,6 +369,54 @@
 
       let currentLevel = 1;
       let lastQuestion = null;
+      let pendingLevel = null;  // level of currently-shown question, waiting for verdict
+      const STORAGE_KEY = 'deskwalk-session';
+
+      function loadSession() {
+        try {
+          const raw = sessionStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : { 1: 0, 2: 0, 3: 0 };
+        } catch { return { 1: 0, 2: 0, 3: 0 }; }
+      }
+      function saveSession(s) { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+      let session = loadSession();
+
+      function renderCounter() {
+        const total = session[1] + session[2] + session[3];
+        const totalEl = document.getElementById('totalCount');
+        totalEl.textContent = total;
+        document.getElementById('c1').textContent = session[1];
+        document.getElementById('c2').textContent = session[2];
+        document.getElementById('c3').textContent = session[3];
+        // star ribbon — one ⭐ per L3 共感, max 10
+        const stars = '⭐'.repeat(Math.min(session[3], 10));
+        document.getElementById('stars').textContent = stars;
+      }
+      renderCounter();
+
+      function record(achieved) {
+        if (pendingLevel == null) return;
+        if (achieved) {
+          session[pendingLevel] += 1;
+          saveSession(session);
+          const big = document.getElementById('totalCount');
+          renderCounter();
+          big.classList.remove('pop');
+          void big.offsetWidth;  // restart animation
+          big.classList.add('pop');
+          setTimeout(() => big.classList.remove('pop'), 400);
+        }
+        pendingLevel = null;
+        document.getElementById('verdict').classList.remove('show');
+        document.getElementById('drawBtn').style.display = '';
+      }
+
+      function resetSession() {
+        if (!confirm('清空這場的共感紀錄？')) return;
+        session = { 1: 0, 2: 0, 3: 0 };
+        saveSession(session);
+        renderCounter();
+      }
 
       function setLevel(lv) {
         currentLevel = lv;
@@ -287,6 +454,10 @@
             hintEl.textContent = goalText;
           }
           card.classList.remove('flip');
+          // show verdict buttons, hide draw button until verdict given
+          pendingLevel = currentLevel;
+          document.getElementById('verdict').classList.add('show');
+          document.getElementById('drawBtn').style.display = 'none';
         }, 200);
       }
     </script>
