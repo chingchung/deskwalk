@@ -9,20 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
       :root {
-        /* Tinted neutrals toward violet hue 305 */
-        --bg: oklch(0.16 0.018 305);
-        --bg-deep: oklch(0.11 0.022 305);
-        --surface: oklch(0.21 0.022 305);
-        --ink: oklch(0.94 0.012 80);
-        --ink-soft: oklch(0.68 0.018 305);
-        --ink-faint: oklch(0.45 0.02 305);
-        --line: oklch(0.28 0.022 305);
-        /* Level moods: dusk → ember → midnight */
-        --l1: oklch(0.78 0.09 175);  /* dusk jade */
-        --l2: oklch(0.82 0.13 75);   /* ember amber */
-        --l3: oklch(0.74 0.18 320);  /* midnight violet */
-        --accent: oklch(0.74 0.18 320);
-        --glow: oklch(0.74 0.18 320 / 0.35);
+        /* Mono cream palette — warm paper, charcoal ink */
+        --bg: oklch(0.945 0.014 80);       /* cream */
+        --bg-deep: oklch(0.91 0.018 80);    /* slightly darker paper */
+        --surface: oklch(0.97 0.01 80);     /* lifted card */
+        --ink: oklch(0.22 0.012 60);        /* warm charcoal */
+        --ink-soft: oklch(0.45 0.01 60);
+        --ink-faint: oklch(0.62 0.008 60);
+        --line: oklch(0.78 0.012 60);
+        --line-soft: oklch(0.86 0.012 60);
+        /* Single accent — no color drift, just deepest ink for emphasis */
+        --accent: oklch(0.18 0.014 60);
+        --glow: oklch(0.22 0.012 60 / 0.18);
+        --warn: oklch(0.55 0.04 25);        /* desaturated terracotta for loss */
         --serif: "Cormorant Garamond", "Songti TC", "Noto Serif TC", serif;
         --sans: "Inter", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
       }
@@ -40,32 +39,32 @@
         position: relative;
         min-height: 100vh;
       }
-      /* Ambient vignette — radial warmth from center, deep edges */
+      /* Paper warmth — soft radial gradient on cream */
       body::before {
         content: "";
         position: fixed;
         inset: 0;
         background: radial-gradient(
-          ellipse at 50% 35%,
-          oklch(0.24 0.04 320) 0%,
-          var(--bg) 40%,
+          ellipse at 50% 30%,
+          oklch(0.97 0.01 80) 0%,
+          var(--bg) 55%,
           var(--bg-deep) 100%
         );
         z-index: -1;
         pointer-events: none;
       }
-      /* Subtle starlit grain — pure CSS, no images */
+      /* Subtle ink specks — paper grain */
       body::after {
         content: "";
         position: fixed;
         inset: 0;
         background-image:
-          radial-gradient(1px 1px at 17% 23%, oklch(0.9 0.05 80 / 0.5) 50%, transparent 100%),
-          radial-gradient(1px 1px at 64% 12%, oklch(0.85 0.08 320 / 0.4) 50%, transparent 100%),
-          radial-gradient(1px 1px at 84% 71%, oklch(0.9 0.05 80 / 0.4) 50%, transparent 100%),
-          radial-gradient(1px 1px at 23% 84%, oklch(0.85 0.08 320 / 0.3) 50%, transparent 100%),
-          radial-gradient(1px 1px at 47% 56%, oklch(0.9 0.05 80 / 0.25) 50%, transparent 100%),
-          radial-gradient(1px 1px at 91% 33%, oklch(0.9 0.05 80 / 0.4) 50%, transparent 100%);
+          radial-gradient(1px 1px at 17% 23%, oklch(0.3 0.01 60 / 0.12) 50%, transparent 100%),
+          radial-gradient(1px 1px at 64% 12%, oklch(0.3 0.01 60 / 0.08) 50%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 84% 71%, oklch(0.3 0.01 60 / 0.1) 50%, transparent 100%),
+          radial-gradient(1px 1px at 23% 84%, oklch(0.3 0.01 60 / 0.09) 50%, transparent 100%),
+          radial-gradient(1px 1px at 47% 56%, oklch(0.3 0.01 60 / 0.07) 50%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 91% 33%, oklch(0.3 0.01 60 / 0.1) 50%, transparent 100%);
         z-index: -1;
         pointer-events: none;
       }
@@ -96,18 +95,18 @@
       .counter .num {
         font-family: var(--serif);
         font-size: 2.75rem;
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1;
         color: var(--ink);
         font-variant-numeric: lining-nums tabular-nums;
-        transition: color 0.6s ease;
+        transition: color 0.6s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }
       .counter .num.pop {
         color: var(--accent);
         transform: scale(1.08);
       }
       .counter .num.drop {
-        color: oklch(0.65 0.14 25);
+        color: var(--warn);
         transform: translateY(2px) scale(0.96);
       }
       .counter .num-label {
@@ -135,7 +134,7 @@
       .leg + .leg::before {
         content: "";
         align-self: center;
-        width: 0.5rem;
+        width: 0.55rem;
         height: 1px;
         background: var(--line);
         margin-right: 0.3rem;
@@ -149,26 +148,22 @@
         background: transparent;
         transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      .leg[data-level="1"] { --leg-color: var(--l1); --leg-glow: oklch(0.78 0.09 175 / 0.45); }
-      .leg[data-level="2"] { --leg-color: var(--l2); --leg-glow: oklch(0.82 0.13 75 / 0.45); }
-      .leg[data-level="3"] { --leg-color: var(--l3); --leg-glow: var(--glow); }
-      .dot.win {
-        background: var(--leg-color);
-        border-color: var(--leg-color);
-        box-shadow: 0 0 10px var(--leg-glow);
+      /* L3 dots are slightly larger — the climax leg */
+      .leg[data-level="3"] .dot {
+        width: 0.78rem;
+        height: 0.78rem;
       }
-      .dot.fail {
-        background: oklch(0.35 0.06 25);
-        border-color: oklch(0.5 0.1 25);
-        box-shadow: none;
+      .dot.win {
+        background: var(--ink);
+        border-color: var(--ink);
       }
       .dot.current {
-        border-color: var(--leg-color);
-        animation: dotPulse 1.6s ease-in-out infinite;
+        border-color: var(--ink);
+        animation: dotPulse 1.8s ease-in-out infinite;
       }
       @keyframes dotPulse {
-        0%, 100% { box-shadow: 0 0 0 0 var(--leg-glow); transform: scale(1); }
-        50%      { box-shadow: 0 0 0 5px transparent; transform: scale(1.15); }
+        0%, 100% { box-shadow: 0 0 0 0 var(--glow); transform: scale(1); }
+        50%      { box-shadow: 0 0 0 5px transparent; transform: scale(1.18); }
       }
       .threshold {
         font-size: 0.78rem;
@@ -201,13 +196,13 @@
       .bubble {
         position: relative;
         background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 32px;
-        padding: 2.75rem 2.25rem;
+        border: 1.5px solid var(--ink);
+        border-radius: 36px;
+        padding: 2.4rem 2.25rem;
         max-width: 26rem;
         width: 100%;
-        box-shadow: 0 30px 60px -25px oklch(0 0 0 / 0.6),
-                    inset 0 1px 0 oklch(1 0 0 / 0.04);
+        box-shadow: 0 12px 0 -8px var(--line),
+                    0 22px 38px -28px oklch(0.22 0.012 60 / 0.25);
         transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
                     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -221,23 +216,23 @@
         transform: translateX(-50%);
       }
       .bubble::before {
-        bottom: -18px;
+        bottom: -19px;
         border-left: 18px solid transparent;
         border-right: 18px solid transparent;
-        border-top: 18px solid var(--line);
+        border-top: 18px solid var(--ink);
       }
       .bubble::after {
         bottom: -15px;
-        border-left: 16px solid transparent;
-        border-right: 16px solid transparent;
-        border-top: 16px solid var(--surface);
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-top: 15px solid var(--surface);
       }
       .bubble.flip { opacity: 0; transform: translateY(14px) scale(0.98); }
       .question {
         font-family: var(--serif);
-        font-weight: 300;
-        font-size: clamp(1.8rem, 5.5vw, 2.5rem);
-        line-height: 1.35;
+        font-weight: 400;
+        font-size: clamp(1.35rem, 4vw, 1.7rem);
+        line-height: 1.5;
         color: var(--ink);
         margin: 0;
         max-width: 22ch;
@@ -245,32 +240,22 @@
         margin-right: auto;
       }
       .question .count {
-        font-style: italic;
-        font-weight: 400;
-        color: var(--accent);
-        padding: 0 0.05em;
+        font-weight: 600;
+        color: var(--ink);
+        padding: 0 0.1em;
+        font-size: 1.25em;
       }
       .hint {
         font-family: var(--serif);
-        font-style: italic;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         color: var(--ink-soft);
         margin: 0.5rem 0 0;
         letter-spacing: 0.04em;
       }
       .placeholder {
         font-family: var(--serif);
-        font-style: italic;
         color: var(--ink-faint);
       }
-      /* Phase-tinted bubble border on L3 (climax) */
-      .stage[data-level="3"] .bubble {
-        border-color: oklch(0.36 0.08 320);
-        box-shadow: 0 30px 60px -25px oklch(0 0 0 / 0.6),
-                    0 0 32px -8px var(--glow),
-                    inset 0 1px 0 oklch(1 0 0 / 0.04);
-      }
-      .stage[data-level="3"] .bubble::before { border-top-color: oklch(0.36 0.08 320); }
 
       /* ACTIONS */
       .actions {
@@ -301,24 +286,21 @@
       }
       .btn-primary {
         background: var(--ink);
-        color: var(--bg-deep);
-        border: 1px solid var(--ink);
-        box-shadow: 0 0 0 0 var(--glow);
+        color: var(--bg);
+        border: 1.5px solid var(--ink);
       }
       .btn-primary:hover {
-        background: var(--accent);
-        border-color: var(--accent);
+        background: var(--bg);
         color: var(--ink);
-        box-shadow: 0 0 32px -4px var(--glow);
       }
       .btn-ghost {
         background: transparent;
         color: var(--ink-soft);
-        border: 1px solid var(--line);
+        border: 1.5px solid var(--line);
       }
       .btn-ghost:hover {
         color: var(--ink);
-        border-color: var(--ink-soft);
+        border-color: var(--ink);
       }
 
       /* OVERLAYS */
@@ -326,7 +308,7 @@
         position: fixed;
         inset: 0;
         z-index: 100;
-        background: oklch(0.11 0.02 305 / 0.92);
+        background: var(--bg);
         display: grid;
         place-items: center;
         opacity: 0;
@@ -344,17 +326,8 @@
                     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
       }
       .overlay.show .overlay-inner { opacity: 1; transform: translateY(0); }
-      .overlay.demotion {
-        background: oklch(0.09 0.025 25 / 0.94);
-      }
-      .overlay.demotion .overlay-title .roman {
-        color: oklch(0.72 0.16 25);
-      }
-      .overlay.demotion .overlay-sub {
-        color: oklch(0.6 0.06 25);
-      }
       .overlay-eyebrow {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         letter-spacing: 0.32em;
         text-transform: uppercase;
         color: var(--ink-faint);
@@ -362,58 +335,64 @@
       }
       .overlay-title {
         font-family: var(--serif);
-        font-weight: 300;
-        font-size: 3rem;
+        font-weight: 400;
+        font-size: 2.5rem;
         line-height: 1.2;
         margin: 0 0 0.5rem;
         color: var(--ink);
       }
       .overlay-title .roman {
-        font-style: italic;
-        color: var(--accent);
+        font-weight: 600;
+        color: var(--ink);
       }
       .overlay-sub {
         font-family: var(--serif);
-        font-style: italic;
-        font-size: 1.1rem;
+        font-size: 1rem;
         color: var(--ink-soft);
         margin: 0;
+        letter-spacing: 0.04em;
+      }
+      .overlay-glyph {
+        margin: 0 auto 1.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        opacity: 0.65;
       }
 
       /* FINALE */
       .finale-count {
         font-family: var(--serif);
-        font-size: 5.5rem;
-        font-weight: 300;
-        color: var(--accent);
-        margin: 1.5rem 0 0.5rem;
+        font-size: 5rem;
+        font-weight: 400;
+        color: var(--ink);
+        margin: 1.25rem 0 0.5rem;
         line-height: 1;
       }
       .finale-caption {
         font-family: var(--serif);
-        font-size: 1.15rem;
-        font-style: italic;
+        font-size: 1rem;
         color: var(--ink-soft);
         margin: 0 0 2rem;
+        letter-spacing: 0.04em;
       }
       .finale-stars {
         display: flex;
-        gap: 0.4rem;
+        gap: 0.5rem;
         justify-content: center;
         flex-wrap: wrap;
         margin: 1rem 0 2.5rem;
         max-width: 22rem;
       }
       .finale-stars svg {
-        width: 1.5rem;
-        height: 1.5rem;
-        filter: drop-shadow(0 0 8px var(--glow));
+        width: 1.4rem;
+        height: 1.4rem;
+        color: var(--ink);
         opacity: 0;
-        animation: starFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        animation: starFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
       @keyframes starFadeIn {
-        from { opacity: 0; transform: scale(0.5) rotate(-15deg); }
-        to   { opacity: 1; transform: scale(1) rotate(0); }
+        from { opacity: 0; transform: scale(0.6) rotate(-12deg); }
+        to   { opacity: 0.85; transform: scale(1) rotate(0); }
       }
 
       /* FOOTER */
@@ -451,13 +430,9 @@
       }
       .reset:hover { color: var(--ink-soft); }
 
-      /* Phase tint applied to active question */
-      .stage[data-level="1"] .question .count { color: var(--l1); }
-      .stage[data-level="2"] .question .count { color: var(--l2); }
-      .stage[data-level="3"] .question .count { color: var(--l3); }
+      /* L3 (climax) — slightly heavier emphasis, no color shift */
       .stage[data-level="3"] .question {
-        font-style: italic;
-        font-size: clamp(2.2rem, 7vw, 3.25rem);
+        font-size: clamp(1.5rem, 4.5vw, 1.85rem);
       }
     </style>
   </head>
@@ -503,9 +478,12 @@
 
     </div>
 
-    <!-- Transition overlay between levels (also used for demotion) -->
+    <!-- Transition overlay between levels -->
     <div class="overlay" id="transition">
       <div class="overlay-inner">
+        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M32 6 L36 28 L58 32 L36 36 L32 58 L28 36 L6 32 L28 28 Z" />
+        </svg>
         <p class="overlay-eyebrow" id="transitionEyebrow">你們進入</p>
         <p class="overlay-title">第<span class="roman" id="transitionRoman">二</span>階段</p>
         <p class="overlay-sub" id="transitionSub">升溫</p>
@@ -515,6 +493,12 @@
     <!-- Finale overlay -->
     <div class="overlay" id="finale">
       <div class="overlay-inner">
+        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="32" cy="32" r="6" />
+          <circle cx="32" cy="32" r="14" opacity="0.7" />
+          <circle cx="32" cy="32" r="22" opacity="0.4" />
+          <circle cx="32" cy="32" r="30" opacity="0.2" />
+        </svg>
         <p class="overlay-eyebrow">這場儀式完成</p>
         <p class="finale-count" id="finalCount">0</p>
         <p class="finale-caption">個共感被你們共同寫下</p>
