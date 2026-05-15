@@ -158,6 +158,29 @@
         margin-top: 0.25rem;
         font-style: italic;
         font-family: var(--serif);
+        text-align: right;
+        max-width: 14rem;
+      }
+      .strikes {
+        display: flex;
+        gap: 0.3rem;
+        margin-top: 0.4rem;
+        align-self: flex-end;
+      }
+      .strikes .strike {
+        width: 0.4rem;
+        height: 0.4rem;
+        border-radius: 999px;
+        background: var(--line);
+        transition: background 0.4s ease;
+      }
+      .strikes .strike.lit {
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--glow);
+      }
+      .strikes.warn .strike.lit {
+        background: oklch(0.74 0.2 25);
+        box-shadow: 0 0 8px oklch(0.74 0.2 25 / 0.45);
       }
 
       /* QUESTION */
@@ -287,6 +310,15 @@
                     transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
       }
       .overlay.show .overlay-inner { opacity: 1; transform: translateY(0); }
+      .overlay.demotion {
+        background: oklch(0.09 0.025 25 / 0.94);
+      }
+      .overlay.demotion .overlay-title .roman {
+        color: oklch(0.72 0.16 25);
+      }
+      .overlay.demotion .overlay-sub {
+        color: oklch(0.6 0.06 25);
+      }
       .overlay-eyebrow {
         font-size: 0.78rem;
         letter-spacing: 0.32em;
@@ -409,7 +441,8 @@
             <span class="dot" data-level="2">II</span>
             <span class="dot" data-level="3">III</span>
           </div>
-          <span class="threshold" id="thresholdText">再 1 個共感 進入第二階段</span>
+          <span class="threshold" id="thresholdText">第 1 / 3 題</span>
+          <span class="strikes" id="strikes" aria-hidden="true"></span>
         </div>
       </header>
 
@@ -429,10 +462,10 @@
 
     </div>
 
-    <!-- Transition overlay between levels -->
+    <!-- Transition overlay between levels (also used for demotion) -->
     <div class="overlay" id="transition">
       <div class="overlay-inner">
-        <p class="overlay-eyebrow">你們進入</p>
+        <p class="overlay-eyebrow" id="transitionEyebrow">你們進入</p>
         <p class="overlay-title">第<span class="roman" id="transitionRoman">二</span>階段</p>
         <p class="overlay-sub" id="transitionSub">升溫</p>
       </div>
@@ -506,63 +539,73 @@
         ]
       };
 
-      const THRESHOLDS = { 1: 1, 2: 2, 3: 3 };
+      const ROUNDS = { 1: 3, 2: 2, 3: 1 };  // 每階段題數
       const ROMAN = { 1: "一", 2: "二", 3: "三" };
       const PHASE_NAMES = { 1: "暖身", 2: "升溫", 3: "共感" };
-      const STORAGE_KEY = "deskwalk-session";
+      const STORAGE_KEY = "deskwalk-session-v2";
 
-      let currentLevel = 1;
-      let lastQuestion = null;
-      let pendingLevel = null;
-      let session = loadSession();
-      let finished = false;
-
+      function freshSession() {
+        return { total: 0, level: 1, round: 0, fails: 0, done: false };
+      }
       function loadSession() {
         try {
           const raw = sessionStorage.getItem(STORAGE_KEY);
-          return raw ? JSON.parse(raw) : { 1: 0, 2: 0, 3: 0, level: 1, done: false };
-        } catch {
-          return { 1: 0, 2: 0, 3: 0, level: 1, done: false };
-        }
+          return raw ? { ...freshSession(), ...JSON.parse(raw) } : freshSession();
+        } catch { return freshSession(); }
       }
       function saveSession() { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session)); }
 
-      function total() { return session[1] + session[2] + session[3]; }
+      let session = loadSession();
+      let lastQuestion = null;
+      let pendingLevel = null;  // level of currently-shown question (waiting for verdict)
+      let busy = false;         // suppress interactions during transitions
 
+      // --- Render -------------------------------------------------------
       function renderCounter() {
-        document.getElementById("totalCount").textContent = total();
+        document.getElementById("totalCount").textContent = session.total;
       }
       function renderDots() {
         document.querySelectorAll(".dot").forEach(d => {
           const lv = Number(d.dataset.level);
-          d.classList.toggle("active", lv === currentLevel && !finished);
-          d.classList.toggle("done", session[lv] >= THRESHOLDS[lv]);
+          d.classList.toggle("active", lv === session.level && !session.done);
+          d.classList.toggle("done", session.done && lv <= 3);
         });
       }
       function renderThreshold() {
-        if (finished) { document.getElementById("thresholdText").textContent = "儀式完成"; return; }
-        const need = THRESHOLDS[currentLevel] - session[currentLevel];
-        if (need <= 0) {
-          document.getElementById("thresholdText").textContent = "即將進入下一階段";
-          return;
+        const tEl = document.getElementById("thresholdText");
+        if (session.done) { tEl.textContent = "儀式完成"; return; }
+        const total = ROUNDS[session.level];
+        const current = Math.min(session.round + 1, total);
+        if (session.level === 3) {
+          tEl.textContent = "終局 · 一題定共感";
+        } else {
+          tEl.textContent = `第 ${current} / ${total} 題`;
         }
-        const next = currentLevel < 3 ? `第${ROMAN[currentLevel + 1]}階段` : "儀式終局";
-        document.getElementById("thresholdText").textContent = `再 ${need} 個共感 進入${next}`;
+      }
+      function renderStrikes() {
+        const el = document.getElementById("strikes");
+        el.innerHTML = "";
+        // strikes only meaningful at L2 (2 fails = demote)
+        if (session.level !== 2 || session.done) return;
+        for (let i = 0; i < 2; i++) {
+          const dot = document.createElement("span");
+          dot.className = "strike" + (i < session.fails ? " lit" : "");
+          el.appendChild(dot);
+        }
+        el.classList.toggle("warn", session.fails >= 1);
       }
       function renderPhaseLabel() {
-        document.getElementById("phaseLabel").textContent = `第${ROMAN[currentLevel]}階段 · ${PHASE_NAMES[currentLevel]}`;
+        document.getElementById("phaseLabel").textContent =
+          `第${ROMAN[session.level]}階段 · ${PHASE_NAMES[session.level]}`;
       }
       function renderAll() {
-        renderCounter(); renderDots(); renderThreshold(); renderPhaseLabel();
-        document.getElementById("stage").dataset.level = currentLevel;
+        renderCounter(); renderDots(); renderThreshold();
+        renderStrikes(); renderPhaseLabel();
+        document.getElementById("stage").dataset.level = session.level;
       }
 
-      function setLevel(lv) {
-        currentLevel = lv;
-        session.level = lv;
-        saveSession();
-        renderAll();
-        // reset to "ready to draw" state on the new level
+      // --- Draw ---------------------------------------------------------
+      function resetQuestionToReady() {
         const qEl = document.getElementById("question");
         qEl.classList.add("placeholder");
         qEl.textContent = "準備好了嗎";
@@ -573,8 +616,8 @@
       }
 
       function draw() {
-        if (finished) return;
-        const bank = BANK[currentLevel];
+        if (busy || session.done) return;
+        const bank = BANK[session.level];
         let pick;
         do {
           pick = bank[Math.floor(Math.random() * bank.length)];
@@ -592,85 +635,133 @@
           } else {
             qEl.innerHTML = pick.q.replace("#{n}", `<span class="count">${pick.n}</span>`);
             hintEl.textContent = pick.n === 1
-              ? "全員寫一樣才算過關"
+              ? "全員寫一樣才算成立"
               : `寫 ${pick.n} 個 · 至少 1 個全員都寫了的`;
           }
           qEl.classList.remove("flip");
-          pendingLevel = currentLevel;
+          pendingLevel = session.level;
           document.getElementById("verdict").classList.add("show");
           document.getElementById("drawBtn").style.display = "none";
         }, 280);
       }
 
+      // --- Record (after a question is answered) -----------------------
       function record(achieved) {
-        if (pendingLevel == null || finished) return;
+        if (pendingLevel == null || busy || session.done) return;
         const lv = pendingLevel;
-
-        if (achieved) {
-          session[lv] += 1;
-          saveSession();
-          renderCounter();
-          renderDots();
-          renderThreshold();
-          // celebrate count
-          const num = document.getElementById("totalCount");
-          num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
-          setTimeout(() => num.classList.remove("pop"), 700);
-
-          if (session[lv] >= THRESHOLDS[lv]) {
-            // threshold hit
-            pendingLevel = null;
-            document.getElementById("verdict").classList.remove("show");
-            if (lv < 3) {
-              showTransition(lv + 1);
-            } else {
-              showFinale();
-            }
-            return;
-          }
-        }
-
         pendingLevel = null;
         document.getElementById("verdict").classList.remove("show");
+
+        if (achieved) {
+          session.total += 1;
+          pulseCount();
+        } else {
+          session.fails += 1;
+        }
+        session.round += 1;
+        saveSession();
+        renderCounter();
+        renderStrikes();
+
+        // --- Demotion checks ---
+        // L3: any fail demotes immediately
+        if (lv === 3 && !achieved) {
+          saveSession();
+          showDemotion(2);
+          return;
+        }
+        // L2: 2 fails in this attempt demotes
+        if (lv === 2 && session.fails >= 2) {
+          saveSession();
+          showDemotion(1);
+          return;
+        }
+
+        // --- Round / level completion ---
+        if (session.round >= ROUNDS[lv]) {
+          // finished all rounds of this level → advance
+          if (lv < 3) {
+            showTransition(lv + 1);
+          } else {
+            // L3 + achieved → finale
+            showFinale();
+          }
+          return;
+        }
+
+        // continue current level, next round
+        renderThreshold();
         document.getElementById("drawBtn").style.display = "";
       }
 
+      function pulseCount() {
+        const num = document.getElementById("totalCount");
+        num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
+        setTimeout(() => num.classList.remove("pop"), 700);
+      }
+
+      // --- Transitions --------------------------------------------------
       function showTransition(nextLevel) {
+        busy = true;
         document.getElementById("qBlock").classList.add("dim");
+        document.getElementById("transitionEyebrow").textContent = "你們進入";
         document.getElementById("transitionRoman").textContent = ROMAN[nextLevel];
         document.getElementById("transitionSub").textContent = PHASE_NAMES[nextLevel];
         const overlay = document.getElementById("transition");
+        overlay.classList.remove("demotion");
         overlay.classList.add("show");
         setTimeout(() => {
           overlay.classList.remove("show");
           setTimeout(() => {
-            setLevel(nextLevel);
+            // advance session
+            session.level = nextLevel;
+            session.round = 0;
+            session.fails = 0;
+            saveSession();
+            renderAll();
+            resetQuestionToReady();
             document.getElementById("qBlock").classList.remove("dim");
+            busy = false;
           }, 600);
         }, 2400);
       }
 
+      function showDemotion(toLevel) {
+        busy = true;
+        document.getElementById("qBlock").classList.add("dim");
+        const eyebrow = toLevel === 2 ? "緣分散了" : "心未聚";
+        const sub = toLevel === 2 ? "退回第二階段 重來" : "退回第一階段 重來";
+        document.getElementById("transitionEyebrow").textContent = eyebrow;
+        document.getElementById("transitionRoman").textContent = ROMAN[toLevel];
+        document.getElementById("transitionSub").textContent = sub;
+        const overlay = document.getElementById("transition");
+        overlay.classList.add("demotion", "show");
+        setTimeout(() => {
+          overlay.classList.remove("show");
+          setTimeout(() => {
+            overlay.classList.remove("demotion");
+            session.level = toLevel;
+            session.round = 0;
+            session.fails = 0;
+            saveSession();
+            renderAll();
+            resetQuestionToReady();
+            document.getElementById("qBlock").classList.remove("dim");
+            busy = false;
+          }, 600);
+        }, 2800);
+      }
+
+      // --- Finale -------------------------------------------------------
       function showFinale() {
-        finished = true;
         session.done = true;
         saveSession();
         renderAll();
-        document.getElementById("finalCount").textContent = total();
+        document.getElementById("finalCount").textContent = session.total;
         const starsEl = document.getElementById("finalStars");
         starsEl.innerHTML = "";
         const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.2 7.5.4-5.8 4.8 2 7.3L12 17.7 5.8 21.7l2-7.3L2 9.6l7.5-.4z" /></svg>';
-        const count = total();
-        for (let i = 0; i < count; i++) {
-          const span = document.createElement("span");
-          span.style.color = "var(--accent)";
-          span.style.animationDelay = (i * 0.08) + "s";
-          span.innerHTML = starSvg;
-          starsEl.appendChild(span.firstChild);
-          starsEl.lastChild.style.animationDelay = (i * 0.08) + "s";
-        }
-        // Simpler: rewrite using innerHTML for direct svg insertion
-        starsEl.innerHTML = "";
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < session.total; i++) {
           const wrap = document.createElement("span");
           wrap.innerHTML = starSvg;
           const svg = wrap.firstChild;
@@ -681,11 +772,11 @@
       }
 
       function restart() {
-        session = { 1: 0, 2: 0, 3: 0, level: 1, done: false };
-        finished = false;
+        session = freshSession();
         saveSession();
         document.getElementById("finale").classList.remove("show");
-        setLevel(1);
+        renderAll();
+        resetQuestionToReady();
       }
 
       function resetSession() {
@@ -693,11 +784,9 @@
         restart();
       }
 
-      // Init from saved state
-      currentLevel = session.level || 1;
-      finished = !!session.done;
+      // --- Init ---------------------------------------------------------
       renderAll();
-      if (finished) showFinale();
+      if (session.done) showFinale();
     </script>
   </body>
 </html>
