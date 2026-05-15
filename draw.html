@@ -53,6 +53,36 @@
         z-index: -1;
         pointer-events: none;
       }
+      /* Ambient corner ornaments */
+      .ornament {
+        position: fixed;
+        color: var(--ink);
+        opacity: 0.13;
+        pointer-events: none;
+        z-index: 0;
+        transition: opacity 0.6s ease;
+      }
+      .ornament svg { display: block; width: 100%; height: 100%; }
+      .ornament-tr { top: 1.5rem; right: 1.25rem; width: 4.5rem; height: 4.5rem; }
+      .ornament-bl { bottom: 4rem; left: 1.25rem; width: 5.5rem; height: 5.5rem; }
+      @media (max-width: 480px) {
+        .ornament-tr { width: 3rem; height: 3rem; opacity: 0.1; }
+        .ornament-bl { width: 3.5rem; height: 3.5rem; opacity: 0.1; }
+      }
+
+      /* Small inline glyphs */
+      .glyph-inline {
+        display: inline-block;
+        vertical-align: middle;
+        color: var(--ink-faint);
+      }
+      .bubble-mark {
+        margin: 1.2rem auto 0;
+        opacity: 0.45;
+        color: var(--ink-soft);
+      }
+      .bubble-mark svg { width: 26px; height: 14px; }
+
       /* Subtle ink specks — paper grain */
       body::after {
         content: "";
@@ -354,9 +384,19 @@
       }
       .overlay-glyph {
         margin: 0 auto 1.5rem;
-        width: 3.5rem;
-        height: 3.5rem;
-        opacity: 0.65;
+        width: 4rem;
+        height: 4rem;
+        color: var(--ink);
+        opacity: 0.75;
+      }
+      .finale-mandala {
+        width: 5rem;
+        height: 5rem;
+        animation: mandalaSpin 60s linear infinite;
+      }
+      @keyframes mandalaSpin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
       }
 
       /* FINALE */
@@ -437,12 +477,45 @@
     </style>
   </head>
   <body>
+
+    <!-- Ambient cosmic ornaments -->
+    <div class="ornament ornament-tr" aria-hidden="true">
+      <!-- Concentric ripples — energy field -->
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="32" cy="32" r="4" fill="currentColor" stroke="none" />
+        <path d="M20 32 Q20 22 32 22 Q44 22 44 32" />
+        <path d="M14 36 Q14 18 32 18 Q50 18 50 36" />
+        <path d="M8 40 Q8 14 32 14 Q56 14 56 40" />
+      </svg>
+    </div>
+
+    <div class="ornament ornament-bl" aria-hidden="true">
+      <!-- Pair of lopsided stars with faces — twin spirits -->
+      <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- top star -->
+        <path d="M54 6 L58 24 L74 24 L60 32 L64 50 L52 38 L40 44 L46 30 L36 20 L50 20 Z" />
+        <circle cx="56" cy="26" r="0.8" fill="currentColor" stroke="none" />
+        <circle cx="51" cy="28" r="0.8" fill="currentColor" stroke="none" />
+        <path d="M51 32 Q54 34 57 32" />
+        <!-- bottom star -->
+        <path d="M22 36 L26 50 L40 50 L28 58 L32 74 L20 64 L8 72 L14 58 L4 50 L18 50 Z" />
+        <circle cx="22" cy="54" r="0.8" fill="currentColor" stroke="none" />
+        <circle cx="18" cy="56" r="0.8" fill="currentColor" stroke="none" />
+        <path d="M18 60 Q21 62 24 60" />
+      </svg>
+    </div>
+
     <div class="stage" id="stage" data-level="1">
 
       <header class="head">
         <div class="counter">
           <span class="num" id="totalCount">0</span>
-          <span class="num-label">共感</span>
+          <span class="num-label">
+            <svg class="glyph-inline" width="9" height="9" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0 L9.5 5.5 L15 7 L9.5 8.5 L8 14 L6.5 8.5 L1 7 L6.5 5.5 Z" />
+            </svg>
+            共感
+          </span>
         </div>
         <div class="progress">
           <div class="journey" id="journey">
@@ -464,6 +537,14 @@
         <p class="eyebrow" id="phaseLabel">第一階段 · 暖身</p>
         <div class="bubble" id="bubble">
           <p class="question placeholder" id="question">準備好了嗎</p>
+          <div class="bubble-mark" aria-hidden="true">
+            <!-- Three tiny stars — connective ornament -->
+            <svg viewBox="0 0 26 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7 L4 4 L5 7 L8 6 L5.5 8 L6 11 L4 9 L2 11 L2.5 8 L0 6 Z" opacity="0.7" />
+              <path d="M13 6.5 L14.2 3 L15.4 6.5 L19 5.6 L16 7.8 L16.7 11 L14.2 9 L11.7 11 L12.4 7.8 L9.4 5.6 Z" />
+              <path d="M23 7 L24 4 L25 7 L28 6 L25.5 8 L26 11 L24 9 L22 11 L22.5 8 L20 6 Z" opacity="0.7" />
+            </svg>
+          </div>
         </div>
         <p class="hint" id="hint">按下方開始</p>
       </div>
@@ -481,23 +562,62 @@
     <!-- Transition overlay between levels -->
     <div class="overlay" id="transition">
       <div class="overlay-inner">
-        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M32 6 L36 28 L58 32 L36 36 L32 58 L28 36 L6 32 L28 28 Z" />
-        </svg>
+        <!-- Glyph swapped per destination level by JS -->
+        <div id="transitionGlyph">
+          <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M32 6 L36 28 L58 32 L36 36 L32 58 L28 36 L6 32 L28 28 Z" />
+          </svg>
+        </div>
         <p class="overlay-eyebrow" id="transitionEyebrow">你們進入</p>
         <p class="overlay-title">第<span class="roman" id="transitionRoman">二</span>階段</p>
         <p class="overlay-sub" id="transitionSub">升溫</p>
       </div>
     </div>
 
+    <!-- Glyph library (hidden — JS clones into transition overlay) -->
+    <div id="glyphLibrary" hidden>
+      <!-- Level 2 — energy ripples (升溫 = warming, energy waves) -->
+      <template id="glyph-l2">
+        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="32" cy="36" r="3" fill="currentColor" stroke="none" />
+          <path d="M18 36 Q18 26 32 26 Q46 26 46 36" />
+          <path d="M12 38 Q12 20 32 20 Q52 20 52 38" />
+          <path d="M6 40 Q6 14 32 14 Q58 14 58 40" />
+        </svg>
+      </template>
+      <!-- Level 3 — hands holding orb (共感 = the held moment) -->
+      <template id="glyph-l3">
+        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="32" cy="22" r="5" fill="currentColor" stroke="none" />
+          <path d="M16 60 Q12 44 16 32 Q20 18 30 16" />
+          <path d="M20 60 Q18 46 22 34 Q26 22 30 20" />
+          <path d="M48 60 Q52 44 48 32 Q44 18 34 16" />
+          <path d="M44 60 Q46 46 42 34 Q38 22 34 20" />
+        </svg>
+      </template>
+    </div>
+
     <!-- Finale overlay -->
     <div class="overlay" id="finale">
       <div class="overlay-inner">
-        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="32" cy="32" r="6" />
-          <circle cx="32" cy="32" r="14" opacity="0.7" />
-          <circle cx="32" cy="32" r="22" opacity="0.4" />
-          <circle cx="32" cy="32" r="30" opacity="0.2" />
+        <svg class="overlay-glyph finale-mandala" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- Outer rays -->
+          <g opacity="0.5">
+            <line x1="40" y1="4" x2="40" y2="14" />
+            <line x1="40" y1="66" x2="40" y2="76" />
+            <line x1="4" y1="40" x2="14" y2="40" />
+            <line x1="66" y1="40" x2="76" y2="40" />
+            <line x1="14" y1="14" x2="20" y2="20" />
+            <line x1="60" y1="60" x2="66" y2="66" />
+            <line x1="66" y1="14" x2="60" y2="20" />
+            <line x1="14" y1="66" x2="20" y2="60" />
+          </g>
+          <!-- Concentric rings -->
+          <circle cx="40" cy="40" r="28" opacity="0.35" />
+          <circle cx="40" cy="40" r="20" opacity="0.6" />
+          <circle cx="40" cy="40" r="12" opacity="0.85" />
+          <!-- Core star -->
+          <path d="M40 30 L42 38 L50 40 L42 42 L40 50 L38 42 L30 40 L38 38 Z" fill="currentColor" stroke="none" />
         </svg>
         <p class="overlay-eyebrow">這場儀式完成</p>
         <p class="finale-count" id="finalCount">0</p>
@@ -734,6 +854,13 @@
         document.getElementById("transitionEyebrow").textContent = "你們進入";
         document.getElementById("transitionRoman").textContent = ROMAN[nextLevel];
         document.getElementById("transitionSub").textContent = PHASE_NAMES[nextLevel];
+        // Swap glyph by destination level
+        const glyphHost = document.getElementById("transitionGlyph");
+        const tpl = document.getElementById("glyph-l" + nextLevel);
+        if (tpl) {
+          glyphHost.innerHTML = "";
+          glyphHost.appendChild(tpl.content.cloneNode(true));
+        }
         const overlay = document.getElementById("transition");
         overlay.classList.add("show");
         setTimeout(() => {
