@@ -16,7 +16,8 @@
   #card-screen { padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
   #top-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 0; gap: 12px; }
   #round-indicator { color: #888; font-size: 14px; letter-spacing: 0.1em; }
-  #end-btn { background: transparent; color: #888; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; }
+  .top-btn { background: transparent; color: #888; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; }
+  #top-actions { display: flex; gap: 8px; }
   #version-tag { text-align: center; padding: 4px 0 0; color: #555; font-size: 11px; letter-spacing: 0.05em; }
   #question-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 0; }
   #question { font-size: 36px; font-weight: 700; line-height: 1.4; text-align: center; word-break: break-word; }
@@ -60,9 +61,12 @@
 <div class="screen active" id="card-screen">
   <div id="top-bar">
     <div id="round-indicator">第 <span id="round-num">1</span> / 4 題</div>
-    <button id="end-btn">結束</button>
+    <div id="top-actions">
+      <button class="top-btn" id="skip-btn">跳過</button>
+      <button class="top-btn" id="end-btn">結束</button>
+    </div>
   </div>
-  <div id="version-tag">最勁係你 · v0.3 · 2026-05-27</div>
+  <div id="version-tag">最勁係你 · v0.4 · 2026-05-27</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -105,16 +109,11 @@
 <script>
 const QUESTIONS = [
   "最有可能在公司廁所睡覺的人",
-  "最有可能把鬧鐘按掉繼續睡的人",
-  "最有可能跟外送員聊起來的人",
   "最有可能在電影院哭的人",
-  "最有可能忘記自己車停哪的人",
   "最有可能買了健身房會員只去過 3 次的人",
   "最有可能對著手機相機自言自語的人",
-  "最有可能把「等等回你」變成「等等」的人",
   "最有可能在 IG 限動發吃的的人",
   "最有可能把外套放在椅背上忘記帶走的人",
-  "最有可能跟自己的寵物講話像在跟人講話的人",
   "最有可能存了一堆迷因但從來不發的人",
   "最有可能在 KTV 點了歌卻不唱的人",
   "最有可能在會議裡假裝在記筆記其實在畫畫的人",
@@ -122,7 +121,6 @@ const QUESTIONS = [
   "最有可能把「我先睡了」說完還滑兩小時手機的人",
   "最有可能在群組裡只看不回的人",
   "最有可能把同一首歌循環一整週的人",
-  "最有可能跟陌生人解釋人生哲學的人",
   "最有可能在便利商店站著吃完的人",
   "最有可能在分手後馬上換大頭貼的人",
   "最有可能假裝沒看到前任的 IG 但每天都看的人",
@@ -131,12 +129,8 @@ const QUESTIONS = [
   "最有可能跟前任還是好朋友的人",
   "最有可能愛上不該愛的人的人",
   "最有可能在感情裡先說我愛你的人",
-  "最有可能假裝不在意但其實很在意的人",
-  "最有可能因為一首歌哭整晚的人",
   "最有可能對著鏡子練習怎麼跟人說話的人",
-  "最有可能 IG 限動發完五分鐘刪掉的人",
   "最有可能在凌晨三點傳訊息的人",
-  "最有可能愛得最深的人",
   "最有可能為了維持關係改變自己的人",
   "最有可能說「我沒事」但全身都在說有事的人",
   "最有可能在分手後封鎖再解除封鎖的人",
@@ -381,6 +375,7 @@ $("flip-btn").addEventListener("click", () => {
   facingMode = facingMode === "user" ? "environment" : "user";
   startCamera();
 });
+$("skip-btn").addEventListener("click", () => setQuestion());
 $("end-btn").addEventListener("click", showResults);
 $("save-all-btn").addEventListener("click", saveAll);
 $("restart-btn").addEventListener("click", restart);
