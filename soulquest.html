@@ -15,9 +15,11 @@
   /* ---------- Card screen ---------- */
   #card-screen { padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
   #top-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 0; gap: 12px; }
-  #round-indicator { color: #888; font-size: 14px; letter-spacing: 0.1em; }
+  #thumb-strip { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none; }
+  #thumb-strip::-webkit-scrollbar { display: none; }
+  .thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid #333; }
   .top-btn { background: transparent; color: #888; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; }
-  #top-actions { display: flex; gap: 8px; }
+  #top-actions { display: flex; gap: 8px; flex-shrink: 0; }
   #version-tag { text-align: center; padding: 4px 0 0; color: #555; font-size: 11px; letter-spacing: 0.05em; }
   #question-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 0; }
   #question { font-size: 36px; font-weight: 700; line-height: 1.4; text-align: center; word-break: break-word; }
@@ -31,7 +33,7 @@
   #video-wrap { flex: 1; position: relative; overflow: hidden; }
   #video { width: 100%; height: 100%; object-fit: cover; background: #000; }
   #video.mirror { transform: scaleX(-1); }
-  #overlay-text { position: absolute; top: env(safe-area-inset-top, 0); left: 0; right: 0; padding: 20px 24px; background: rgba(0,0,0,0.55); color: #fff; font-size: 22px; font-weight: 700; line-height: 1.4; text-align: center; }
+  #overlay-text { position: absolute; bottom: 16px; left: 24px; right: 24px; color: #fff; font-size: 30px; font-weight: 900; line-height: 1.2; text-align: left; -webkit-text-stroke: 1.5px #000; text-shadow: 0 2px 6px rgba(0,0,0,0.6); word-break: break-word; }
   #camera-controls { padding: 20px 24px calc(env(safe-area-inset-bottom, 0) + 20px); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #000; }
   #shutter { width: 78px; height: 78px; border-radius: 50%; background: #fff; border: 4px solid #888; cursor: pointer; justify-self: center; }
   #shutter:active { background: #ddd; }
@@ -60,13 +62,13 @@
 <!-- Card screen -->
 <div class="screen active" id="card-screen">
   <div id="top-bar">
-    <div id="round-indicator">第 <span id="round-num">1</span> / 4 題</div>
+    <div id="thumb-strip"></div>
     <div id="top-actions">
       <button class="top-btn" id="skip-btn">跳過</button>
       <button class="top-btn" id="end-btn">結束</button>
     </div>
   </div>
-  <div id="version-tag">最勁係你 · v0.5 · 2026-05-27</div>
+  <div id="version-tag">最勁係你 · v0.6 · 2026-05-27</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -125,38 +127,20 @@ const QUESTIONS = [
   "最有可能同前度仲做好朋友的人",
   "最有可能對住塊鏡練習講嘢的人",
   "最有可能凌晨三點傳 message 的人",
-  "最有可能為咗段關係改變自己的人",
-  "最有可能講「我冇事」但成個人都喺度話有事的人",
   "最有可能分手後 block 完又 unblock 的人",
-  "最有可能對陌生人好過對屋企人的人",
-  "邊個會 send WhatsApp voice message 過一分鐘",
-  "邊個會喺地鐵大聲 FaceTime 講私事",
-  "邊個將對 AirPods 留咗喺的士",
-  "自拍要影超過 50 張先肯放上 IG 的人",
-  "邊個會喺自助餐食到要鬆皮帶",
-  "收到「喺咪」會直接已讀不回的人",
-  "邊個會跟住 IG 排隊但根本唔知排咩",
-  "去日本第一件事衝藥房的人",
-  "邊個會喺超市試食試到飽",
-  "出街成日唔記得帶八達通的人",
-  "收到 8 號風球開心過放假的人",
-  "喺𨋢入面對住鏡頭整 fit 的人",
-  "屋企養嘅植物全部死晒的人",
-  "喺街影 OOTD 影到阻住人的人",
-  "將 IG 摯友設定畀 80 個人的人",
-  "最有可能搭港鐵搭過龍的人",
-  "最似茶記阿姐熟客的人",
-  "最有可能執到 $20 都會出 IG story 的人",
-  "返屋企第一件事除晒衫淨返底褲的人"
+  "最有可能 send WhatsApp voice message 過一分鐘的人",
+  "最有可能自拍超過 50 張先肯放上 IG 的人",
+  "最有可能喺自助餐食到要鬆皮帶的人",
+  "最有可能去日本第一件事衝藥房的人",
+  "最有可能屋企養嘅植物全部死晒的人",
+  "最有可能將 IG 密友設定畀 80 個人的人",
+  "最有可能搭港鐵搭過龍的人"
 ];
-
-const ROUNDS_PER_GAME = 4;
 
 let pool = [];
 let currentQuestion = "";
 let stream = null;
 let facingMode = "user";
-let roundNum = 1;
 let sessionPhotos = []; // { dataUrl, blob, name }
 
 const $ = (id) => document.getElementById(id);
@@ -178,16 +162,14 @@ function setQuestion() {
   if (pool.length === 0) reshuffle();
   currentQuestion = pool.pop();
   $("question").textContent = currentQuestion;
-  $("round-num").textContent = roundNum;
 }
 
-function advanceRound() {
-  if (roundNum >= ROUNDS_PER_GAME) {
-    showResults();
-  } else {
-    roundNum++;
-    setQuestion();
-  }
+function addThumb(dataUrl) {
+  const img = document.createElement("img");
+  img.className = "thumb";
+  img.src = dataUrl;
+  $("thumb-strip").appendChild(img);
+  $("thumb-strip").scrollLeft = $("thumb-strip").scrollWidth;
 }
 
 async function startCamera() {
@@ -267,31 +249,33 @@ function capture() {
   ctx.drawImage(video, 0, 0, w, h);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  const fontSize = Math.round(w * 0.055);
-  ctx.font = `bold ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  ctx.textBaseline = "top";
-  const padding = Math.round(w * 0.04);
+  const fontSize = Math.round(w * 0.085);
+  ctx.font = `900 ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textBaseline = "alphabetic";
+  ctx.textAlign = "left";
+  ctx.lineJoin = "round";
+  const padding = Math.round(w * 0.055);
   const maxTextWidth = w - padding * 2;
   const lines = wrapText(ctx, currentQuestion, maxTextWidth);
-  const lineHeight = Math.round(fontSize * 1.35);
-  const boxH = padding * 2 + lines.length * lineHeight;
-
-  ctx.fillStyle = "rgba(0,0,0,0.55)";
-  ctx.fillRect(0, 0, w, boxH);
-
+  const lineHeight = Math.round(fontSize * 1.18);
+  const baseY = h - padding;
+  ctx.lineWidth = Math.max(4, Math.round(fontSize * 0.14));
+  ctx.strokeStyle = "#000";
   ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
   lines.forEach((ln, i) => {
-    ctx.fillText(ln, w / 2, padding + i * lineHeight);
+    const y = baseY - (lines.length - 1 - i) * lineHeight;
+    ctx.strokeText(ln, padding, y);
+    ctx.fillText(ln, padding, y);
   });
 
   const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   const blob = dataUrlToBlob(dataUrl);
   const name = `soulquest-${Date.now()}.jpg`;
   sessionPhotos.push({ dataUrl, blob, name });
+  addThumb(dataUrl);
 
   closeCamera();
-  advanceRound();
+  setQuestion();
 }
 
 function renderPhotoGrid() {
@@ -361,13 +345,13 @@ function showResults() {
 }
 
 function restart() {
-  roundNum = 1;
   sessionPhotos = [];
+  $("thumb-strip").innerHTML = "";
   setQuestion();
   showScreen("card-screen");
 }
 
-$("next-btn").addEventListener("click", advanceRound);
+$("next-btn").addEventListener("click", setQuestion);
 $("capture-btn").addEventListener("click", openCamera);
 $("cancel-btn").addEventListener("click", closeCamera);
 $("shutter").addEventListener("click", capture);
