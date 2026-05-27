@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SoulQuest</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+
+  /* ---------- Card screen ---------- */
+  #card-screen { flex: 1; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
+  #question-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 0; }
+  #question { font-size: 36px; font-weight: 700; line-height: 1.4; text-align: center; word-break: break-word; }
+  #card-buttons { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; }
+  .btn { width: 100%; padding: 20px; font-size: 20px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: #fff; color: #000; }
+  .btn-secondary { background: #222; color: #fff; border: 1px solid #444; }
+
+  /* ---------- Camera screen ---------- */
+  #camera-screen { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; }
+  #camera-screen.active { display: flex; }
+  #video-wrap { flex: 1; position: relative; overflow: hidden; }
+  #video { width: 100%; height: 100%; object-fit: cover; background: #000; }
+  #video.mirror { transform: scaleX(-1); }
+  #overlay-text { position: absolute; top: env(safe-area-inset-top, 0); left: 0; right: 0; padding: 20px 24px; background: rgba(0,0,0,0.55); color: #fff; font-size: 22px; font-weight: 700; line-height: 1.4; text-align: center; }
+  #camera-controls { padding: 20px 24px calc(env(safe-area-inset-bottom, 0) + 20px); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #000; }
+  #shutter { width: 78px; height: 78px; border-radius: 50%; background: #fff; border: 4px solid #888; cursor: pointer; justify-self: center; }
+  #shutter:active { background: #ddd; }
+  .small-btn { background: transparent; color: #fff; border: 1px solid #555; padding: 12px 16px; border-radius: 10px; font-size: 15px; font-family: inherit; cursor: pointer; }
+  #cancel-btn { justify-self: start; }
+  #flip-btn { justify-self: end; }
+
+  #error { color: #ff8080; padding: 12px; font-size: 14px; text-align: center; }
+  canvas { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Card screen -->
+<div id="card-screen">
+  <div id="question-wrap">
+    <div id="question">準備好了嗎?</div>
+  </div>
+  <div id="card-buttons">
+    <button class="btn btn-primary" id="capture-btn">拍照認證</button>
+    <button class="btn btn-secondary" id="next-btn">下一題</button>
+  </div>
+</div>
+
+<!-- Camera screen -->
+<div id="camera-screen">
+  <div id="video-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <div id="overlay-text"></div>
+  </div>
+  <div id="error"></div>
+  <div id="camera-controls">
+    <button class="small-btn" id="cancel-btn">取消</button>
+    <button id="shutter" aria-label="拍照"></button>
+    <button class="small-btn" id="flip-btn">切換鏡頭</button>
+  </div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const QUESTIONS = [
+  "最有可能在公司廁所睡覺的人",
+  "最有可能把鬧鐘按掉繼續睡的人",
+  "最有可能跟外送員聊起來的人",
+  "最有可能在電影院哭的人",
+  "最有可能忘記自己車停哪的人",
+  "最有可能買了健身房會員只去過 3 次的人",
+  "最有可能對著手機相機自言自語的人",
+  "最有可能把「等等回你」變成「等等」的人",
+  "最有可能在 IG 限動發吃的的人",
+  "最有可能把外套放在椅背上忘記帶走的人",
+  "最有可能跟自己的寵物講話像在跟人講話的人",
+  "最有可能存了一堆迷因但從來不發的人",
+  "最有可能在 KTV 點了歌卻不唱的人",
+  "最有可能在會議裡假裝在記筆記其實在畫畫的人",
+  "最有可能買書比看書多的人",
+  "最有可能把「我先睡了」說完還滑兩小時手機的人",
+  "最有可能在群組裡只看不回的人",
+  "最有可能把同一首歌循環一整週的人",
+  "最有可能跟陌生人解釋人生哲學的人",
+  "最有可能在便利商店站著吃完的人",
+  "最有可能在分手後馬上換大頭貼的人",
+  "最有可能假裝沒看到前任的 IG 但每天都看的人",
+  "最有可能為了陌生人哭的人",
+  "最有可能在朋友面前演沒事其實在崩潰的人",
+  "最有可能跟前任還是好朋友的人",
+  "最有可能愛上不該愛的人的人",
+  "最有可能在感情裡先說我愛你的人",
+  "最有可能假裝不在意但其實很在意的人",
+  "最有可能因為一首歌哭整晚的人",
+  "最有可能對著鏡子練習怎麼跟人說話的人",
+  "最有可能 IG 限動發完五分鐘刪掉的人",
+  "最有可能在凌晨三點傳訊息的人",
+  "最有可能愛得最深的人",
+  "最有可能為了維持關係改變自己的人",
+  "最有可能說「我沒事」但全身都在說有事的人",
+  "最有可能在分手後封鎖再解除封鎖的人",
+  "最有可能因為朋友的成就偷偷難過的人",
+  "最有可能在群組裡笑得最大聲但回家最安靜的人",
+  "最有可能把祕密寫成 Note 但永遠不發的人",
+  "最有可能對陌生人比對家人溫柔的人",
+  "最害怕被人真正看穿的人",
+  "最在感情裡假裝不需要對方的人",
+  "最有可能說「我沒事」但其實已經撐很久的人",
+  "最有可能愛上明知道不會有結果的人的人",
+  "最有可能用工作填滿生活逃避其他事的人",
+  "最有可能其實很想被需要但不說的人",
+  "最有可能還在愛著一個應該放下的人的人",
+  "最有可能覺得自己不夠好的人",
+  "最有可能用幽默掩蓋真實情緒的人",
+  "最有可能在這桌上最寂寞的人"
+];
+
+let pool = [];
+let currentQuestion = "準備好了嗎?";
+let stream = null;
+let facingMode = "user";
+
+const $ = (id) => document.getElementById(id);
+
+function reshuffle() {
+  pool = QUESTIONS.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+}
+
+function drawNext() {
+  if (pool.length === 0) reshuffle();
+  currentQuestion = pool.pop();
+  $("question").textContent = currentQuestion;
+}
+
+async function startCamera() {
+  stopCamera();
+  $("error").textContent = "";
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: facingMode } },
+      audio: false
+    });
+    const video = $("video");
+    video.srcObject = stream;
+    video.classList.toggle("mirror", facingMode === "user");
+  } catch (e) {
+    $("error").textContent = "無法開啟相機: " + (e.message || e.name);
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+}
+
+function openCamera() {
+  $("overlay-text").textContent = currentQuestion;
+  $("camera-screen").classList.add("active");
+  startCamera();
+}
+
+function closeCamera() {
+  stopCamera();
+  $("camera-screen").classList.remove("active");
+}
+
+function wrapText(ctx, text, maxWidth) {
+  const lines = [];
+  let line = "";
+  for (const ch of text) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxWidth && line.length > 0) {
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function capture() {
+  const video = $("video");
+  if (!video.videoWidth) return;
+
+  const canvas = $("canvas");
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+
+  if (facingMode === "user") {
+    ctx.translate(w, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(video, 0, 0, w, h);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  // Overlay text
+  const fontSize = Math.round(w * 0.055);
+  ctx.font = `bold ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
+  ctx.textBaseline = "top";
+  const padding = Math.round(w * 0.04);
+  const maxTextWidth = w - padding * 2;
+  const lines = wrapText(ctx, currentQuestion, maxTextWidth);
+  const lineHeight = Math.round(fontSize * 1.35);
+  const boxH = padding * 2 + lines.length * lineHeight;
+
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.fillRect(0, 0, w, boxH);
+
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  lines.forEach((ln, i) => {
+    ctx.fillText(ln, w / 2, padding + i * lineHeight);
+  });
+
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = `soulquest-${Date.now()}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  closeCamera();
+  drawNext();
+}
+
+$("next-btn").addEventListener("click", drawNext);
+$("capture-btn").addEventListener("click", openCamera);
+$("cancel-btn").addEventListener("click", closeCamera);
+$("shutter").addEventListener("click", capture);
+$("flip-btn").addEventListener("click", () => {
+  facingMode = facingMode === "user" ? "environment" : "user";
+  startCamera();
+});
+
+// Init
+reshuffle();
+drawNext();
+</script>
+</body>
+</html>
