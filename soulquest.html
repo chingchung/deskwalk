@@ -6,11 +6,15 @@
 <title>SoulQuest</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif; overflow: hidden; }
-  body { display: flex; flex-direction: column; }
+  html, body { min-height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
 
   /* ---------- Card screen ---------- */
-  #card-screen { flex: 1; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
+  #card-screen { padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
+  #round-indicator { text-align: center; padding: 16px 0 0; color: #888; font-size: 14px; letter-spacing: 0.1em; }
   #question-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 0; }
   #question { font-size: 36px; font-weight: 700; line-height: 1.4; text-align: center; word-break: break-word; }
   #card-buttons { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; }
@@ -19,8 +23,7 @@
   .btn-secondary { background: #222; color: #fff; border: 1px solid #444; }
 
   /* ---------- Camera screen ---------- */
-  #camera-screen { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; }
-  #camera-screen.active { display: flex; }
+  #camera-screen { position: fixed; inset: 0; background: #000; }
   #video-wrap { flex: 1; position: relative; overflow: hidden; }
   #video { width: 100%; height: 100%; object-fit: cover; background: #000; }
   #video.mirror { transform: scaleX(-1); }
@@ -32,6 +35,18 @@
   #cancel-btn { justify-self: start; }
   #flip-btn { justify-self: end; }
 
+  /* ---------- Results screen ---------- */
+  #results-screen { padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
+  #results-header { padding: 32px 0 16px; text-align: center; }
+  #results-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  #results-header p { color: #888; font-size: 14px; }
+  #photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 8px 0 24px; }
+  .photo-item { position: relative; background: #111; border-radius: 8px; overflow: hidden; }
+  .photo-item img { width: 100%; display: block; }
+  .photo-item .save-one { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid #555; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; cursor: pointer; }
+  #results-buttons { display: flex; flex-direction: column; gap: 12px; padding: 8px 0 24px; }
+  #empty-note { text-align: center; color: #666; padding: 40px 0; font-size: 14px; }
+
   #error { color: #ff8080; padding: 12px; font-size: 14px; text-align: center; }
   canvas { display: none; }
 </style>
@@ -39,7 +54,8 @@
 <body>
 
 <!-- Card screen -->
-<div id="card-screen">
+<div class="screen active" id="card-screen">
+  <div id="round-indicator">第 <span id="round-num">1</span> / 4 題</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -50,7 +66,7 @@
 </div>
 
 <!-- Camera screen -->
-<div id="camera-screen">
+<div class="screen" id="camera-screen">
   <div id="video-wrap">
     <video id="video" autoplay playsinline muted></video>
     <div id="overlay-text"></div>
@@ -60,6 +76,20 @@
     <button class="small-btn" id="cancel-btn">取消</button>
     <button id="shutter" aria-label="拍照"></button>
     <button class="small-btn" id="flip-btn">切換鏡頭</button>
+  </div>
+</div>
+
+<!-- Results screen -->
+<div class="screen" id="results-screen">
+  <div id="results-header">
+    <h1>這局完成</h1>
+    <p>長按相片可儲存,或用下方按鈕分享 / 儲存到相簿</p>
+  </div>
+  <div id="photo-grid"></div>
+  <div id="empty-note" style="display:none;">這局沒有拍照</div>
+  <div id="results-buttons">
+    <button class="btn btn-primary" id="save-all-btn">儲存所有相片到相簿</button>
+    <button class="btn btn-secondary" id="restart-btn">再玩一局</button>
   </div>
 </div>
 
@@ -119,12 +149,21 @@ const QUESTIONS = [
   "最有可能在這桌上最寂寞的人"
 ];
 
+const ROUNDS_PER_GAME = 4;
+
 let pool = [];
-let currentQuestion = "準備好了嗎?";
+let currentQuestion = "";
 let stream = null;
 let facingMode = "user";
+let roundNum = 1;
+let sessionPhotos = []; // { dataUrl, blob, name }
 
 const $ = (id) => document.getElementById(id);
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
 
 function reshuffle() {
   pool = QUESTIONS.slice();
@@ -134,10 +173,20 @@ function reshuffle() {
   }
 }
 
-function drawNext() {
+function setQuestion() {
   if (pool.length === 0) reshuffle();
   currentQuestion = pool.pop();
   $("question").textContent = currentQuestion;
+  $("round-num").textContent = roundNum;
+}
+
+function advanceRound() {
+  if (roundNum >= ROUNDS_PER_GAME) {
+    showResults();
+  } else {
+    roundNum++;
+    setQuestion();
+  }
 }
 
 async function startCamera() {
@@ -165,13 +214,13 @@ function stopCamera() {
 
 function openCamera() {
   $("overlay-text").textContent = currentQuestion;
-  $("camera-screen").classList.add("active");
+  showScreen("camera-screen");
   startCamera();
 }
 
 function closeCamera() {
   stopCamera();
-  $("camera-screen").classList.remove("active");
+  showScreen("card-screen");
 }
 
 function wrapText(ctx, text, maxWidth) {
@@ -188,6 +237,15 @@ function wrapText(ctx, text, maxWidth) {
   }
   if (line) lines.push(line);
   return lines;
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [head, b64] = dataUrl.split(",");
+  const mime = head.match(/:(.*?);/)[1];
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
 }
 
 function capture() {
@@ -208,7 +266,6 @@ function capture() {
   ctx.drawImage(video, 0, 0, w, h);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  // Overlay text
   const fontSize = Math.round(w * 0.055);
   ctx.font = `bold ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
   ctx.textBaseline = "top";
@@ -228,18 +285,88 @@ function capture() {
   });
 
   const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
-  const a = document.createElement("a");
-  a.href = dataUrl;
-  a.download = `soulquest-${Date.now()}.jpg`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  const blob = dataUrlToBlob(dataUrl);
+  const name = `soulquest-${Date.now()}.jpg`;
+  sessionPhotos.push({ dataUrl, blob, name });
 
   closeCamera();
-  drawNext();
+  advanceRound();
 }
 
-$("next-btn").addEventListener("click", drawNext);
+function renderPhotoGrid() {
+  const grid = $("photo-grid");
+  grid.innerHTML = "";
+  if (sessionPhotos.length === 0) {
+    $("empty-note").style.display = "block";
+    $("save-all-btn").style.display = "none";
+    return;
+  }
+  $("empty-note").style.display = "none";
+  $("save-all-btn").style.display = "block";
+
+  sessionPhotos.forEach((p, idx) => {
+    const wrap = document.createElement("div");
+    wrap.className = "photo-item";
+
+    const img = document.createElement("img");
+    img.src = p.dataUrl;
+    img.alt = `照片 ${idx + 1}`;
+    wrap.appendChild(img);
+
+    const btn = document.createElement("button");
+    btn.className = "save-one";
+    btn.textContent = "儲存";
+    btn.addEventListener("click", () => savePhoto(p));
+    wrap.appendChild(btn);
+
+    grid.appendChild(wrap);
+  });
+}
+
+async function savePhoto(photo) {
+  const file = new File([photo.blob], photo.name, { type: "image/jpeg" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return;
+    } catch (e) {
+      if (e.name === "AbortError") return;
+    }
+  }
+  // Fallback: open in new tab so user can long-press → Save to Photos
+  const url = URL.createObjectURL(photo.blob);
+  window.open(url, "_blank");
+}
+
+async function saveAll() {
+  const files = sessionPhotos.map(p => new File([p.blob], p.name, { type: "image/jpeg" }));
+  if (navigator.canShare && navigator.canShare({ files })) {
+    try {
+      await navigator.share({ files });
+      return;
+    } catch (e) {
+      if (e.name === "AbortError") return;
+    }
+  }
+  // Fallback: save one by one
+  for (const p of sessionPhotos) {
+    await savePhoto(p);
+  }
+}
+
+function showResults() {
+  renderPhotoGrid();
+  showScreen("results-screen");
+}
+
+function restart() {
+  roundNum = 1;
+  sessionPhotos = [];
+  setQuestion();
+  showScreen("card-screen");
+}
+
+$("next-btn").addEventListener("click", advanceRound);
 $("capture-btn").addEventListener("click", openCamera);
 $("cancel-btn").addEventListener("click", closeCamera);
 $("shutter").addEventListener("click", capture);
@@ -247,10 +374,12 @@ $("flip-btn").addEventListener("click", () => {
   facingMode = facingMode === "user" ? "environment" : "user";
   startCamera();
 });
+$("save-all-btn").addEventListener("click", saveAll);
+$("restart-btn").addEventListener("click", restart);
 
 // Init
 reshuffle();
-drawNext();
+setQuestion();
 </script>
 </body>
 </html>
