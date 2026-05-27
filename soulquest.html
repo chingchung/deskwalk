@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>SoulQuest</title>
+<title>最勁係你</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { min-height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif; }
@@ -14,7 +14,10 @@
 
   /* ---------- Card screen ---------- */
   #card-screen { padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0); }
-  #round-indicator { text-align: center; padding: 16px 0 0; color: #888; font-size: 14px; letter-spacing: 0.1em; }
+  #top-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 0; gap: 12px; }
+  #round-indicator { color: #888; font-size: 14px; letter-spacing: 0.1em; }
+  #end-btn { background: transparent; color: #888; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; cursor: pointer; }
+  #version-tag { text-align: center; padding: 4px 0 0; color: #555; font-size: 11px; letter-spacing: 0.05em; }
   #question-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 0; }
   #question { font-size: 36px; font-weight: 700; line-height: 1.4; text-align: center; word-break: break-word; }
   #card-buttons { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; }
@@ -55,7 +58,11 @@
 
 <!-- Card screen -->
 <div class="screen active" id="card-screen">
-  <div id="round-indicator">第 <span id="round-num">1</span> / 4 題</div>
+  <div id="top-bar">
+    <div id="round-indicator">第 <span id="round-num">1</span> / 4 題</div>
+    <button id="end-btn">結束</button>
+  </div>
+  <div id="version-tag">最勁係你 · v0.3 · 2026-05-27</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -374,6 +381,7 @@ $("flip-btn").addEventListener("click", () => {
   facingMode = facingMode === "user" ? "environment" : "user";
   startCamera();
 });
+$("end-btn").addEventListener("click", showResults);
 $("save-all-btn").addEventListener("click", saveAll);
 $("restart-btn").addEventListener("click", restart);
 

@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C /Users/kenny.cc.hung/Documents/claude-playground/deskwalk status)"
+      "Bash(git -C /Users/kenny.cc.hung/Documents/claude-playground/deskwalk status)",
+      "Bash(git push *)"
     ]
   }
 }
