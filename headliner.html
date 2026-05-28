@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>最勁係你</title>
+<title>Headliner · 頭條人物</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { min-height: 100%; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", sans-serif; }
@@ -69,7 +69,7 @@
       <button class="top-btn" id="end-btn">結束</button>
     </div>
   </div>
-  <div id="version-tag">最勁係你 · v1.0 · 2026-05-28</div>
+  <div id="version-tag">Headliner · 頭條人物 · v1.1 · 2026-05-28</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -407,7 +407,7 @@ function capture() {
 
   const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   const blob = dataUrlToBlob(dataUrl);
-  const name = `soulquest-${Date.now()}.jpg`;
+  const name = `headliner-${Date.now()}.jpg`;
   sessionPhotos.push({ dataUrl, blob, name });
   addThumb(dataUrl);
 
