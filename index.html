@@ -3,17 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>deskwalk — 桌遊靈感整理</title>
+    <title>deskwalk</title>
     <style>
       :root {
         --bg: #f5f5f0;
         --surface: #ffffff;
         --ink: #1a1a1a;
-        --ink-soft: #5a5a5a;
+        --ink-soft: #6b6b6b;
         --line: #e5e3da;
         --accent: #2a4a7f;
-        --accent-soft: #eaeef5;
-        --warm: #c89a5b;
       }
       * { box-sizing: border-box; }
       body {
@@ -21,414 +19,87 @@
         background: var(--bg);
         color: var(--ink);
         margin: 0;
-        line-height: 1.7;
+        line-height: 1.6;
         font-size: 16px;
       }
+      main {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem 5rem;
+      }
       header {
-        padding: 4rem 1.5rem 2rem;
-        text-align: center;
-        border-bottom: 1px solid var(--line);
+        margin-bottom: 3rem;
       }
       header h1 {
-        font-size: 2.5rem;
-        margin: 0 0 0.5rem;
+        font-size: 2rem;
+        margin: 0 0 0.25rem;
         letter-spacing: 0.02em;
       }
       header p {
         color: var(--ink-soft);
         margin: 0;
-        font-size: 1.05rem;
-      }
-      nav {
-        position: sticky;
-        top: 0;
-        background: var(--bg);
-        border-bottom: 1px solid var(--line);
-        padding: 0.75rem 1.5rem;
-        text-align: center;
-        z-index: 10;
-      }
-      nav a {
-        color: var(--ink-soft);
-        text-decoration: none;
-        margin: 0 0.75rem;
-        font-size: 0.95rem;
-        padding: 0.25rem 0;
-        border-bottom: 2px solid transparent;
-        transition: all 0.15s;
-      }
-      nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-      main {
-        max-width: 820px;
-        margin: 0 auto;
-        padding: 2.5rem 1.5rem 5rem;
-      }
-      section { margin-bottom: 4rem; scroll-margin-top: 4rem; }
-      section > h2 {
-        font-size: 1.75rem;
-        margin: 0 0 0.25rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--ink);
-        display: inline-block;
-      }
-      section > p.intro {
-        color: var(--ink-soft);
-        margin: 0.25rem 0 2rem;
         font-size: 0.95rem;
       }
-      .card {
+      .proto {
+        display: block;
         background: var(--surface);
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 1.5rem 1.75rem;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.15s, transform 0.15s;
       }
-      .card h3 {
-        margin: 0 0 0.5rem;
+      .proto:hover {
+        border-color: var(--accent);
+      }
+      .proto h2 {
+        margin: 0 0 0.4rem;
         font-size: 1.2rem;
         color: var(--accent);
       }
-      .card h3 .num {
-        color: var(--ink-soft);
-        margin-right: 0.4rem;
-        font-weight: normal;
-      }
-      .card p, .card ul { margin: 0.5rem 0; }
-      .card ul { padding-left: 1.25rem; }
-      .card li { margin-bottom: 0.25rem; }
-      .card .tag {
-        display: inline-block;
-        background: var(--accent-soft);
-        color: var(--accent);
-        font-size: 0.78rem;
-        padding: 0.1rem 0.55rem;
-        border-radius: 4px;
-        margin-right: 0.35rem;
-      }
-      .card.active {
-        border-left: 3px solid var(--warm);
-      }
-      .quote {
-        font-style: italic;
-        color: var(--ink-soft);
-        border-left: 3px solid var(--line);
-        padding-left: 1rem;
-        margin: 1rem 0;
-      }
-      .subhead {
-        font-size: 1.3rem;
-        margin: 2.5rem 0 1rem;
+      .proto .concept {
+        margin: 0 0 0.85rem;
         color: var(--ink);
-        padding-bottom: 0.3rem;
-        border-bottom: 1px dashed var(--line);
-      }
-      .mech-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 0.85rem;
-      }
-      .mech-grid .card { margin: 0; padding: 1.1rem 1.25rem; }
-      .mech-grid .card h3 { font-size: 1rem; }
-      .mech-grid .card p { font-size: 0.92rem; color: var(--ink-soft); margin: 0; }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 1rem 0;
         font-size: 0.95rem;
       }
-      th, td {
-        text-align: left;
-        padding: 0.55rem 0.75rem;
-        border-bottom: 1px solid var(--line);
-      }
-      th { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-      footer {
-        text-align: center;
+      .proto .meta {
         color: var(--ink-soft);
-        font-size: 0.85rem;
-        padding: 2rem 1rem 3rem;
-        border-top: 1px solid var(--line);
+        font-size: 0.8rem;
+        letter-spacing: 0.03em;
       }
-      footer a { color: var(--accent); }
-      details { margin: 0.5rem 0; }
-      summary {
-        cursor: pointer;
-        color: var(--accent);
-        font-size: 0.95rem;
-        padding: 0.25rem 0;
+      footer {
+        margin-top: 4rem;
+        color: var(--ink-soft);
+        font-size: 0.8rem;
+        text-align: center;
       }
+      footer a { color: var(--ink-soft); }
     </style>
   </head>
   <body>
-    <header>
-      <h1>deskwalk</h1>
-      <p>桌遊靈感整理 · work in progress</p>
-      <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
-        <p style="margin:0;">
-          <a href="draw.html" style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);font-size:0.95rem;">→ 心靈共感 (Hive Mind)</a>
-          <span style="color:var(--ink-soft);font-size:0.78rem;margin-left:0.5rem;">v0.5 · 2026-05-15</span>
-        </p>
-        <p style="margin:0;">
-          <a href="headliner.html" style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);font-size:0.95rem;">→ Headliner · 頭條人物</a>
-          <span style="color:var(--ink-soft);font-size:0.78rem;margin-left:0.5rem;">v1.1 · 2026-05-28</span>
-        </p>
-      </div>
-    </header>
-
-    <nav>
-      <a href="#backlog">概念清單</a>
-      <a href="#soulquest">SoulQuest</a>
-      <a href="#mechanisms">機制探索</a>
-      <a href="#questions">題型庫</a>
-    </nav>
-
     <main>
+      <header>
+        <h1>deskwalk</h1>
+        <p>桌遊原型實驗</p>
+      </header>
 
-      <!-- ============ BACKLOG ============ -->
-      <section id="backlog">
-        <h2>概念清單</h2>
-        <p class="intro">未開發的種子。每個都還在「為什麼這值得做」的階段。</p>
+      <a class="proto" href="headliner.html">
+        <h2>Headliner · 頭條人物</h2>
+        <p class="concept">派對指認遊戲。抽題、用手指指人、自拍時 AI 自動打格遮眼。</p>
+        <p class="meta">v1.1 · 2026-05-28</p>
+      </a>
 
-        <div class="card">
-          <h3><span class="num">01</span>Dixit 改進版 / 身心靈版</h3>
-          <p>Dixit 用圖片表達模糊概念，溝通門檻低。想做身心靈版本——在某情境或題目下，玩家先以直覺從圖片出發，再透過說話補充想法。</p>
-        </div>
+      <a class="proto" href="draw.html">
+        <h2>心靈共感 (Hive Mind)</h2>
+        <p class="concept">三階段抽題 demo,測試玩家集體默契,以「共感」累積分數推進。</p>
+        <p class="meta">v0.5 · 2026-05-15</p>
+      </a>
 
-        <div class="card">
-          <h3><span class="num">02</span>引導討論的對話桌遊</h3>
-          <p>一般對話桌遊只給題目不引導討論，遇到沒想法的題目玩家就直接跳過抽下一張。應該應用心理／談判／創意發想技巧延伸討論，引導大家導向共識。</p>
-        </div>
-
-        <div class="card">
-          <h3><span class="num">03</span>Insight Deck — Decode Your Emotion</h3>
-          <p>所有人都可以參與的塔羅。解決塔羅占卜往往一對一、需要解讀門檻的限制。讓所有人提供建議給問題者，讓問題者的心事被聽見，包裝成「集合眾人與宇宙能量的顯化」。某程度適合男女溝通。</p>
-        </div>
-
-        <div class="card">
-          <h3><span class="num">04</span>Tournament of Towers</h3>
-          <p>表面是 home decor，其實是 boardgame。</p>
-        </div>
-
-        <div class="card">
-          <h3><span class="num">05</span>貓塔羅</h3>
-          <p>暫無內容。</p>
-        </div>
-      </section>
-
-      <!-- ============ SOULQUEST ============ -->
-      <section id="soulquest">
-        <h2>SoulQuest <span style="font-size:0.9rem;color:var(--warm);font-weight:normal;">· active</span></h2>
-        <p class="intro">Design doc v0.3 · double diamond stage 1：整理喜歡的方向，不急著定案。</p>
-
-        <div class="card active">
-          <h3>定位</h3>
-          <p>讓玩家透過問答建立深度連結的 party game。包裝是「同頻／默契／價值觀」，機制保留曖昧張力——玩家自己定義那個連結是友情還是愛情。</p>
-        </div>
-
-        <div class="card active">
-          <h3>設計機會</h3>
-          <p>市面上的遊戲要嘛有深度但沒機制（WNRS），要嘛有機制但沒深度（Truth Bombs）。SoulQuest 的機會在中間——用機制製造進入深度對話的理由，讓揭曉的瞬間成為真實連結的入口。</p>
-        </div>
-
-        <div class="card active">
-          <h3>核心張力</h3>
-          <ul>
-            <li>低門檻 vs 深度揭露</li>
-            <li>匿名安全感 vs 社交高潮的揭曉</li>
-            <li>同頻獎勵 vs 遊戲性（要有贏家）</li>
-          </ul>
-        </div>
-
-        <h3 class="subhead">References — 喜歡的機制</h3>
-
-        <details>
-          <summary>展開 8 個參考遊戲</summary>
-          <div class="card">
-            <h3>誰最可能⋯⋯</h3>
-            <p><span class="tag">投票</span><span class="tag">匿名</span><span class="tag">得分</span></p>
-            <p>猜中最多人選的答案才得分——獎勵同頻，不問對錯。揭曉瞬間是社交高潮。</p>
-          </div>
-          <div class="card">
-            <h3>Hive Mind</h3>
-            <p><span class="tag">集體潛意識</span><span class="tag">默契</span></p>
-            <p>跟所有玩家越同頻越高分。玩的是群體的集體感知。</p>
-          </div>
-          <div class="card">
-            <h3>Wavelength</h3>
-            <p><span class="tag">配件設計</span><span class="tag">光譜思維</span></p>
-            <p>高質感實體配件值得參考。思維光譜的比較，天然產生「原來你這樣想」的時刻。</p>
-          </div>
-          <div class="card">
-            <h3>３ターんだけ君が好き</h3>
-            <p><span class="tag">核心方向</span><span class="tag">短回合</span><span class="tag">對象輪換</span></p>
-            <p>目前最符合想做的方向。短回合、時間壓力、每輪聚焦特定對象都值得保留。</p>
-          </div>
-          <div class="card">
-            <h3>Wink</h3>
-            <p><span class="tag">隱晦訊號</span><span class="tag">新鮮感</span></p>
-            <p>每輪換對象的新鮮感。隱晦訊號製造張力——你在暗示誰？</p>
-          </div>
-          <div class="card">
-            <h3>Lifeboat</h3>
-            <p><span class="tag">喜歡 &amp; 恨</span><span class="tag">hidden identity</span></p>
-            <p>有喜歡也有恨的對象，讓遊戲感更強。隱藏動機驅動行為。</p>
-          </div>
-          <div class="card">
-            <h3>The School of Life</h3>
-            <p><span class="tag">問題品質</span><span class="tag">深度標準</span></p>
-            <p>問題設計的品質標準。能讓人說出平時不會說的話的問題。</p>
-          </div>
-          <div class="card">
-            <h3>1/1024</h3>
-            <p><span class="tag">兩層揭曉</span><span class="tag">低門檻</span></p>
-            <p>2 選 1 即時揭曉 + 終局累積同頻——兩層張力。10 題全同頻概率 1/1024。「選擇」比「表達」門檻低但同樣揭露。</p>
-          </div>
-        </details>
-
-        <h3 class="subhead">核心 Loop 草案</h3>
-
-        <div class="card">
-          <h3>Loop A · 誰最可能（投票指認）</h3>
-          <ol>
-            <li>抽問題卡（例：「這桌上誰最可能在感情裡先道歉？」）</li>
-            <li>所有人匿名寫一個名字（可以寫自己）</li>
-            <li>揭曉票數，票最多的人是「答案」</li>
-            <li>猜中答案的人得分</li>
-          </ol>
-          <p class="quote">待決策：平票時由當事人裁決——把自我認知拉進遊戲。</p>
-        </div>
-
-        <div class="card active">
-          <h3>Loop B · 辨認版（current direction）</h3>
-          <p class="quote">解決 Loop A 與 Hive 系列的死穴：「猜搭檔會寫什麼」會逼玩家策略性回答，玩完不會更了解彼此。翻轉成獎勵「辨認」而非「匹配」。</p>
-          <ol>
-            <li>抽深度題（例：「上次哭是因為什麼？」）</li>
-            <li>大家寫<strong>真實答案</strong>（沒有匹配壓力）</li>
-            <li>匿名揭曉——所有答案一起放上桌</li>
-            <li>每人寫「我猜這張是 ___ 寫的」</li>
-            <li>計分：
-              <ul>
-                <li>你的答案被猜中 +1（你夠像自己）</li>
-                <li>你猜中別人 +1（你夠認識他）</li>
-                <li>搭檔互相猜中你 +3</li>
-              </ul>
-            </li>
-          </ol>
-          <p><strong>為什麼這比 Loop A 好：</strong></p>
-          <table>
-            <tr><th>痛點</th><th>翻轉後</th></tr>
-            <tr><td>不能表達真實想法</td><td>真實答案是得分前提，越像自己越好</td></tr>
-            <tr><td>玩完不會更了解搭檔</td><td>整場都在練習辨認搭檔的聲音，這就是了解</td></tr>
-          </table>
-          <p>副作用：題目品質變成關鍵——強制走 School of Life 風格的深度題。</p>
-        </div>
-
-        <h3 class="subhead">兩種遊玩模式</h3>
-
-        <div class="card">
-          <h3>Mode α · Hive 群體共識</h3>
-          <ul>
-            <li>開放題，同步寫答案</li>
-            <li>計分：和你同答案的人 = 同盟，每多一人 +1</li>
-            <li>連鎖加碼：和同一群人連續同頻，倍率累積（×1 → ×2 → ×4），斷一次歸 1</li>
-            <li>指定對象：寫答前秘密押一人，押中加倍</li>
-          </ul>
-          <p>玩的是「我跟這群人有多像」。</p>
-        </div>
-
-        <div class="card">
-          <h3>Mode β · King 輪流當王</h3>
-          <ul>
-            <li>一人當王，寫下自己的答案</li>
-            <li>其他人猜王會寫什麼</li>
-            <li>王的計分：被多少人猜中 = 你被了解的程度</li>
-            <li>其他人計分：猜中王 +2</li>
-            <li>王輪換，每人都會被當一次主角</li>
-          </ul>
-          <p>玩的是「我多懂這個特定的人」。</p>
-        </div>
-
-        <h3 class="subhead">Hidden Pairs（秘密同盟）</h3>
-
-        <div class="card active">
-          <h3>設計累積</h3>
-          <p><strong>關係類型差異化：</strong>不是所有 pair 都是同一種關係。每對抽不同關係牌——同頻／對映／守護者／天敵。從「猜身份」進化成「猜身份 + 猜關係」。<em>第一版先做同頻一種，對映需要裁決較複雜。</em></p>
-
-          <p><strong>暗號圖卡：</strong>每對配 3 張共享圖卡，作為視覺暗號。圖必須模稜兩可，提供「合理推諉」——對外別人推不出，對內同盟讀得到調性。</p>
-
-          <p><strong>共享母題視覺系統：</strong>整副牌共用 6-8 個母題（圓／線／水／門／光⋯），每張卡 2-3 個母題組合。製造解讀噪音——你不能憑單一元素鎖定卡片。美學副作用：整副牌像一套有靈魂的塔羅／神諭卡。</p>
-
-          <p><strong>跨遊戲共用：</strong>暗號牌、Insight Deck、貓塔羅可以共用同一套視覺語言系統。</p>
-
-          <p><strong>與主機制耦合：</strong>Hive 模式下搭檔同頻有額外暗分；King 模式下搭檔當王時猜中雙倍；終局互相指中搭檔有大獎。讓 Hidden Pairs 不只是 side quest。</p>
-
-          <p><strong>在 Loop B 裡的新意義：</strong>搭檔任務不再是「跟我寫一樣」，而是「讀懂我」。整場遊戲在練習辨認搭檔的語氣／用詞／視角。圖卡從「暗號」改成「個人風格的視覺指紋」。</p>
-        </div>
-
-        <h3 class="subhead">已知未解問題</h3>
-
-        <div class="card">
-          <ul>
-            <li><strong>同頻搭檔可能過早確認</strong>（兩三輪就鎖定），後面回合張力下降。需要干擾機制——例如「沉默輪」讓你不確定剛才的同頻是真是假。</li>
-            <li><strong>對映關係計分需要裁決</strong>，第一版暫不做。</li>
-            <li><strong>暗號圖卡目前沒給分</strong>。可考慮揭曉後投票「最巧妙運用暗號的人」+ 額外分。</li>
-            <li><strong>人數校準：</strong>6 人剛剛好，4 人 pair 太容易猜到，8 人難度提升。</li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- ============ MECHANISMS ============ -->
-      <section id="mechanisms">
-        <h2>機制方向探索</h2>
-        <p class="intro">10 個方向用來刺激設計思考。有些互斥，有些可疊加。</p>
-
-        <div class="mech-grid">
-          <div class="card"><h3>01 · 賭注升級</h3><p>每輪可加注押分，賭自己會跟某人同頻。猜對雙倍，猜錯歸零。</p></div>
-          <div class="card"><h3>02 · 秘密同盟</h3><p>開局抽牌決定命運連結。透過答案找到你的人，結束時揭曉。</p></div>
-          <div class="card"><h3>03 · 一題多軌</h3><p>同題，一半人答「X 會怎麼選」，一半答「自己怎麼選」。交叉比對。</p></div>
-          <div class="card"><h3>04 · 犧牲者輪盤</h3><p>每輪一個 hot seat，其他人預測他的答案。強制輪換，每人都被看見。</p></div>
-          <div class="card"><h3>05 · 漸層光譜</h3><p>不選 A 或 B，在 0-100 光譜上下注。揭露立場也揭露程度。</p></div>
-          <div class="card"><h3>06 · 時間膠囊</h3><p>某些題目封存到尾聲。累積懸念。</p></div>
-          <div class="card"><h3>07 · 叛徒機制</h3><p>有一人的秘密任務是不要跟任何人同頻。製造閱讀遊戲。</p></div>
-          <div class="card"><h3>08 · 雙盲承諾</h3><p>兩人同時決定是否對彼此下注。囚徒困境的親密版。</p></div>
-          <div class="card"><h3>09 · 問題拍賣</h3><p>花分數買下問題卡，決定這輪問誰。權力交給玩家。</p></div>
-          <div class="card"><h3>10 · 身份碎片</h3><p>開局抽三張「我是誰」隱藏牌。被猜中時有風險也有獎勵。</p></div>
-        </div>
-      </section>
-
-      <!-- ============ QUESTIONS ============ -->
-      <section id="questions">
-        <h2>題型庫</h2>
-        <p class="intro">收集好用的題目模板（句型／結構），不是具體題目本身。</p>
-
-        <div class="card">
-          <h3>誰最可能 ＿＿＿＿</h3>
-          <p><span class="tag">投票指認</span><span class="tag">他選自選皆可</span></p>
-          <p><strong>句型：</strong>誰最可能（在 X 情境下）做 Y？</p>
-          <p><strong>特性：</strong>強迫玩家用「對別人的觀察」當答案。揭曉是社交高潮——「為什麼你們都覺得是我？」</p>
-          <p><strong>範例：</strong></p>
-          <ul>
-            <li>誰最可能在感情裡先道歉？</li>
-            <li>誰最可能凌晨三點還在傳訊息？</li>
-            <li>誰最可能養一隻會講話的鸚鵡？</li>
-          </ul>
-        </div>
-
-        <div class="card" style="opacity:0.6;">
-          <h3>候選題型（待擴充）</h3>
-          <ul>
-            <li>最代表 X 的 Y——具象指涉，引發地域／個人記憶</li>
-            <li>最後一次 X 是什麼時候——時間追問，逼回憶</li>
-            <li>如果只能 X，你會選 Y 嗎——強制取捨</li>
-            <li>你願意花多少 X 換 Y——量化價值觀</li>
-          </ul>
-        </div>
-      </section>
-
+      <footer>
+        <a href="https://github.com/chingchung/deskwalk">github</a>
+      </footer>
     </main>
-
-    <footer>
-      <p>deskwalk · <a href="https://github.com/chingchung/deskwalk">github</a></p>
-    </footer>
   </body>
 </html>
