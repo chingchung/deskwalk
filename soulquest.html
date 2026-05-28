@@ -54,7 +54,8 @@
   #empty-note { text-align: center; color: #666; padding: 40px 0; font-size: 14px; }
 
   #error { color: #ff8080; padding: 12px; font-size: 14px; text-align: center; }
-  canvas { display: none; }
+  #live-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  #canvas { display: none; }
 </style>
 </head>
 <body>
@@ -68,7 +69,7 @@
       <button class="top-btn" id="end-btn">結束</button>
     </div>
   </div>
-  <div id="version-tag">最勁係你 · v0.8 · 2026-05-27</div>
+  <div id="version-tag">最勁係你 · v0.9 · 2026-05-28</div>
   <div id="question-wrap">
     <div id="question">準備好了嗎?</div>
   </div>
@@ -82,6 +83,7 @@
 <div class="screen" id="camera-screen">
   <div id="video-wrap">
     <video id="video" autoplay playsinline muted></video>
+    <canvas id="live-overlay"></canvas>
     <div id="overlay-text"></div>
   </div>
   <div id="error"></div>
@@ -142,6 +144,10 @@ let currentQuestion = "";
 let stream = null;
 let facingMode = "user";
 let sessionPhotos = []; // { dataUrl, blob, name }
+let faceDetector = null;
+let detectorLoading = false;
+let detectLoopId = null;
+let lastDetections = [];
 
 const $ = (id) => document.getElementById(id);
 
@@ -198,12 +204,120 @@ function stopCamera() {
 function openCamera() {
   $("overlay-text").textContent = currentQuestion;
   showScreen("camera-screen");
-  startCamera();
+  startCamera().then(() => {
+    ensureDetector().then(() => startDetectLoop());
+  });
 }
 
 function closeCamera() {
+  stopDetectLoop();
   stopCamera();
   showScreen("card-screen");
+}
+
+async function ensureDetector() {
+  if (faceDetector || detectorLoading) return faceDetector;
+  detectorLoading = true;
+  try {
+    const mod = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs");
+    const vision = await mod.FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    );
+    faceDetector = await mod.FaceDetector.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
+        delegate: "GPU"
+      },
+      runningMode: "VIDEO",
+      minDetectionConfidence: 0.5
+    });
+  } catch (e) {
+    console.warn("Face detector failed to load, falling back to bottom text", e);
+    faceDetector = null;
+  }
+  detectorLoading = false;
+  return faceDetector;
+}
+
+function startDetectLoop() {
+  if (!faceDetector) return;
+  const video = $("video");
+  const canvas = $("live-overlay");
+  const ctx = canvas.getContext("2d");
+
+  function tick() {
+    if (!stream) { detectLoopId = null; return; }
+    if (video.readyState >= 2 && video.videoWidth) {
+      if (canvas.width !== video.videoWidth) canvas.width = video.videoWidth;
+      if (canvas.height !== video.videoHeight) canvas.height = video.videoHeight;
+      try {
+        const result = faceDetector.detectForVideo(video, performance.now());
+        lastDetections = result && result.detections ? result.detections : [];
+      } catch (e) {
+        lastDetections = [];
+      }
+      const mirror = facingMode === "user";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawCensorBars(ctx, canvas.width, canvas.height, lastDetections, currentQuestion, mirror);
+      $("overlay-text").style.display = lastDetections.length ? "none" : "block";
+    }
+    detectLoopId = requestAnimationFrame(tick);
+  }
+  detectLoopId = requestAnimationFrame(tick);
+}
+
+function stopDetectLoop() {
+  if (detectLoopId) cancelAnimationFrame(detectLoopId);
+  detectLoopId = null;
+  lastDetections = [];
+  const canvas = $("live-overlay");
+  if (canvas.width) canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+  $("overlay-text").style.display = "block";
+}
+
+function drawCensorBars(ctx, w, h, detections, text, mirror) {
+  for (const det of detections) {
+    const kp = det.keypoints;
+    if (!kp || kp.length < 2) continue;
+    let x1 = kp[0].x * w, y1 = kp[0].y * h;
+    let x2 = kp[1].x * w, y2 = kp[1].y * h;
+    if (mirror) { x1 = w - x1; x2 = w - x2; }
+    const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2;
+    const dx = x2 - x1, dy = y2 - y1;
+    const eyeDist = Math.hypot(dx, dy);
+    if (eyeDist < 10) continue;
+    const angle = Math.atan2(dy, dx);
+    const barW = eyeDist * 2.6;
+    const barH = eyeDist * 0.75;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(-barW / 2, -barH / 2, barW, barH);
+
+    // Shrink-to-fit text
+    let fontSize = barH * 0.6;
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    let displayText = text;
+    const maxW = barW * 0.92;
+    while (fontSize > 8) {
+      ctx.font = `900 ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
+      if (ctx.measureText(displayText).width <= maxW) break;
+      fontSize -= 1;
+    }
+    if (ctx.measureText(displayText).width > maxW) {
+      // truncate
+      while (displayText.length > 4 && ctx.measureText(displayText + "…").width > maxW) {
+        displayText = displayText.slice(0, -1);
+      }
+      displayText += "…";
+    }
+    ctx.fillText(displayText, 0, 0);
+    ctx.restore();
+  }
 }
 
 function wrapText(ctx, text, maxWidth) {
@@ -249,27 +363,41 @@ function capture() {
   ctx.drawImage(video, 0, 0, w, h);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  const fontSize = Math.round(w * 0.115);
-  ctx.font = `900 ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
-  ctx.textBaseline = "alphabetic";
-  ctx.textAlign = "left";
-  const padding = Math.round(w * 0.055);
-  const maxTextWidth = w - padding * 2;
-  const lines = wrapText(ctx, currentQuestion, maxTextWidth);
-  const lineHeight = Math.round(fontSize * 1.12);
-  const baseY = h - padding;
-  ctx.shadowColor = "rgba(0,0,0,0.35)";
-  ctx.shadowBlur = Math.round(fontSize * 0.12);
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = Math.round(fontSize * 0.05);
-  ctx.fillStyle = "#fff";
-  lines.forEach((ln, i) => {
-    const y = baseY - (lines.length - 1 - i) * lineHeight;
-    ctx.fillText(ln, padding, y);
-  });
-  ctx.shadowColor = "transparent";
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
+  // Re-detect on the captured frame for accuracy (sync with live)
+  let detections = lastDetections;
+  if (faceDetector) {
+    try {
+      const result = faceDetector.detectForVideo(video, performance.now());
+      if (result && result.detections) detections = result.detections;
+    } catch (e) { /* keep lastDetections */ }
+  }
+
+  if (detections && detections.length > 0) {
+    drawCensorBars(ctx, w, h, detections, currentQuestion, facingMode === "user");
+  } else {
+    // Fallback: bottom-left text
+    const fontSize = Math.round(w * 0.115);
+    ctx.font = `900 ${fontSize}px -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif`;
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "left";
+    const padding = Math.round(w * 0.055);
+    const maxTextWidth = w - padding * 2;
+    const lines = wrapText(ctx, currentQuestion, maxTextWidth);
+    const lineHeight = Math.round(fontSize * 1.12);
+    const baseY = h - padding;
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = Math.round(fontSize * 0.12);
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = Math.round(fontSize * 0.05);
+    ctx.fillStyle = "#fff";
+    lines.forEach((ln, i) => {
+      const y = baseY - (lines.length - 1 - i) * lineHeight;
+      ctx.fillText(ln, padding, y);
+    });
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
 
   const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
   const blob = dataUrlToBlob(dataUrl);
