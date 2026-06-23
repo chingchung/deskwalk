@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>1234</title>
+<style>
+  :root{
+    --paper:#FBFAF6; --grid:#ECE6DA; --ink:#16130F; --ink-soft:#6F665B;
+    --a1:#1E64FF; --a2:#1FB07A; --a3:#FFB020; --a4:#FF275E;
+    --good:#1FB07A; --bad:#FF275E; --hl:#FFE24D;
+    --card:#FFFFFF; --line:#E4DCCE; --radius:20px;
+    --shadow:0 3px 0 var(--line), 0 18px 30px -20px rgba(22,19,15,.55);
+    font-synthesis-weight:none;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:var(--paper);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px;
+    color:var(--ink);
+    font-family:"PingFang HK","PingFang TC","Noto Sans HK","Noto Sans TC","Microsoft JhengHei","Heiti TC",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  #app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+    padding:max(16px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  button:focus-visible{outline:3px solid var(--a1);outline-offset:2px;}
+  .brand{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;}
+  .brand .nums{display:flex;gap:5px;}
+  .brand .nums b{font-size:15px;font-weight:900;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;color:#fff;}
+  .brand .nums b:nth-child(1){background:var(--a1);}
+  .brand .nums b:nth-child(2){background:var(--a2);}
+  .brand .nums b:nth-child(3){background:var(--a3);}
+  .brand .nums b:nth-child(4){background:var(--a4);}
+  .brand span{font-size:11px;letter-spacing:.18em;color:var(--ink-soft);font-weight:700;}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-weight:900;
+    font-size:18px;letter-spacing:.02em;padding:17px;border-radius:15px;background:var(--ink);color:var(--paper);
+    box-shadow:0 4px 0 #000;transition:transform .06s,box-shadow .06s;}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #000;}
+  .btn--go{background:var(--a1);box-shadow:0 4px 0 #0c3da6;}
+  .btn--go:active{box-shadow:0 1px 0 #0c3da6;}
+  .btn--ghost{background:transparent;color:var(--ink);border:2px solid var(--ink);box-shadow:none;font-size:15px;padding:13px;}
+  .btn--ghost:active{transform:translateY(2px);}
+  .muted{color:var(--ink-soft);font-size:13px;}
+
+  /* ---------- intro ---------- */
+  .hero{font-size:clamp(38px,12vw,58px);font-weight:900;letter-spacing:-.02em;line-height:1;margin:4px 0 6px;}
+  .hero em{font-style:normal;}
+  .hero em:nth-child(1){color:var(--a1);} .hero em:nth-child(2){color:var(--a2);}
+  .hero em:nth-child(3){color:var(--a3);} .hero em:nth-child(4){color:var(--a4);}
+  .tagline{font-size:15px;font-weight:700;color:var(--ink-soft);margin:0 0 20px;}
+
+  .rules{background:var(--card);border:2px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px 20px 20px;margin-bottom:20px;}
+  .rules h3{margin:0 0 12px;font-size:13px;letter-spacing:.14em;color:var(--ink-soft);font-weight:800;}
+  .rules-p{margin:0;font-size:15px;font-weight:600;line-height:1.6;}
+  .rules ol{margin:0;padding:0;list-style:none;counter-reset:r;display:flex;flex-direction:column;gap:11px;}
+  .rules li{counter-increment:r;display:flex;gap:12px;font-size:14.5px;font-weight:600;line-height:1.45;}
+  .rules li::before{content:counter(r);flex:none;width:24px;height:24px;border-radius:8px;background:var(--ink);
+    color:var(--paper);font-weight:900;font-size:13px;display:grid;place-items:center;margin-top:1px;}
+  .rules b{color:var(--a4);}
+
+  /* ---------- deck ---------- */
+  .deckwrap{position:relative;height:200px;margin:6px 0 22px;display:grid;place-items:center;}
+  .dcard{position:absolute;width:min(300px,80vw);height:170px;background:var(--card);border:2px solid var(--ink);
+    border-radius:var(--radius);box-shadow:var(--shadow);display:grid;place-items:center;text-align:center;padding:18px;}
+  .dcard.b3{transform:translateY(14px) rotate(-5deg) scale(.94);opacity:.55;}
+  .dcard.b2{transform:translateY(7px) rotate(3.5deg) scale(.97);opacity:.8;}
+  .dcard.top .klabel{font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--ink-soft);margin-bottom:10px;}
+  .dcard.top .ktopic{font-size:clamp(24px,7vw,32px);font-weight:900;letter-spacing:-.01em;line-height:1.2;}
+  .dcard .deckface{font-size:46px;font-weight:900;letter-spacing:4px;color:var(--line);}
+  .deckcount{text-align:center;font-size:12px;color:var(--ink-soft);font-weight:700;margin:-12px 0 18px;}
+
+  /* ---------- play ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;}
+  .topicpill{background:var(--ink);color:var(--paper);border-radius:30px;padding:9px 16px;font-weight:900;
+    font-size:15px;max-width:78%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .topicpill span{font-size:10px;letter-spacing:.14em;opacity:.7;display:block;font-weight:800;}
+  .xbtn{flex:none;width:38px;height:38px;border-radius:11px;border:2px solid var(--line);background:var(--card);
+    font-weight:900;font-size:17px;color:var(--ink-soft);display:grid;place-items:center;}
+
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;}
+  .turnlabel{font-size:14px;font-weight:800;letter-spacing:.1em;color:var(--ink-soft);}
+  .turnlabel b{color:var(--ink);}
+  .wordbig{font-size:clamp(56px,20vw,104px);font-weight:900;line-height:.95;letter-spacing:-.03em;}
+  .wordbig small{font-size:.32em;font-weight:800;letter-spacing:0;vertical-align:.45em;margin-left:2px;color:var(--ink-soft);}
+
+  .ringwrap{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:14px 0 4px;}
+  .ringwrap svg{width:100%;height:100%;transform:rotate(-90deg);}
+  .ringwrap .track{fill:none;stroke:var(--line);stroke-width:14;}
+  .ringwrap .prog{fill:none;stroke:var(--a1);stroke-width:14;stroke-linecap:round;transition:stroke .15s;}
+  .ringtext{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ringtext .sec{font-size:clamp(46px,14vw,72px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+  .ringtext .status{font-size:13.5px;font-weight:800;color:var(--ink-soft);margin-top:6px;display:flex;align-items:center;gap:7px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--bad);}
+  .dot.live{background:var(--good);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+
+  .pips{display:flex;gap:9px;margin:8px 0 2px;}
+  .pips i{width:11px;height:11px;border-radius:50%;background:var(--line);transition:background .15s,transform .15s;}
+  .pips i.on{background:var(--a3);}
+  .pips i.spent{background:var(--bad);transform:scale(1.25);}
+
+  .listenbar{height:9px;width:min(230px,62vw);background:var(--card);border:2px solid var(--line);border-radius:20px;
+    overflow:hidden;margin-top:4px;}
+  .listenbar i{display:block;height:100%;width:0;background:var(--good);border-radius:20px;transition:width .07s linear;}
+
+  .playfoot{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .flash{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;}
+  .flash.good{background:radial-gradient(circle,rgba(31,176,122,.35),transparent 70%);}
+  .flash.bad{background:radial-gradient(circle,rgba(255,39,94,.4),transparent 70%);}
+
+  /* ---------- result ---------- */
+  .result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;}
+  .result .emo{font-size:60px;}
+  .result .rt{font-size:26px;font-weight:900;}
+  .result .score{font-size:clamp(64px,22vw,120px);font-weight:900;line-height:1;color:var(--a4);letter-spacing:-.03em;}
+  .result .score small{font-size:.26em;color:var(--ink-soft);font-weight:800;display:block;letter-spacing:.1em;}
+  .result .sub{font-size:14px;color:var(--ink-soft);font-weight:700;max-width:300px;}
+
+  .hide{display:none !important;}
+  .foot-note{text-align:center;color:var(--ink-soft);font-size:11.5px;margin-top:auto;padding-top:18px;line-height:1.5;}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="flash" id="flash"></div>
+
+<script>
+"use strict";
+
+/* ============ 題目庫 ============ */
+const TOPICS = [
+  "請假嘅理由", "分手嘅藉口", "遲到嘅原因", "拒絕飯局嘅藉口",
+  "香港茶餐廳食物", "一個香港地鐵站", "形容你前度", "老闆講過嘅廢話",
+  "戀愛大忌", "減肥失敗嘅原因", "屋企人嘅嘮叨", "你最怕嘅嘢",
+  "一種香港小食", "扮病嘅症狀", "週末做嘅嘢", "一句分手對白",
+];
+
+/* ============ 狀態 ============ */
+const App = {
+  screen: "intro",
+  deck: [],
+  topic: "",
+  player: 1,        // 第幾位 = 要講幾個字
+  running: false,
+  audio: null,      // AudioContext
+  analyser: null,
+  micStream: null,
+  micOK: false,
+};
+
+const root = document.getElementById("app");
+const flash = document.getElementById("flash");
+
+/* ============ 音效 (WebAudio) ============ */
+function ensureAudio(){
+  if(!App.audio){
+    App.audio = new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(App.audio.state === "suspended") App.audio.resume();
+  return App.audio;
+}
+function beep(freq, dur, type="sine", gain=0.25){
+  const ac = ensureAudio();
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, ac.currentTime);
+  g.gain.linearRampToValueAtTime(gain, ac.currentTime+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime+dur);
+  o.connect(g).connect(ac.destination);
+  o.start(); o.stop(ac.currentTime+dur+0.02);
+  guardMic(dur*1000 + 90);
+}
+// 每秒提示音:越接近超時越高音、越急
+function sndTick(n){ // n = 已用秒數 1..3
+  const f = [0,520,640,820][n] || 520;
+  beep(f, 0.10, "square", 0.18);
+}
+// 成功:兩粒上行叮叮
+function sndGood(){
+  beep(740, 0.10, "sine", 0.28);
+  setTimeout(()=>beep(1108, 0.16, "sine", 0.28), 95);
+}
+// 失敗:低沉長 buzz(第4秒專用)
+function sndFail(){
+  beep(160, 0.45, "sawtooth", 0.3);
+  setTimeout(()=>beep(110, 0.5, "sawtooth", 0.28), 70);
+}
+function sndStart(){ beep(440, 0.08, "sine", 0.16); }
+
+function flashFx(kind){
+  flash.className = "flash " + kind;
+  flash.style.opacity = "1";
+  setTimeout(()=>flash.style.opacity="0", 160);
+}
+
+/* ============ 語音偵測 (VAD) ============ */
+let _vadGuardUntil = 0;
+function guardMic(ms){ _vadGuardUntil = Math.max(_vadGuardUntil, performance.now()+ms); }
+
+async function initMic(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});
+    App.micStream = stream;
+    const ac = ensureAudio();
+    const src = ac.createMediaStreamSource(stream);
+    const an = ac.createAnalyser();
+    an.fftSize = 1024;
+    an.smoothingTimeConstant = 0.4;
+    src.connect(an);
+    App.analyser = an;
+    App.micOK = true;
+    return true;
+  }catch(e){
+    App.micOK = false;
+    return false;
+  }
+}
+function micRMS(){
+  const an = App.analyser;
+  if(!an) return 0;
+  const buf = new Uint8Array(an.fftSize);
+  an.getByteTimeDomainData(buf);
+  let s=0;
+  for(let i=0;i<buf.length;i++){ const x=(buf[i]-128)/128; s+=x*x; }
+  return Math.sqrt(s/buf.length);
+}
+
+/* ============ 回合計時 + 偵測迴圈 ============ */
+const TURN_MS = 4000;          // 每位 4 秒
+const VOICE_THR = 0.028;       // 講嘢音量門檻(越細越敏感)
+const NEED_VOICE_MS = 130;     // 要講夠咁耐先當「有講」
+const END_SILENCE_MS = 320;    // 講完後靜咁耐 = 「講完」
+
+let turnState = null;
+function startTurn(){
+  App.running = true;
+  sndStart();
+  turnState = {
+    t0: performance.now(),
+    voiceMs: 0,
+    silenceMs: 0,
+    spoke: false,
+    lastFrame: performance.now(),
+    ticksDone: 0,
+    finished: false,
+    level: 0,        // 0..1 平滑音量 (畀條 bar 用)
+  };
+  requestAnimationFrame(loop);
+}
+
+function loop(now){
+  if(!App.running || !turnState) return;
+  const ts = turnState;
+  const dt = now - ts.lastFrame; ts.lastFrame = now;
+  const elapsed = now - ts.t0;
+  const remain = Math.max(0, TURN_MS - elapsed);
+
+  /* --- 每秒提示音 --- */
+  const sec = Math.floor(elapsed/1000);
+  if(sec > ts.ticksDone && sec >= 1 && sec <= 3){
+    ts.ticksDone = sec;
+    sndTick(sec);
+  }
+
+  /* --- 語音偵測 --- */
+  let level = 0;
+  if(App.micOK && now > _vadGuardUntil){
+    const r = micRMS();
+    level = Math.min(1, r/0.18);
+    if(r > VOICE_THR){
+      ts.voiceMs += dt; ts.silenceMs = 0;
+      if(ts.voiceMs > NEED_VOICE_MS) ts.spoke = true;
+    }else{
+      if(ts.spoke) ts.silenceMs += dt;
+    }
+    // 講完(有講過 + 靜咗一陣)→ 成功
+    if(ts.spoke && ts.silenceMs > END_SILENCE_MS){
+      return success();
+    }
+  }
+  ts.level = ts.level*0.7 + level*0.3;
+
+  /* --- 更新畫面 --- */
+  renderRing(remain, elapsed, ts.level, ts.spoke);
+
+  /* --- 超時 = 失敗(第 4 秒) --- */
+  if(remain <= 0){
+    return fail();
+  }
+  requestAnimationFrame(loop);
+}
+
+function success(){
+  if(!turnState || turnState.finished) return;
+  turnState.finished = true;
+  App.running = false;
+  sndGood();
+  flashFx("good");
+  App.player += 1;
+  setTimeout(()=>{ startTurn(); render(); }, 480);
+  render();
+}
+function fail(){
+  if(!turnState) return;
+  App.running = false;
+  turnState.finished = true;
+  sndFail();
+  flashFx("bad");
+  App.screen = "result";
+  render();
+}
+function quitToDeck(){
+  App.running = false; turnState = null;
+  App.screen = "intro";
+  render();
+}
+
+/* ============ 牌庫 ============ */
+function shuffleDeck(){
+  App.deck = [...TOPICS].sort(()=>Math.random()-0.5);
+}
+function drawTopic(){
+  if(App.deck.length===0) shuffleDeck();
+  App.topic = App.deck.shift();
+}
+
+/* ============ 開始遊戲 ============ */
+async function beginGame(){
+  ensureAudio();
+  if(!App.micOK){ await initMic(); }
+  drawTopic();
+  App.player = 1;
+  App.screen = "play";
+  render();
+  startTurn();
+}
+
+/* ============ Render ============ */
+function render(){
+  if(App.screen === "intro") root.innerHTML = viewIntro();
+  else if(App.screen === "play") root.innerHTML = viewPlay();
+  else if(App.screen === "result") root.innerHTML = viewResult();
+  bind();
+}
+
+function viewIntro(){
+  if(App.deck.length===0) shuffleDeck();
+  const peek = App.deck[0];
+  return `
+  <div class="brand">
+    <div class="nums"><b>1</b><b>2</b><b>3</b><b>4</b></div>
+    <span>DESKWALK</span>
+  </div>
+
+  <h1 class="hero"><em>1</em> <em>2</em> <em>3</em> <em>4</em></h1>
+  <p class="tagline">越講越長,越講越亂 — 4 秒之內,講夠字數!</p>
+
+  <div class="rules">
+    <h3>玩法</h3>
+    <p class="rules-p">抽一張題目卡(例:<b>請假嘅理由</b>),全枱圍住輪流作答 —— 第 <b>1</b> 位講 <b>1 個字</b>、第 <b>2</b> 位 <b>2 個字</b>,字數一路加上去,睇你哋全枱可以撐到第幾位!</p>
+  </div>
+
+  <div class="deckwrap">
+    <div class="dcard b3"></div>
+    <div class="dcard b2"></div>
+    <div class="dcard top">
+      <div>
+        <div class="klabel">題目卡 · 輕按開始抽</div>
+        <div class="ktopic">${peek}</div>
+      </div>
+    </div>
+  </div>
+  <div class="deckcount">牌庫 ${App.deck.length} 張</div>
+
+  <button class="btn btn--go" id="start">🎙️ 開始遊戲</button>
+  <p class="foot-note">需要咪高峰權限作語音偵測。<br>偵測唔到?play 畫面有「答完」掣可手動推進。</p>
+  `;
+}
+
+function viewPlay(){
+  const p = App.player;
+  return `
+  <div class="topbar">
+    <div class="topicpill"><span>而家玩緊</span>${App.topic}</div>
+    <button class="xbtn" id="quit">✕</button>
+  </div>
+
+  <div class="stage">
+    <div class="turnlabel">第 <b>${p}</b> 位作答</div>
+    <div class="wordbig">${p}<small>個字</small></div>
+
+    <div class="ringwrap">
+      <svg viewBox="0 0 120 120">
+        <circle class="track" cx="60" cy="60" r="52"></circle>
+        <circle class="prog" id="prog" cx="60" cy="60" r="52"
+          stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="ringtext">
+        <div class="sec" id="sec">4</div>
+        <div class="status"><span class="dot ${App.micOK?'live':''}" id="dot"></span><span id="stat">${App.micOK?'聽緊你講…':'冇咪 · 手動模式'}</span></div>
+      </div>
+    </div>
+
+    <div class="pips" id="pips">
+      <i></i><i></i><i></i><i></i>
+    </div>
+    <div class="listenbar"><i id="lvl"></i></div>
+  </div>
+
+  <div class="playfoot">
+    <button class="btn btn--go" id="done">✓ 答完(手動)</button>
+  </div>
+  `;
+}
+
+function viewResult(){
+  const got = App.player - 1; // 成功嘅位數
+  const msg = got===0 ? "第一位就 GG,唔好咁緊張!"
+            : got<3 ? "熱身啫,翻去再試過!"
+            : got<6 ? "幾掂吖,差少少破紀錄!"
+            : "勁!全枱腦霧都頂得住!";
+  return `
+  <div class="brand">
+    <div class="nums"><b>1</b><b>2</b><b>3</b><b>4</b></div>
+    <span>遊戲結束</span>
+  </div>
+  <div class="result">
+    <div class="emo">${got<3?'💥':'🏆'}</div>
+    <div class="rt">出局喇!</div>
+    <div class="score">${got}<small>成功撐過嘅位數</small></div>
+    <div class="muted">題目:${App.topic}</div>
+    <div class="sub">${msg}</div>
+  </div>
+  <div class="playfoot">
+    <button class="btn btn--go" id="again">↻ 同一題再嚟</button>
+    <button class="btn btn--ghost" id="newtopic">換一題</button>
+    <button class="btn btn--ghost" id="home">返主頁</button>
+  </div>
+  `;
+}
+
+/* ---- 即時更新 ring(唔重 render 成個畫面) ---- */
+const RING_C = 2*Math.PI*52;
+function renderRing(remain, elapsed, level, spoke){
+  const prog = document.getElementById("prog");
+  const secEl = document.getElementById("sec");
+  const lvl = document.getElementById("lvl");
+  const stat = document.getElementById("stat");
+  const dot = document.getElementById("dot");
+  if(!prog) return;
+  const frac = remain / TURN_MS;        // 1 → 0
+  prog.style.strokeDashoffset = String(RING_C * (1-frac));
+  // 顏色隨時間轉急
+  const sec = Math.ceil(remain/1000);
+  const col = sec>=4?'var(--a1)':sec===3?'var(--a2)':sec===2?'var(--a3)':'var(--a4)';
+  prog.style.stroke = col;
+  secEl.textContent = String(Math.max(1, sec));
+  secEl.style.color = col;
+  if(lvl) lvl.style.width = Math.round(Math.min(1,level)*100) + "%";
+  if(stat && App.micOK) stat.textContent = spoke ? "聽到喇,講完即過…" : "聽緊你講…";
+  if(dot && spoke) dot.classList.add("live");
+
+  // pips:已用秒數變紅
+  const pips = document.querySelectorAll("#pips i");
+  const used = Math.floor(elapsed/1000);
+  pips.forEach((el,i)=>{
+    el.classList.toggle("spent", i < used);
+    el.classList.toggle("on", i === used && i<4);
+  });
+}
+
+/* ============ 綁定事件 ============ */
+function bind(){
+  const $ = id => document.getElementById(id);
+  if($("start")) $("start").onclick = beginGame;
+  if($("quit")) $("quit").onclick = quitToDeck;
+  if($("done")) $("done").onclick = ()=>{ if(App.running) success(); };
+  if($("again")) $("again").onclick = ()=>{ App.player=1; App.screen="play"; render(); startTurn(); };
+  if($("newtopic")) $("newtopic").onclick = ()=>{ drawTopic(); App.player=1; App.screen="play"; render(); startTurn(); };
+  if($("home")) $("home").onclick = quitToDeck;
+}
+
+render();
+</script>
+</body>
+</html>
