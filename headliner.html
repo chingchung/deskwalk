@@ -20,8 +20,8 @@
   #top-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 0; gap: 12px; }
   #thumb-strip { display: flex; gap: 6px; overflow-x: auto; flex: 1; min-width: 0; scrollbar-width: none; }
   #thumb-strip::-webkit-scrollbar { display: none; }
-  .thumb { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 2px solid var(--ink); }
-  .top-btn { background: var(--card); color: var(--ink-soft); border: 2px solid var(--line); padding: 7px 13px; border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
+  .thumb { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--line); }
+  .top-btn { background: var(--card); color: var(--ink-soft); border: 1px solid var(--line); padding: 7px 13px; border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
   .top-btn:active { transform: translateY(1px); }
   #top-actions { display: flex; gap: 8px; flex-shrink: 0; }
   #version-tag { text-align: center; padding: 14px 0 0; color: var(--ink-soft); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; }
@@ -30,8 +30,8 @@
   #card-buttons { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
   .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 18px; font-size: 19px; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; font-family: inherit; transition: transform .06s, box-shadow .06s; }
   .btn-primary { background: var(--accent); color: #fff; box-shadow: var(--shadow-pop); }
-  .btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--accent-deep); }
-  .btn-secondary { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+  .btn-primary:active { transform: translateY(3px); box-shadow: var(--shadow-press); }
+  .btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
   .btn-secondary:active { transform: translateY(2px); }
 
   /* ---------- Camera screen (stays dark — live capture) ---------- */
@@ -53,7 +53,7 @@
   #results-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
   #results-header p { color: var(--ink-soft); font-size: 14px; }
   #photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 8px 0 24px; }
-  .photo-item { position: relative; background: var(--card); border: 2px solid var(--ink); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .photo-item { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
   .photo-item img { width: 100%; display: block; }
   .photo-item .save-one { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.66); color: #fff; border: none; padding: 6px 11px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; }
   #results-buttons { display: flex; flex-direction: column; gap: 12px; padding: 8px 0 24px; }

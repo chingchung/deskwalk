@@ -145,10 +145,10 @@
       }
       .dot.win {
         background: var(--ink);
-        border-color: var(--ink);
+        border-color: var(--accent);
       }
       .dot.current {
-        border-color: var(--ink);
+        border-color: var(--accent);
         animation: dotPulse 1.8s ease-in-out infinite;
       }
       @keyframes dotPulse {
@@ -194,7 +194,7 @@
         position: absolute;
         inset: 0;
         background: var(--card);
-        border: 2px solid var(--ink);
+        border: 1px solid var(--line);
         border-radius: 22px;
         box-shadow: var(--shadow);
       }
@@ -317,12 +317,12 @@
       }
       .btn-primary:active {
         transform: translateY(3px);
-        box-shadow: 0 1px 0 var(--accent-deep);
+        box-shadow: var(--shadow-press);
       }
       .btn-ghost {
         background: var(--card);
         color: var(--ink);
-        border: 2px solid var(--ink);
+        border: 1px solid var(--line);
       }
       .btn-ghost:active { transform: translateY(2px); }
 

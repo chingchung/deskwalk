@@ -28,8 +28,10 @@
   --radius: 16px;
   --radius-sm: 11px;
   --pill: 999px;
-  --shadow: 0 2px 0 var(--line), 0 16px 30px -20px rgba(26, 23, 18, 0.42);
-  --shadow-pop: 0 4px 0 var(--accent-deep);
+  /* soft shadows only — no hard outline strokes */
+  --shadow: 0 1px 2px rgba(26, 23, 18, 0.05), 0 14px 30px -18px rgba(26, 23, 18, 0.26);
+  --shadow-pop: 0 10px 22px -10px rgba(240, 82, 46, 0.50);
+  --shadow-press: 0 5px 13px -7px rgba(240, 82, 46, 0.55);
 
   /* ---- type ---- */
   --sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "PingFang HK",
@@ -74,7 +76,7 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   gap: 0.4em;
   padding: 5px 11px 5px 9px;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: var(--pill);
   background: color-mix(in srgb, var(--paper) 86%, transparent);
   backdrop-filter: blur(6px);

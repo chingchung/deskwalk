@@ -39,7 +39,7 @@
         position: relative;
         display: block;
         background: var(--card);
-        border: 2px solid var(--ink);
+        border: 1px solid var(--line);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
         padding: 1.4rem 1.6rem;
@@ -50,7 +50,8 @@
       }
       .proto:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 0 var(--line), 0 22px 34px -20px rgba(26, 23, 18, 0.5);
+        border-color: color-mix(in srgb, var(--ink) 18%, var(--line));
+        box-shadow: 0 20px 36px -18px rgba(26, 23, 18, 0.30);
       }
       .proto-head {
         display: flex;
