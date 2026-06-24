@@ -1,0 +1,97 @@
+/* ============================================================
+   deskwalk — brand system
+   桌遊原型系列共用設計基底。所有原型 import 此檔取得一致的
+   紙感底色、墨色字、單一品牌色與基本元件樣式。
+   設計語言：暖紙格底 + 墨線白卡 + 單一暖橘品牌色。輕、簡、夠玩味。
+   ============================================================ */
+
+:root {
+  /* ---- paper & ink ---- */
+  --paper: #FBFAF6;   /* warm off-white desk surface */
+  --grid: #ECE6DA;    /* faint graph-paper line */
+  --card: #FFFFFF;    /* card / surface face */
+  --ink: #1A1712;     /* warm near-black text */
+  --ink-soft: #736B5F;/* secondary text */
+  --line: #E7E0D2;    /* hairline / soft border */
+
+  /* ---- single brand accent ---- */
+  --accent: #F0522E;       /* deskwalk vermilion */
+  --accent-deep: #C53F1F;  /* pressed / button base shadow */
+  --accent-soft: #FCEBE2;  /* tint fill */
+
+  /* ---- shared status colors ---- */
+  --good: #1F9D6B;
+  --bad: #E23A57;
+  --hl: #FFE15A;
+
+  /* ---- shape & depth ---- */
+  --radius: 16px;
+  --radius-sm: 11px;
+  --pill: 999px;
+  --shadow: 0 2px 0 var(--line), 0 16px 30px -20px rgba(26, 23, 18, 0.42);
+  --shadow-pop: 0 4px 0 var(--accent-deep);
+
+  /* ---- type ---- */
+  --sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "PingFang HK",
+    "PingFang TC", "Noto Sans HK", "Noto Sans TC", "Microsoft JhengHei",
+    "Heiti TC", system-ui, sans-serif;
+
+  font-synthesis-weight: none;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 27px 27px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+button { font-family: inherit; cursor: pointer; }
+
+/* ------------------------------------------------------------
+   deskwalk series mark — small wordmark in the corner of every
+   prototype, linking home. Establishes "part of the series".
+   ------------------------------------------------------------ */
+.dw-mark {
+  position: fixed;
+  top: max(0.7rem, env(safe-area-inset-top));
+  left: max(0.85rem, env(safe-area-inset-left));
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 5px 11px 5px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--pill);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  line-height: 1;
+  transition: border-color 0.18s, color 0.18s;
+}
+.dw-mark::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+.dw-mark:hover { border-color: var(--accent); color: var(--accent); }
