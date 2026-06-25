@@ -2,17 +2,16 @@
    deskwalk — brand system
    桌遊原型系列共用設計基底。所有原型 import 此檔取得一致的
    紙感底色、墨色字、單一品牌色與基本元件樣式。
-   設計語言：暖紙格底 + 墨線白卡 + 單一暖橘品牌色。輕、簡、夠玩味。
+   設計語言：暖紙格底 + Apple「液態玻璃」面材 + 單一暖橘品牌色。
+   面材全部用半透明霜面玻璃：背景模糊 + 高光鑲邊 + 軟陰影。輕、柔、夠玩味。
    ============================================================ */
 
 :root {
   /* ---- paper & ink ---- */
   --paper: #FBFAF6;   /* warm off-white desk surface */
   --grid: #ECE6DA;    /* faint graph-paper line */
-  --card: #FFFFFF;    /* card / surface face */
   --ink: #1A1712;     /* warm near-black text */
   --ink-soft: #736B5F;/* secondary text */
-  --line: #E7E0D2;    /* hairline / soft border */
 
   /* ---- single brand accent ---- */
   --accent: #F0522E;       /* deskwalk vermilion */
@@ -24,14 +23,37 @@
   --bad: #E23A57;
   --hl: #FFE15A;
 
+  /* ---- liquid glass material ----
+     --card / --line keep their old names so every prototype that builds
+     surfaces from them turns to glass automatically. */
+  --card: rgba(255, 255, 255, 0.55);        /* frosted glass face */
+  --card-strong: rgba(255, 255, 255, 0.70); /* denser glass (small controls) */
+  --card-ink: linear-gradient(180deg, rgba(46, 42, 35, 0.90), rgba(26, 23, 18, 0.92)); /* dark glass */
+  /* light warm hairline — also doubles as the soft fill/stroke for tracks,
+     pips & deck faces in the prototypes, so it stays light (not transparent). */
+  --line: #E3DBCB;
+  --glass-rim: rgba(255, 255, 255, 0.72);   /* bright specular rim (via inset highlight) */
+  /* the blur lives in a token so a single backdrop-filter line glassifies any surface */
+  --glass-blur: blur(20px) saturate(1.7);
+  --glass-blur-sm: blur(13px) saturate(1.6);
+
   /* ---- shape & depth ---- */
-  --radius: 16px;
-  --radius-sm: 11px;
+  --radius: 18px;
+  --radius-sm: 12px;
   --pill: 999px;
-  /* soft shadows only — no hard outline strokes */
-  --shadow: 0 1px 2px rgba(26, 23, 18, 0.05), 0 14px 30px -18px rgba(26, 23, 18, 0.26);
-  --shadow-pop: 0 10px 22px -10px rgba(240, 82, 46, 0.50);
-  --shadow-press: 0 5px 13px -7px rgba(240, 82, 46, 0.55);
+  /* glass shadow = soft drop + bright inset top rim + faint inset bottom edge */
+  --shadow:
+    0 14px 34px -18px rgba(26, 23, 18, 0.28),
+    0 2px 6px -3px rgba(26, 23, 18, 0.06),
+    inset 0 1px 0 var(--glass-rim),
+    inset 0 -1px 0 rgba(26, 23, 18, 0.04);
+  --shadow-pop:
+    0 12px 26px -10px rgba(240, 82, 46, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 5px rgba(197, 63, 31, 0.35);
+  --shadow-press:
+    0 6px 14px -8px rgba(240, 82, 46, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
 
   /* ---- type ---- */
   --sans: "Helvetica Neue", -apple-system, BlinkMacSystemFont, "PingFang HK",
@@ -48,6 +70,7 @@ html, body { min-height: 100%; }
 body {
   margin: 0;
   background-color: var(--paper);
+  /* warm graph-paper grid stays the signature底紋 */
   background-image:
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
@@ -61,7 +84,36 @@ body {
   text-size-adjust: 100%;
 }
 
+/* faint drifting colour glows behind the glass — gives the frost something
+   to refract & tint. Sits above the body grid, behind all page content. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vw 36vw at 15% 10%, rgba(240, 82, 46, 0.13), transparent 60%),
+    radial-gradient(36vw 34vw at 86% 20%, rgba(30, 100, 255, 0.10), transparent 60%),
+    radial-gradient(42vw 40vw at 50% 94%, rgba(31, 176, 122, 0.11), transparent 62%);
+  filter: blur(6px);
+  animation: dwAmbient 28s ease-in-out infinite alternate;
+}
+@keyframes dwAmbient {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(2.5%, -2%, 0) scale(1.08); }
+}
+
 button { font-family: inherit; cursor: pointer; }
+
+/* shared glass helpers — any prototype can apply these directly */
+.dw-glass {
+  background: var(--card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
 
 /* ------------------------------------------------------------
    deskwalk series mark — small wordmark in the corner of every
@@ -75,19 +127,22 @@ button { font-family: inherit; cursor: pointer; }
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  padding: 5px 11px 5px 9px;
+  padding: 6px 12px 6px 10px;
   border: 1px solid var(--line);
   border-radius: var(--pill);
-  background: color-mix(in srgb, var(--paper) 86%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: var(--card);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  box-shadow:
+    0 6px 16px -8px rgba(26, 23, 18, 0.30),
+    inset 0 1px 0 var(--glass-rim);
   color: var(--ink);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-decoration: none;
   line-height: 1;
-  transition: border-color 0.18s, color 0.18s;
+  transition: border-color 0.18s, color 0.18s, box-shadow 0.18s;
 }
 .dw-mark::before {
   content: "";

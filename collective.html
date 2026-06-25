@@ -31,8 +31,7 @@
         position: relative;
         min-height: 100vh;
       }
-      /* Cosmic radial removed — warm paper grid comes from brand.css */
-      body::before { display: none; }
+      /* warm paper grid + liquid-glass ambient glow come from brand.css (body::before) */
       /* Ambient corner ornaments */
       .ornament { display: none; }
       .ornament svg { display: block; width: 100%; height: 100%; }
@@ -194,6 +193,8 @@
         position: absolute;
         inset: 0;
         background: var(--card);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
         border: 1px solid var(--line);
         border-radius: 22px;
         box-shadow: var(--shadow);
@@ -310,9 +311,11 @@
         transition: transform 0.06s, box-shadow 0.06s, background 0.2s, color 0.2s;
       }
       .btn-primary {
-        background: var(--accent);
+        background: linear-gradient(180deg, #F5704E, var(--accent));
         color: #fff;
         border: none;
+        -webkit-backdrop-filter: var(--glass-blur-sm);
+        backdrop-filter: var(--glass-blur-sm);
         box-shadow: var(--shadow-pop);
       }
       .btn-primary:active {
@@ -323,6 +326,9 @@
         background: var(--card);
         color: var(--ink);
         border: 1px solid var(--line);
+        -webkit-backdrop-filter: var(--glass-blur-sm);
+        backdrop-filter: var(--glass-blur-sm);
+        box-shadow: var(--shadow);
       }
       .btn-ghost:active { transform: translateY(2px); }
 
@@ -331,7 +337,9 @@
         position: fixed;
         inset: 0;
         z-index: 100;
-        background: var(--bg);
+        background: rgba(251, 250, 246, 0.7);
+        -webkit-backdrop-filter: blur(26px) saturate(1.5);
+        backdrop-filter: blur(26px) saturate(1.5);
         display: grid;
         place-items: center;
         opacity: 0;
