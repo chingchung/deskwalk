@@ -54,18 +54,25 @@
   .pad h2 { margin: 0 0 1rem; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
 
   /* ---------- records (紀錄) ---------- */
-  .lock { text-align: center; border: 1px dashed color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: var(--radius); padding: 1.6rem 1.2rem; margin-bottom: 1.2rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); }
-  .lock .ic { font-size: 1.5rem; }
-  .lock p { margin: 0.4rem 0 0.9rem; font-size: 0.88rem; color: var(--ink-soft); }
-  .lock input { font: inherit; font-size: 1.1rem; letter-spacing: 0.3em; text-align: center; width: 130px; padding: 0.5rem; border: 1px solid var(--line); border-radius: 12px; background: var(--card-strong); color: var(--ink); }
-  .lock .err { color: var(--bad); font-size: 0.8rem; min-height: 1.1em; margin: 0.5rem 0 0; }
   .btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.1rem; font: inherit; font-size: 0.9rem; font-weight: 800; box-shadow: var(--shadow-pop); }
-  .btn.ghost { background: var(--accent-soft); color: var(--accent-deep); box-shadow: none; border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line)); }
-
-  .admin[hidden] { display: none; }
-  .admin-bar { display: flex; gap: 0.6rem; align-items: center; margin-bottom: 1rem; }
-  .admin-bar .sp { flex: 1; }
   .lock-link { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.78rem; text-decoration: underline; }
+  .err { color: var(--bad); font-size: 0.8rem; min-height: 1.1em; margin: 0.5rem 0; }
+
+  /* FAB + bottom sheet */
+  .fab { position: fixed; top: max(0.9rem, env(safe-area-inset-top)); right: max(0.9rem, env(safe-area-inset-right)); z-index: 96; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 1.7rem; font-weight: 400; line-height: 1; display: grid; place-items: center; box-shadow: var(--shadow-pop); transition: transform 0.15s ease; }
+  .fab:active { transform: scale(0.93); }
+  .fab[hidden] { display: none; }
+  .sheet-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(26, 23, 18, 0.34); display: flex; align-items: flex-end; justify-content: center; }
+  .sheet-backdrop[hidden] { display: none; }
+  .sheet { width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto; background: rgba(251, 250, 246, 0.97); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-radius: 24px 24px 0 0; padding: 0.7rem 1.3rem calc(1.5rem + env(safe-area-inset-bottom)); box-shadow: 0 -16px 44px -16px rgba(26, 23, 18, 0.4), inset 0 1px 0 var(--glass-rim); animation: sheetUp 0.26s ease; }
+  @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sheet-grip { width: 38px; height: 4px; border-radius: 999px; background: var(--line); margin: 0.2rem auto 1rem; cursor: pointer; }
+  .sheet-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+  .sheet-sub { margin: 0.3rem 0 1rem; font-size: 0.85rem; color: var(--ink-soft); }
+  .sheet-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.9rem; }
+  #sheet-lock { text-align: center; padding: 0.4rem 0 0.6rem; }
+  #sheet-lock input { font: inherit; font-size: 1.2rem; letter-spacing: 0.3em; text-align: center; width: 160px; padding: 0.6rem; border: 1px solid var(--line); border-radius: 12px; background: var(--card-strong); color: var(--ink); }
+  #sheet-form .add-form { border: none; background: none; padding: 0; margin: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
 
   .add-form { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.2rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); }
   .field { margin-bottom: 0.7rem; }
@@ -95,7 +102,16 @@
   .rec { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); padding: 0.7rem 0.85rem; }
   .rec-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; }
   .rec-date { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .rec-game { font-size: 0.95rem; font-weight: 800; color: var(--ink); flex: 1; }
+  .rec-title { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0.45rem; }
+  .rec-game { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
+  .rec-note { font-size: 0.68rem; font-weight: 700; color: var(--ink-soft); background: var(--card-strong); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
+  .rec-game-link { background: none; border: none; text-align: left; padding: 0; cursor: pointer; }
+  .rec-game-link:hover { color: var(--accent-deep); }
+  .detail-back { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.9rem; font-weight: 700; padding: 0; margin-bottom: 0.5rem; }
+  .detail-back:hover { color: var(--accent-deep); }
+  .detail-sub { color: var(--ink-soft); font-size: 0.8rem; margin: -0.6rem 0 1.1rem; }
+  .detail-h3 { font-size: 0.9rem; font-weight: 800; color: var(--ink); margin: 1.5rem 0 0.7rem; }
+  #detail-board { padding-left: 0; padding-right: 0; }
   .mode-badge { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
   .mode-rank { background: var(--card-strong); color: var(--ink-soft); border: 1px solid var(--line); }
   .mode-team { background: var(--accent-soft); color: var(--accent-deep); }
@@ -135,7 +151,6 @@
 </style>
 </head>
 <body>
-<a class="dw-mark" href="index.html">deskwalk</a>
 <main>
   <!-- ========== 排名 ========== -->
   <section class="tab" id="tab-rank">
@@ -150,46 +165,7 @@
   <section class="tab" id="tab-log" hidden>
     <div class="pad">
       <h2>場次紀錄</h2>
-
-      <div class="lock" id="lock">
-        <div class="ic">🔒</div>
-        <p>新增 / 編輯場次需要密碼</p>
-        <input type="password" id="pw" inputmode="numeric" autocomplete="off" placeholder="••••">
-        <p class="err" id="pw-err"></p>
-        <button class="btn" id="unlock">解鎖</button>
-      </div>
-
-      <div class="admin" id="admin" hidden>
-        <div class="admin-bar">
-          <button class="btn ghost" id="toggle-add">＋ 新增場次</button>
-          <span class="sp"></span>
-          <button class="lock-link" id="lock-again">鎖定</button>
-        </div>
-
-        <div class="add-form m-rank" id="add-form" hidden>
-          <div class="two">
-            <div class="field"><label>日期</label><input type="date" id="f-date"></div>
-            <div class="field"><label>遊戲</label><input type="text" id="f-game" placeholder="例:卡卡頌"></div>
-          </div>
-          <div class="field">
-            <label>計分方式</label>
-            <div class="seg" id="f-mode">
-              <button type="button" data-mode="rank" class="on">名次制</button>
-              <button type="button" data-mode="team">勝負制</button>
-            </div>
-          </div>
-          <div class="field">
-            <label id="players-label">玩家與名次（同名次 = 並列）</label>
-            <div id="players"></div>
-            <button type="button" class="addrow" id="add-row">＋ 加一位</button>
-          </div>
-          <div class="preview" id="preview"></div>
-          <button class="btn btn-save" id="save" disabled>儲存場次</button>
-        </div>
-      </div>
-
       <ul class="records" id="records"></ul>
-      <button class="reset" id="reset" hidden>重設為示範資料</button>
     </div>
   </section>
 
@@ -225,7 +201,21 @@
       </div>
     </div>
   </section>
+
+  <!-- ========== 單一遊戲詳情 ========== -->
+  <section class="tab" id="tab-detail" hidden>
+    <div class="pad">
+      <button class="detail-back" id="detail-back">‹ 返回</button>
+      <h2 id="detail-title"></h2>
+      <p class="detail-sub" id="detail-sub"></p>
+      <ol class="list" id="detail-board"></ol>
+      <h3 class="detail-h3">場次</h3>
+      <ul class="records" id="detail-records"></ul>
+    </div>
+  </section>
 </main>
+
+<button class="fab" id="fab" hidden aria-label="新增場次">＋</button>
 
 <nav class="tabbar" id="tabbar">
   <button data-tab="rank" class="on">排名</button>
@@ -233,16 +223,58 @@
   <button data-tab="rules">積分準則</button>
 </nav>
 
+<div class="sheet-backdrop" id="sheet" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="新增場次">
+    <div class="sheet-grip" id="sheet-grip"></div>
+
+    <div id="sheet-lock">
+      <h3 class="sheet-title">輸入密碼</h3>
+      <p class="sheet-sub">新增場次需要密碼</p>
+      <input type="password" id="pw" inputmode="numeric" autocomplete="off" placeholder="••••">
+      <p class="err" id="pw-err"></p>
+      <button class="btn" id="unlock">解鎖</button>
+    </div>
+
+    <div id="sheet-form" hidden>
+      <div class="sheet-head">
+        <h3 class="sheet-title">新增場次</h3>
+        <button class="lock-link" id="lock-again">鎖定</button>
+      </div>
+      <div class="add-form m-rank" id="add-form">
+        <div class="two">
+          <div class="field"><label>日期</label><input type="date" id="f-date"></div>
+          <div class="field"><label>遊戲</label><input type="text" id="f-game" placeholder="例:卡卡頌"></div>
+        </div>
+        <div class="field"><label>備注（可選）</label><input type="text" id="f-note" placeholder="同名遊戲嘅變體 / 場合,例:撞機"></div>
+        <div class="field">
+          <label>計分方式</label>
+          <div class="seg" id="f-mode">
+            <button type="button" data-mode="rank" class="on">名次制</button>
+            <button type="button" data-mode="team">勝負制</button>
+          </div>
+        </div>
+        <div class="field">
+          <label id="players-label">玩家與名次（同名次 = 並列）</label>
+          <div id="players"></div>
+          <button type="button" class="addrow" id="add-row">＋ 加一位</button>
+        </div>
+        <div class="preview" id="preview"></div>
+        <button class="btn btn-save" id="save" disabled>儲存場次</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-const STORE = 'deskwalk_leaderboard_v2';
+const STORE = 'deskwalk_leaderboard_v4';
 const PW = '2444';
 
 const SEED = [
-  { date: '2026-06-17', game: 'one shot',     mode: 'rank', ranks: [['Nicole'], ['Charles'], ['Kenny']] },
-  { date: '2026-06-18', game: 'one shot 撞機', mode: 'team', winners: ['Nicole', 'Sam', 'Kaman'], losers: [] },
-  { date: '2026-06-22', game: '卡卡頌',        mode: 'rank', ranks: [['Kenny'], ['Step'], ['Nicole']] },
-  { date: '2026-06-24', game: '機密代號',      mode: 'rank', ranks: [['Nicole'], ['Phoebe', 'Step']] },
-  { date: '2026-06-25', game: '卡卡頌',        mode: 'rank', ranks: [['Step'], ['Nicole'], ['Charles']] },
+  { date: '2026-06-17', game: 'one shot', mode: 'rank', ranks: [['Nicole'], ['Charles'], ['Kenny']] },
+  { date: '2026-06-18', game: 'one shot', note: '撞機', mode: 'team', winners: ['Nicole', 'Sam', 'Kaman'], losers: [] },
+  { date: '2026-06-22', game: '卡卡頌',        mode: 'rank', ranks: [['Kenny'], ['Step'], ['Nicole'], ['Yoko', 'Phoebe']] },
+  { date: '2026-06-24', game: '機密代號',      mode: 'rank', ranks: [['Nicole'], ['Phoebe', 'Step'], ['Kenny', 'Samuel', 'Sam']] },
+  { date: '2026-06-25', game: '卡卡頌',        mode: 'rank', ranks: [['Step'], ['Nicole'], ['Charles'], ['Kenny', 'Samuel']] },
 ];
 
 let games = load();
@@ -287,9 +319,9 @@ function scoreGame(g) {
 }
 
 /* ---------- standings ---------- */
-function standings() {
+function standings(list = games) {
   const pts = {}, played = {}, wins = {};
-  games.forEach(g => {
+  list.forEach(g => {
     const s = scoreGame(g);
     Object.entries(s).forEach(([n, p]) => {
       pts[n] = (pts[n] || 0) + p;
@@ -345,70 +377,111 @@ function renderBoard() {
 }
 
 /* ---------- render: 紀錄 ---------- */
+function recHTML(g, idx, { link, del }) {
+  const s = scoreGame(g);
+  const chips = Object.entries(s).sort((a, b) => b[1] - a[1]).map(([name, pts]) =>
+    `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${pts}</span></span>`
+  ).join('');
+  const game = link
+    ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
+    : `<span class="rec-game">${esc(g.game || '未命名')}</span>`;
+  const note = g.note ? `<span class="rec-note">${esc(g.note)}</span>` : '';
+  const delEl = del ? `<button class="del" data-idx="${idx}" title="刪除">×</button>` : '';
+  return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}${note}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
+}
+
+function boardRowHTML(p) {
+  return `<li class="li"><span class="rk">${p.rank}</span><span class="ava">${initials(p.name)}</span>` +
+    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% WR</span></span>` +
+    `<span class="pt">${p.pts}<span>pts</span></span></li>`;
+}
+
 function renderRecords() {
   const list = document.getElementById('records');
-  list.innerHTML = '';
-  games.map((g, idx) => ({ g, idx }))
-    .sort((a, b) => (b.g.date || '').localeCompare(a.g.date || ''))
-    .forEach(({ g, idx }) => {
-      const s = scoreGame(g);
-      const entries = Object.entries(s).sort((a, b) => b[1] - a[1]);
-      const chips = entries.map(([name, pts]) =>
-        `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${pts}</span></span>`
-      ).join('');
-      const matchup = g.mode === 'team' && (g.losers || []).length
-        ? ` · ${(g.winners || []).length} vs ${(g.losers || []).length}` : '';
-      const badge = g.mode === 'team'
-        ? `<span class="mode-badge mode-team">勝負制${matchup}</span>`
-        : '<span class="mode-badge mode-rank">名次制</span>';
-      const del = unlocked ? `<button class="del" data-idx="${idx}" title="刪除">×</button>` : '';
-      const li = document.createElement('li');
-      li.className = 'rec';
-      li.innerHTML =
-        `<div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span>` +
-        `<span class="rec-game">${esc(g.game || '未命名')}</span>${badge}${del}</div>` +
-        `<div class="chips">${chips}</div>`;
-      list.appendChild(li);
-    });
+  const ordered = games.map((g, idx) => ({ g, idx }))
+    .sort((a, b) => (b.g.date || '').localeCompare(a.g.date || ''));
+  list.innerHTML = ordered.map(({ g, idx }) => recHTML(g, idx, { link: true, del: unlocked })).join('');
   list.querySelectorAll('.del').forEach(b => b.addEventListener('click', () => {
     if (confirm('刪除呢場紀錄?')) { games.splice(+b.dataset.idx, 1); save(); renderAll(); }
   }));
+  list.querySelectorAll('.rec-game-link').forEach(b => b.addEventListener('click', () => openGame(b.dataset.game)));
+}
+
+/* ---------- per-game detail ---------- */
+function openGame(name) {
+  const list = games.filter(g => (g.game || '') === name);
+  const data = standings(list);
+  document.getElementById('detail-title').textContent = name;
+  document.getElementById('detail-sub').textContent = `${list.length} 場 · ${data.length} 位玩家`;
+  document.getElementById('detail-board').innerHTML = data.map(boardRowHTML).join('');
+  document.getElementById('detail-records').innerHTML = list.slice()
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .map(g => recHTML(g, -1, { link: false, del: false })).join('');
+  document.getElementById('tab-detail').hidden = false;
+  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = true);
+  document.querySelectorAll('#tabbar button').forEach(b => b.classList.remove('on'));
+  document.getElementById('fab').hidden = true;
+  window.scrollTo(0, 0);
 }
 
 function renderAll() { renderBoard(); renderRecords(); }
 
 /* ---------- tabs ---------- */
+function activateTab(name) {
+  document.getElementById('tab-detail').hidden = true;
+  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = (t !== name));
+  document.getElementById('fab').hidden = (name !== 'log');
+  window.scrollTo(0, 0);
+}
 document.getElementById('tabbar').addEventListener('click', e => {
   const btn = e.target.closest('button[data-tab]');
-  if (!btn) return;
-  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b === btn));
-  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = (t !== btn.dataset.tab));
-  window.scrollTo(0, 0);
+  if (btn) activateTab(btn.dataset.tab);
 });
+document.getElementById('detail-back').addEventListener('click', () => activateTab('log'));
 
-/* ---------- lock ---------- */
-function applyLock() {
-  document.getElementById('lock').hidden = unlocked;
-  document.getElementById('admin').hidden = !unlocked;
-  document.getElementById('reset').hidden = !unlocked;
+/* ---------- bottom sheet + lock ---------- */
+function showSheetForm() {
+  document.getElementById('sheet-lock').hidden = true;
+  document.getElementById('sheet-form').hidden = false;
+  if (!playersBox.children.length) resetForm(); else updatePreview();
+  setTimeout(() => document.getElementById('f-game').focus(), 60);
 }
+function openSheet() {
+  document.getElementById('sheet').hidden = false;
+  if (unlocked) {
+    showSheetForm();
+  } else {
+    document.getElementById('sheet-lock').hidden = false;
+    document.getElementById('sheet-form').hidden = true;
+    document.getElementById('pw-err').textContent = '';
+    document.getElementById('pw').value = '';
+    setTimeout(() => document.getElementById('pw').focus(), 60);
+  }
+}
+function closeSheet() { document.getElementById('sheet').hidden = true; }
+
+document.getElementById('fab').addEventListener('click', openSheet);
+document.getElementById('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+document.getElementById('sheet-grip').addEventListener('click', closeSheet);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
 document.getElementById('unlock').addEventListener('click', tryUnlock);
 document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
 function tryUnlock() {
-  const v = document.getElementById('pw').value;
-  if (v === PW) {
+  if (document.getElementById('pw').value === PW) {
     unlocked = true; sessionStorage.setItem('dw_lb_unlocked', '1');
-    document.getElementById('pw-err').textContent = '';
     document.getElementById('pw').value = '';
-    applyLock(); renderRecords();
+    document.getElementById('pw-err').textContent = '';
+    showSheetForm();
+    renderRecords();
   } else {
     document.getElementById('pw-err').textContent = '密碼錯誤';
   }
 }
 document.getElementById('lock-again').addEventListener('click', () => {
   unlocked = false; sessionStorage.removeItem('dw_lb_unlocked');
-  document.getElementById('add-form').hidden = true;
-  applyLock(); renderRecords();
+  closeSheet(); renderRecords();
 });
 
 /* ---------- add form ---------- */
@@ -441,6 +514,8 @@ function readForm() {
     win: r.querySelector('.wl').classList.contains('win'),
   })).filter(p => p.name);
   const g = { date: document.getElementById('f-date').value, game: document.getElementById('f-game').value.trim(), mode };
+  const note = document.getElementById('f-note').value.trim();
+  if (note) g.note = note;
   if (mode === 'team') {
     g.winners = players.filter(p => p.win).map(p => p.name);
     g.losers = players.filter(p => !p.win).map(p => p.name);
@@ -484,23 +559,17 @@ document.getElementById('f-mode').addEventListener('click', e => {
 });
 document.getElementById('add-row').addEventListener('click', () => addPlayerRow());
 document.getElementById('f-game').addEventListener('input', updatePreview);
-document.getElementById('toggle-add').addEventListener('click', () => {
-  form.hidden = !form.hidden;
-  if (!form.hidden && !playersBox.children.length) resetForm();
-});
 document.getElementById('save').addEventListener('click', () => {
   const g = readForm();
   if (!valid(g)) return;
   if (!g.date) g.date = new Date().toISOString().slice(0, 10);
-  games.push(g); save(); renderAll(); resetForm(); form.hidden = true;
-});
-document.getElementById('reset').addEventListener('click', () => {
-  if (confirm('重設為示範資料?會清除你新增嘅場次。')) { games = structuredClone(SEED); save(); renderAll(); }
+  games.push(g); save(); renderAll(); resetForm(); closeSheet();
 });
 
 function resetForm() {
   document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
   document.getElementById('f-game').value = '';
+  document.getElementById('f-note').value = '';
   playersBox.innerHTML = '';
   addPlayerRow(); addPlayerRow(); addPlayerRow();
   updatePreview();
@@ -508,7 +577,6 @@ function resetForm() {
 
 /* ---------- boot ---------- */
 resetForm();
-applyLock();
 renderAll();
 </script>
 </body>
