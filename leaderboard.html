@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>積分榜 · deskwalk</title>
+<link rel="stylesheet" href="brand.css" />
+<style>
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  main { max-width: 460px; margin: 0 auto; }
+  .tab[hidden] { display: none; }
+
+  /* ---------- hero + podium (排名) ---------- */
+  .hero {
+    position: relative;
+    padding: calc(2.6rem + env(safe-area-inset-top)) 1.2rem 1.4rem;
+    background:
+      radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--hl) 38%, transparent), transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, var(--paper)), var(--paper) 92%);
+    border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
+    overflow: hidden;
+  }
+  .hero h1 { text-align: center; margin: 0 0 1.4rem; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--accent-deep); }
+  .hero h1 small { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-soft); margin-top: 0.2rem; text-transform: uppercase; }
+
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.55rem; }
+  .pod { display: flex; flex-direction: column; align-items: center; width: 30%; }
+  .pod-ava { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.05rem; font-weight: 800; color: var(--ink); background: var(--card-strong); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--shadow); margin-bottom: 0.5rem; }
+  .pod-1 .pod-ava { width: 70px; height: 70px; font-size: 1.2rem; border: 2px solid #E6B23A; }
+  .pod-2 .pod-ava { border: 2px solid #AFA89B; }
+  .pod-3 .pod-ava { border: 2px solid #CF8A57; }
+  .pod-pts { font-size: 1.35rem; font-weight: 800; color: var(--ink); line-height: 1; }
+  .pod-pts span { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); }
+  .pod-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); margin-top: 0.15rem; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pod-wr { font-size: 0.72rem; font-weight: 700; color: var(--good); margin-bottom: 0.5rem; }
+  .pod-base { width: 100%; border-radius: 12px 12px 0 0; display: grid; place-items: center; background: var(--card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--line); border-bottom: none; box-shadow: inset 0 1px 0 var(--glass-rim); }
+  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: color-mix(in srgb, var(--accent) 45%, var(--ink-soft)); opacity: 0.55; }
+  .pod-1 .pod-base { height: 96px; } .pod-2 .pod-base { height: 70px; } .pod-3 .pod-base { height: 56px; }
+
+  /* ---------- list ---------- */
+  .list { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0; }
+  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0.3rem; border-bottom: 1px solid var(--line); }
+  .li:last-child { border-bottom: none; }
+  .li .rk { width: 22px; text-align: center; font-size: 1.05rem; font-weight: 800; color: var(--ink-soft); flex: none; }
+  .li .ava { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 800; color: var(--ink); background: var(--card-strong); border: 1.5px solid color-mix(in srgb, var(--good) 45%, var(--line)); flex: none; }
+  .li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .li .who .nm { font-size: 0.95rem; font-weight: 800; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .li .who .wr { font-size: 0.78rem; font-weight: 700; color: var(--good); }
+  .li .pt { font-size: 1.1rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; flex: none; }
+  .li .pt span { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
+
+  /* ---------- shared section heads ---------- */
+  .pad { padding: calc(1.8rem + env(safe-area-inset-top)) 1.2rem 1rem; }
+  .pad h2 { margin: 0 0 1rem; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
+
+  /* ---------- records (紀錄) ---------- */
+  .lock { text-align: center; border: 1px dashed color-mix(in srgb, var(--accent) 35%, var(--line)); border-radius: var(--radius); padding: 1.6rem 1.2rem; margin-bottom: 1.2rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); }
+  .lock .ic { font-size: 1.5rem; }
+  .lock p { margin: 0.4rem 0 0.9rem; font-size: 0.88rem; color: var(--ink-soft); }
+  .lock input { font: inherit; font-size: 1.1rem; letter-spacing: 0.3em; text-align: center; width: 130px; padding: 0.5rem; border: 1px solid var(--line); border-radius: 12px; background: var(--card-strong); color: var(--ink); }
+  .lock .err { color: var(--bad); font-size: 0.8rem; min-height: 1.1em; margin: 0.5rem 0 0; }
+  .btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.1rem; font: inherit; font-size: 0.9rem; font-weight: 800; box-shadow: var(--shadow-pop); }
+  .btn.ghost { background: var(--accent-soft); color: var(--accent-deep); box-shadow: none; border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line)); }
+
+  .admin[hidden] { display: none; }
+  .admin-bar { display: flex; gap: 0.6rem; align-items: center; margin-bottom: 1rem; }
+  .admin-bar .sp { flex: 1; }
+  .lock-link { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.78rem; text-decoration: underline; }
+
+  .add-form { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.2rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); }
+  .field { margin-bottom: 0.7rem; }
+  .field label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--ink-soft); letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+  .add-form input[type=text], .add-form input[type=date], .add-form input[type=number] { font: inherit; font-size: 0.9rem; padding: 0.5rem 0.6rem; border: 1px solid var(--line); border-radius: 10px; background: var(--card-strong); color: var(--ink); }
+  .add-form input[type=text], .add-form input[type=date] { width: 100%; }
+  .two { display: flex; gap: 0.6rem; } .two .field { flex: 1; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card-strong); }
+  .seg button { border: none; background: none; padding: 0.4rem 0.95rem; font: inherit; font-size: 0.82rem; font-weight: 800; color: var(--ink-soft); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .prow { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem; }
+  .prow .pname { flex: 1; }
+  .prow .prank { width: 56px; text-align: center; }
+  .prow .wl { border: 1px solid var(--line); background: var(--card-strong); border-radius: 999px; padding: 0.35rem 0.8rem; font: inherit; font-size: 0.8rem; font-weight: 800; color: var(--ink-soft); white-space: nowrap; }
+  .prow .wl.win { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .prow .rm { background: none; border: none; color: var(--ink-soft); font-size: 1.15rem; line-height: 1; padding: 0 0.25rem; }
+  .prow .rm:hover { color: var(--bad); }
+  .add-form.m-rank .prow .wl { display: none; }
+  .add-form.m-team .prow .prank { display: none; }
+  .addrow { background: none; border: 1px dashed var(--line); border-radius: 8px; padding: 0.35rem 0.75rem; font: inherit; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); }
+  .preview { margin-top: 0.7rem; font-size: 0.8rem; color: var(--ink-soft); min-height: 1.1em; line-height: 1.5; }
+  .preview b { color: var(--ink); font-weight: 800; }
+  .btn-save { margin-top: 0.85rem; width: 100%; }
+  .btn-save:disabled { opacity: 0.45; box-shadow: none; }
+
+  .records { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.7rem; }
+  .rec { border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); padding: 0.7rem 0.85rem; }
+  .rec-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem; }
+  .rec-date { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .rec-game { font-size: 0.95rem; font-weight: 800; color: var(--ink); flex: 1; }
+  .mode-badge { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+  .mode-rank { background: var(--card-strong); color: var(--ink-soft); border: 1px solid var(--line); }
+  .mode-team { background: var(--accent-soft); color: var(--accent-deep); }
+  .del { background: none; border: none; color: var(--ink-soft); font-size: 1.05rem; line-height: 1; padding: 0 2px; }
+  .del:hover { color: var(--bad); }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.55rem; border-radius: 999px; background: var(--card-strong); border: 1px solid var(--line); color: var(--ink); }
+  .chip .s { font-weight: 800; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
+  .chip.win { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
+  .chip.lose { color: var(--ink-soft); }
+  .chip.lose .s { color: var(--ink-soft); }
+  .reset { display: block; margin: 1.4rem auto 0; background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.74rem; text-decoration: underline; }
+
+  /* ---------- rules (積分準則) ---------- */
+  .rule { margin-bottom: 1.1rem; }
+  .rule h3 { margin: 0 0 0.3rem; font-size: 0.92rem; font-weight: 800; color: var(--ink); }
+  .rule p { margin: 0.15rem 0; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.6; }
+  .rule b { color: var(--ink); }
+  .pip { color: var(--accent-deep); font-weight: 800; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-top: 0.55rem; }
+  .tbl th, .tbl td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--line); }
+  .tbl th { color: var(--ink-soft); font-weight: 800; font-size: 0.7rem; }
+  .tbl td { font-variant-numeric: tabular-nums; }
+  .tbl tr:last-child td { border-bottom: none; }
+
+  /* ---------- bottom tab bar ---------- */
+  .tabbar {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: max(0.6rem, env(safe-area-inset-bottom)); z-index: 95;
+    width: min(440px, calc(100% - 1.4rem));
+    display: flex; padding: 0.35rem;
+    background: var(--card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--line); border-radius: var(--pill); box-shadow: var(--shadow);
+  }
+  .tabbar button { flex: 1; border: none; background: none; padding: 0.6rem 0; font: inherit; font-size: 0.86rem; font-weight: 800; color: var(--ink-soft); border-radius: var(--pill); }
+  .tabbar button.on { background: var(--accent-soft); color: var(--accent-deep); }
+</style>
+</head>
+<body>
+<a class="dw-mark" href="index.html">deskwalk</a>
+<main>
+  <!-- ========== 排名 ========== -->
+  <section class="tab" id="tab-rank">
+    <div class="hero">
+      <h1>積分榜<small>Leaderboard</small></h1>
+      <div class="podium" id="podium"></div>
+    </div>
+    <ol class="list" id="list"></ol>
+  </section>
+
+  <!-- ========== 紀錄 ========== -->
+  <section class="tab" id="tab-log" hidden>
+    <div class="pad">
+      <h2>場次紀錄</h2>
+
+      <div class="lock" id="lock">
+        <div class="ic">🔒</div>
+        <p>新增 / 編輯場次需要密碼</p>
+        <input type="password" id="pw" inputmode="numeric" autocomplete="off" placeholder="••••">
+        <p class="err" id="pw-err"></p>
+        <button class="btn" id="unlock">解鎖</button>
+      </div>
+
+      <div class="admin" id="admin" hidden>
+        <div class="admin-bar">
+          <button class="btn ghost" id="toggle-add">＋ 新增場次</button>
+          <span class="sp"></span>
+          <button class="lock-link" id="lock-again">鎖定</button>
+        </div>
+
+        <div class="add-form m-rank" id="add-form" hidden>
+          <div class="two">
+            <div class="field"><label>日期</label><input type="date" id="f-date"></div>
+            <div class="field"><label>遊戲</label><input type="text" id="f-game" placeholder="例:卡卡頌"></div>
+          </div>
+          <div class="field">
+            <label>計分方式</label>
+            <div class="seg" id="f-mode">
+              <button type="button" data-mode="rank" class="on">名次制</button>
+              <button type="button" data-mode="team">勝負制</button>
+            </div>
+          </div>
+          <div class="field">
+            <label id="players-label">玩家與名次（同名次 = 並列）</label>
+            <div id="players"></div>
+            <button type="button" class="addrow" id="add-row">＋ 加一位</button>
+          </div>
+          <div class="preview" id="preview"></div>
+          <button class="btn btn-save" id="save" disabled>儲存場次</button>
+        </div>
+      </div>
+
+      <ul class="records" id="records"></ul>
+      <button class="reset" id="reset" hidden>重設為示範資料</button>
+    </div>
+  </section>
+
+  <!-- ========== 積分準則 ========== -->
+  <section class="tab" id="tab-rules" hidden>
+    <div class="pad">
+      <h2>積分準則</h2>
+      <p class="rule" style="color:var(--ink-soft);font-size:.85rem;line-height:1.6;">每場遊戲派分,<b>全程整數</b>。先睇「個人有冇名次」決定用邊種。WR(勝率)= 有得分嘅場數 ÷ 總出場數。</p>
+
+      <div class="rule">
+        <h3>名次制 · 個人分先後</h3>
+        <p>🥇 第一 <span class="pip">3</span> ／ 🥈 第二 <span class="pip">2</span> ／ 🥉 第三 <span class="pip">1</span>,其餘 0 → 合計固定 6。</p>
+        <p><b>並列取高位:</b>並列者同取較高名次嘅分,低位取消(該場可能變 7)。例:第一 3、並列第二 2 / 2。</p>
+        <p><b>全員平手:</b>當勝負制對稱勝派(3 人 → 2/2/2)。</p>
+      </div>
+
+      <div class="rule">
+        <h3>勝負制 · 分陣營（含不對稱對抗,如狼人殺）</h3>
+        <p>贏方每人攞同一個整數,輸方 0。無平分、無小數:</p>
+        <p style="margin:.4rem 0;"><b>每人 = ⌊6 ÷ 贏方人數⌋（最少 1），少數派贏每人再 +1。</b></p>
+        <table class="tbl">
+          <thead><tr><th>贏方人數</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+          <tbody>
+            <tr><td>每人(對稱/多數勝)</td><td>6</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:.7rem;">少數派勝（贏方 &lt; 輸方）每人再 <span class="pip">+1</span>:4 贏 5 → 2、3 贏 4 → 3、2 贏 6（狼隊）→ 4。</p>
+      </div>
+
+      <div class="rule" style="margin-bottom:0;">
+        <h3>排名</h3>
+        <p>以<b>累積總分</b>計,同分並列。名次制每場鎖 6 分;勝負制該場合計隨人數浮動,反映「贏得有幾難」。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button data-tab="rank" class="on">排名</button>
+  <button data-tab="log">紀錄</button>
+  <button data-tab="rules">積分準則</button>
+</nav>
+
+<script>
+const STORE = 'deskwalk_leaderboard_v2';
+const PW = '2444';
+
+const SEED = [
+  { date: '2026-06-17', game: 'one shot',     mode: 'rank', ranks: [['Nicole'], ['Charles'], ['Kenny']] },
+  { date: '2026-06-18', game: 'one shot 撞機', mode: 'team', winners: ['Nicole', 'Sam', 'Kaman'], losers: [] },
+  { date: '2026-06-22', game: '卡卡頌',        mode: 'rank', ranks: [['Kenny'], ['Step'], ['Nicole']] },
+  { date: '2026-06-24', game: '機密代號',      mode: 'rank', ranks: [['Nicole'], ['Phoebe', 'Step']] },
+  { date: '2026-06-25', game: '卡卡頌',        mode: 'rank', ranks: [['Step'], ['Nicole'], ['Charles']] },
+];
+
+let games = load();
+let unlocked = sessionStorage.getItem('dw_lb_unlocked') === '1';
+
+function load() {
+  try { const raw = localStorage.getItem(STORE); if (raw) return JSON.parse(raw); } catch (e) {}
+  return structuredClone(SEED);
+}
+function save() { localStorage.setItem(STORE, JSON.stringify(games)); }
+
+/* ---------- scoring engine ---------- */
+function podium(place) { return place === 1 ? 3 : place === 2 ? 2 : place === 3 ? 1 : 0; }
+
+function scoreTeam(winners, loseCount) {
+  const out = {};
+  const W = winners.length;
+  if (W === 0) return out;
+  let p = Math.max(1, Math.floor(6 / W));
+  if (loseCount > W) p += 1;
+  winners.forEach(w => out[w] = p);
+  return out;
+}
+
+/* returns { name: pts } for ALL participants (losers = 0) */
+function scoreGame(g) {
+  if (g.mode === 'team') {
+    const out = scoreTeam(g.winners || [], (g.losers || []).length);
+    (g.losers || []).forEach(n => { if (!(n in out)) out[n] = 0; });
+    return out;
+  }
+  const groups = g.ranks || [];
+  if (groups.length <= 1) return scoreTeam(groups[0] || [], 0);
+  const out = {};
+  let place = 1;
+  for (const grp of groups) {
+    const v = podium(place);
+    grp.forEach(name => out[name] = v);
+    place += grp.length;
+  }
+  return out;
+}
+
+/* ---------- standings ---------- */
+function standings() {
+  const pts = {}, played = {}, wins = {};
+  games.forEach(g => {
+    const s = scoreGame(g);
+    Object.entries(s).forEach(([n, p]) => {
+      pts[n] = (pts[n] || 0) + p;
+      played[n] = (played[n] || 0) + 1;
+      if (p > 0) wins[n] = (wins[n] || 0) + 1;
+    });
+  });
+  const data = Object.keys(pts).map(n => ({
+    name: n, pts: pts[n], played: played[n], wins: wins[n] || 0,
+    wr: Math.round((wins[n] || 0) / played[n] * 100),
+  })).sort((a, b) => b.pts - a.pts || b.wr - a.wr || a.name.localeCompare(b.name));
+  let rank = 0, prev = null;
+  data.forEach(p => { if (prev === null || p.pts < prev) { rank++; prev = p.pts; } p.rank = rank; });
+  return data;
+}
+
+function initials(name) { const t = name.trim(); return /^[A-Za-z]/.test(t) ? t.slice(0, 2) : t.slice(0, 1); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+/* ---------- render: 排名 ---------- */
+function renderBoard() {
+  const data = standings();
+  const pod = document.getElementById('podium');
+  pod.innerHTML = '';
+  const order = [1, 0, 2]; // 2nd · 1st · 3rd
+  order.forEach(i => {
+    if (!data[i]) return;
+    const p = data[i];
+    const place = i + 1;
+    const div = document.createElement('div');
+    div.className = `pod pod-${place}`;
+    div.innerHTML =
+      `<div class="pod-ava">${initials(p.name)}</div>` +
+      `<div class="pod-pts">${p.pts}<span>pts</span></div>` +
+      `<div class="pod-name">${esc(p.name)}</div>` +
+      `<div class="pod-wr">${p.wr}% WR</div>` +
+      `<div class="pod-base"><span class="n">${place}</span></div>`;
+    pod.appendChild(div);
+  });
+
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  data.slice(3).forEach(p => {
+    const li = document.createElement('li');
+    li.className = 'li';
+    li.innerHTML =
+      `<span class="rk">${p.rank}</span>` +
+      `<span class="ava">${initials(p.name)}</span>` +
+      `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% WR</span></span>` +
+      `<span class="pt">${p.pts}<span>pts</span></span>`;
+    list.appendChild(li);
+  });
+}
+
+/* ---------- render: 紀錄 ---------- */
+function renderRecords() {
+  const list = document.getElementById('records');
+  list.innerHTML = '';
+  games.map((g, idx) => ({ g, idx }))
+    .sort((a, b) => (b.g.date || '').localeCompare(a.g.date || ''))
+    .forEach(({ g, idx }) => {
+      const s = scoreGame(g);
+      const entries = Object.entries(s).sort((a, b) => b[1] - a[1]);
+      const chips = entries.map(([name, pts]) =>
+        `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${pts}</span></span>`
+      ).join('');
+      const matchup = g.mode === 'team' && (g.losers || []).length
+        ? ` · ${(g.winners || []).length} vs ${(g.losers || []).length}` : '';
+      const badge = g.mode === 'team'
+        ? `<span class="mode-badge mode-team">勝負制${matchup}</span>`
+        : '<span class="mode-badge mode-rank">名次制</span>';
+      const del = unlocked ? `<button class="del" data-idx="${idx}" title="刪除">×</button>` : '';
+      const li = document.createElement('li');
+      li.className = 'rec';
+      li.innerHTML =
+        `<div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span>` +
+        `<span class="rec-game">${esc(g.game || '未命名')}</span>${badge}${del}</div>` +
+        `<div class="chips">${chips}</div>`;
+      list.appendChild(li);
+    });
+  list.querySelectorAll('.del').forEach(b => b.addEventListener('click', () => {
+    if (confirm('刪除呢場紀錄?')) { games.splice(+b.dataset.idx, 1); save(); renderAll(); }
+  }));
+}
+
+function renderAll() { renderBoard(); renderRecords(); }
+
+/* ---------- tabs ---------- */
+document.getElementById('tabbar').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-tab]');
+  if (!btn) return;
+  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b === btn));
+  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = (t !== btn.dataset.tab));
+  window.scrollTo(0, 0);
+});
+
+/* ---------- lock ---------- */
+function applyLock() {
+  document.getElementById('lock').hidden = unlocked;
+  document.getElementById('admin').hidden = !unlocked;
+  document.getElementById('reset').hidden = !unlocked;
+}
+document.getElementById('unlock').addEventListener('click', tryUnlock);
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+function tryUnlock() {
+  const v = document.getElementById('pw').value;
+  if (v === PW) {
+    unlocked = true; sessionStorage.setItem('dw_lb_unlocked', '1');
+    document.getElementById('pw-err').textContent = '';
+    document.getElementById('pw').value = '';
+    applyLock(); renderRecords();
+  } else {
+    document.getElementById('pw-err').textContent = '密碼錯誤';
+  }
+}
+document.getElementById('lock-again').addEventListener('click', () => {
+  unlocked = false; sessionStorage.removeItem('dw_lb_unlocked');
+  document.getElementById('add-form').hidden = true;
+  applyLock(); renderRecords();
+});
+
+/* ---------- add form ---------- */
+const form = document.getElementById('add-form');
+const playersBox = document.getElementById('players');
+let mode = 'rank';
+
+function addPlayerRow(name = '', rank = '') {
+  const row = document.createElement('div');
+  row.className = 'prow';
+  row.innerHTML =
+    `<input type="text" class="pname" placeholder="名字" value="${esc(name)}">` +
+    `<input type="number" class="prank" min="1" placeholder="名次" value="${rank}">` +
+    `<button type="button" class="wl win">贏</button>` +
+    `<button type="button" class="rm" title="移除">×</button>`;
+  row.querySelector('.wl').addEventListener('click', e => {
+    const b = e.currentTarget; const win = b.classList.toggle('win');
+    b.textContent = win ? '贏' : '輸'; updatePreview();
+  });
+  row.querySelector('.rm').addEventListener('click', () => { row.remove(); updatePreview(); });
+  row.querySelectorAll('input').forEach(el => el.addEventListener('input', updatePreview));
+  playersBox.appendChild(row);
+}
+
+function readForm() {
+  const rows = [...playersBox.querySelectorAll('.prow')];
+  const players = rows.map(r => ({
+    name: r.querySelector('.pname').value.trim(),
+    rank: parseInt(r.querySelector('.prank').value, 10),
+    win: r.querySelector('.wl').classList.contains('win'),
+  })).filter(p => p.name);
+  const g = { date: document.getElementById('f-date').value, game: document.getElementById('f-game').value.trim(), mode };
+  if (mode === 'team') {
+    g.winners = players.filter(p => p.win).map(p => p.name);
+    g.losers = players.filter(p => !p.win).map(p => p.name);
+  } else {
+    const ranked = players.filter(p => Number.isFinite(p.rank));
+    const byRank = {};
+    ranked.forEach(p => { (byRank[p.rank] = byRank[p.rank] || []).push(p.name); });
+    g.ranks = Object.keys(byRank).map(Number).sort((a, b) => a - b).map(k => byRank[k]);
+  }
+  return g;
+}
+
+function valid(g) {
+  if (!g.game) return false;
+  if (g.mode === 'team') return (g.winners || []).length >= 1;
+  return (g.ranks || []).reduce((s, grp) => s + grp.length, 0) >= 2;
+}
+
+function updatePreview() {
+  const g = readForm();
+  const ok = valid(g);
+  document.getElementById('save').disabled = !ok;
+  const pv = document.getElementById('preview');
+  if (!ok) { pv.innerHTML = mode === 'team' ? '撳每位嘅 贏/輸,填埋輸方,即時試算。' : '每位填名次(同數字 = 並列),即時試算。'; return; }
+  const s = scoreGame(g);
+  const entries = Object.entries(s).sort((a, b) => b[1] - a[1]);
+  const sum = entries.reduce((a, [, v]) => a + v, 0);
+  pv.innerHTML = '試算:' + entries.map(([n, v]) => `${esc(n)} <b>+${v}</b>`).join(' · ') + ` <span style="opacity:.7">(合計 ${sum})</span>`;
+}
+
+document.getElementById('f-mode').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-mode]');
+  if (!btn) return;
+  mode = btn.dataset.mode;
+  [...e.currentTarget.children].forEach(b => b.classList.toggle('on', b === btn));
+  form.classList.toggle('m-rank', mode === 'rank');
+  form.classList.toggle('m-team', mode === 'team');
+  document.getElementById('players-label').textContent =
+    mode === 'team' ? '玩家（撳 贏/輸,要填埋輸方先計到勝率同少數派加成）' : '玩家與名次（同名次 = 並列）';
+  updatePreview();
+});
+document.getElementById('add-row').addEventListener('click', () => addPlayerRow());
+document.getElementById('f-game').addEventListener('input', updatePreview);
+document.getElementById('toggle-add').addEventListener('click', () => {
+  form.hidden = !form.hidden;
+  if (!form.hidden && !playersBox.children.length) resetForm();
+});
+document.getElementById('save').addEventListener('click', () => {
+  const g = readForm();
+  if (!valid(g)) return;
+  if (!g.date) g.date = new Date().toISOString().slice(0, 10);
+  games.push(g); save(); renderAll(); resetForm(); form.hidden = true;
+});
+document.getElementById('reset').addEventListener('click', () => {
+  if (confirm('重設為示範資料?會清除你新增嘅場次。')) { games = structuredClone(SEED); save(); renderAll(); }
+});
+
+function resetForm() {
+  document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('f-game').value = '';
+  playersBox.innerHTML = '';
+  addPlayerRow(); addPlayerRow(); addPlayerRow();
+  updatePreview();
+}
+
+/* ---------- boot ---------- */
+resetForm();
+applyLock();
+renderAll();
+</script>
+</body>
+</html>
