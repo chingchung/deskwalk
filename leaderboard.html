@@ -30,6 +30,8 @@
     --gold: #B5891F;
     --silver: #94949B;
     --bronze: #A86E3C;
+    /* editorial serif for the big screen titles (Beli-style) */
+    --serif: Georgia, "Songti TC", "Noto Serif TC", "Source Han Serif TC", "Times New Roman", serif;
   }
   /* drop the warm colour glows so the glass refracts neutral grey */
   body::before {
@@ -38,58 +40,34 @@
       radial-gradient(40vw 38vw at 84% 24%, rgba(26, 23, 18, 0.04), transparent 62%);
   }
 
-  /* ---------- hero + podium (排名) ---------- */
-  .hero {
-    position: relative;
-    padding: calc(2.6rem + env(safe-area-inset-top)) 1.2rem 1.4rem;
-    background:
-      radial-gradient(120% 80% at 50% -10%, rgba(26, 23, 18, 0.06), transparent 60%),
-      linear-gradient(180deg, color-mix(in srgb, var(--ink) 6%, var(--paper)), var(--paper) 92%);
-    border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
-    overflow: hidden;
-  }
-  .hero h1 { text-align: center; margin: 0 0 1.4rem; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.01em; color: var(--accent-deep); }
-  .hero h1 small { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-soft); margin-top: 0.2rem; text-transform: uppercase; }
+  /* ---------- ranking header (排名) ---------- */
+  .lb-head { padding: calc(1.3rem + env(safe-area-inset-top)) 1.3rem 0; }
+  .lb-title { font-family: var(--serif); font-size: 2.45rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 1.1rem; color: var(--ink); }
 
-  .podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.55rem; }
-  .pod { display: flex; flex-direction: column; align-items: center; width: 30%; }
-  /* crown sits above #1 only; 2nd/3rd keep an invisible one so avatars stay baseline-aligned */
-  .pod-crown { font-size: 1.15rem; line-height: 1; margin-bottom: 0.3rem; filter: drop-shadow(0 2px 3px rgba(26, 23, 18, 0.28)); }
-  .pod-2 .pod-crown, .pod-3 .pod-crown { visibility: hidden; }
-  .pod-ava { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.05rem; font-weight: 800; color: var(--ink); background: var(--card-strong); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); margin-bottom: 0.5rem; box-shadow: 0 0 0 1.5px var(--line), var(--shadow); }
-  /* the only colour on the page: gold / silver / bronze for the top 3 */
-  .pod-1 .pod-ava { width: 72px; height: 72px; font-size: 1.25rem; box-shadow: 0 0 0 2.5px var(--gold), 0 10px 22px -10px rgba(181, 137, 31, 0.45), inset 0 1px 0 var(--glass-rim); }
-  .pod-2 .pod-ava { box-shadow: 0 0 0 2px var(--silver), var(--shadow); }
-  .pod-3 .pod-ava { box-shadow: 0 0 0 2px var(--bronze), var(--shadow); }
-  .pod-pts { font-size: 1.35rem; font-weight: 800; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
-  .pod-pts span { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); }
-  .pod-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); margin-top: 0.15rem; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pod-1 .pod-name { font-size: 0.92rem; }
-  .pod-meta { font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.5rem; font-variant-numeric: tabular-nums; }
-  .pod-base { width: 100%; border-radius: 12px 12px 0 0; display: grid; place-items: center; background: var(--card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--line); border-bottom: none; box-shadow: inset 0 1px 0 var(--glass-rim); }
-  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: var(--ink-soft); opacity: 0.5; }
-  .pod-1 .pod-base { height: 96px; }
-  .pod-1 .pod-base .n { color: var(--gold); opacity: 0.9; }
-  .pod-2 .pod-base .n { color: var(--silver); opacity: 0.9; }
-  .pod-3 .pod-base .n { color: var(--bronze); opacity: 0.9; }
-  .pod-2 .pod-base { height: 70px; } .pod-3 .pod-base { height: 56px; }
+  /* segmented metric switcher — light track, white active pill */
+  .seg-tabs { display: flex; gap: 2px; padding: 4px; border-radius: 13px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+  .seg-tabs button { flex: 1; border: none; background: none; padding: 0.5rem 0.2rem; font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--ink-soft); border-radius: 10px; transition: color 0.15s; }
+  .seg-tabs button.on { background: rgba(255, 255, 255, 0.92); color: var(--ink); box-shadow: 0 1px 3px rgba(26, 23, 18, 0.16), 0 0 0 0.5px rgba(26, 23, 18, 0.04); }
 
-  /* ---------- list ---------- */
-  .list { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0; }
-  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0.3rem; }
-  .li + .li { border-top: 1px solid var(--line); }
-  .li .rk { width: 22px; text-align: center; font-size: 1.05rem; font-weight: 800; color: var(--ink-soft); flex: none; font-variant-numeric: tabular-nums; }
-  .li .ava { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1.5px var(--line); flex: none; }
+  .lb-sub { margin: 0.95rem 0 0.9rem; font-size: 1rem; font-weight: 500; color: var(--ink-soft); }
+
+  .lb-filters { display: flex; gap: 0.6rem; }
+  .filter-pill { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line)); border-radius: var(--pill); padding: 0.5rem 0.95rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); font-size: 0.95rem; font-weight: 800; color: var(--ink); cursor: pointer; }
+  .filter-pill .chev { font-size: 0.7rem; opacity: 0.6; }
+  .filter-pill.set { border-color: var(--ink); }
+  .filter-pill select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: none; cursor: pointer; font: inherit; -webkit-appearance: none; appearance: none; }
+
+  /* ---------- list (Beli-style flat ranked rows) ---------- */
+  .list { list-style: none; margin: 0; padding: 0.5rem 0 0; }
+  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 1.3rem; }
+  .li .rk { width: 26px; text-align: left; font-size: 1.15rem; font-weight: 700; color: var(--ink-soft); flex: none; font-variant-numeric: tabular-nums; }
+  .li .ava { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1px var(--line); flex: none; overflow: hidden; }
   .li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-  .li .who .nm { font-size: 0.95rem; font-weight: 800; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .li .who .wr { font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .li .pt { font-size: 1.1rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; flex: none; }
-  .li .pt span { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
-  /* medal accents — top-3 ranks in any list (e.g. per-game detail) */
+  .li .who .nm { font-size: 1.08rem; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .li .who .sub { font-size: 0.88rem; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .li .score { flex: none; font-size: 1.35rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+  /* the only colour: gold / silver / bronze on the top-3 rank numbers */
   .rk.m1 { color: var(--gold); } .rk.m2 { color: var(--silver); } .rk.m3 { color: var(--bronze); }
-  .ava.m1 { box-shadow: 0 0 0 2px var(--gold); }
-  .ava.m2 { box-shadow: 0 0 0 2px var(--silver); }
-  .ava.m3 { box-shadow: 0 0 0 2px var(--bronze); }
 
   /* ---------- empty board ---------- */
   .board-empty { text-align: center; padding: 3.4rem 1.6rem; color: var(--ink-soft); }
@@ -99,7 +77,7 @@
 
   /* ---------- shared section heads ---------- */
   .pad { padding: calc(1.8rem + env(safe-area-inset-top)) 1.2rem 1rem; }
-  .pad h2 { margin: 0 0 1rem; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.01em; }
+  .pad h2 { margin: 0 0 1rem; font-family: var(--serif); font-size: 1.85rem; font-weight: 800; letter-spacing: -0.01em; }
 
   /* ---------- records (紀錄) ---------- */
   .btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.1rem; font: inherit; font-size: 0.9rem; font-weight: 800; box-shadow: var(--shadow-pop); }
@@ -202,10 +180,29 @@
 <main>
   <!-- ========== 排名 ========== -->
   <section class="tab" id="tab-rank">
-    <div class="hero">
-      <h1>積分榜<small>Leaderboard</small></h1>
-      <div class="podium" id="podium"></div>
-    </div>
+    <header class="lb-head">
+      <h1 class="lb-title">積分榜</h1>
+      <div class="seg-tabs" id="metric-tabs">
+        <button type="button" data-metric="pts" class="on">積分</button>
+        <button type="button" data-metric="wr">勝率</button>
+        <button type="button" data-metric="played">場數</button>
+      </div>
+      <p class="lb-sub" id="lb-sub">累積總分</p>
+      <div class="lb-filters">
+        <label class="filter-pill" id="pill-game">
+          <span id="game-label">全部遊戲</span><span class="chev">▾</span>
+          <select id="filter-game" aria-label="篩選遊戲"></select>
+        </label>
+        <label class="filter-pill" id="pill-mode">
+          <span id="mode-label">全部計分</span><span class="chev">▾</span>
+          <select id="filter-mode" aria-label="篩選計分方式">
+            <option value="">全部計分</option>
+            <option value="rank">名次制</option>
+            <option value="team">勝負制</option>
+          </select>
+        </label>
+      </div>
+    </header>
     <ol class="list" id="list"></ol>
   </section>
 
@@ -393,48 +390,53 @@ function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<':
 function medal(rank) { return rank <= 3 ? ' m' + rank : ''; }
 
 /* ---------- render: 排名 ---------- */
-function renderBoard() {
-  const data = standings();
-  const pod = document.getElementById('podium');
-  const list = document.getElementById('list');
+let metric = 'pts', fGame = '', fMode = '';
+const SUB = { pts: '累積總分', wr: '得分場數 ÷ 出場數', played: '總出場次數' };
 
+/* games passing the active game / mode filters */
+function viewGames() {
+  return games.filter(g =>
+    (!fGame || (g.game || '') === fGame) &&
+    (!fMode || g.mode === fMode));
+}
+
+/* re-rank a standings array by the active metric (ties share a rank) */
+function rankBy(data, m) {
+  const val = p => m === 'wr' ? p.wr : m === 'played' ? p.played : p.pts;
+  data.sort((a, b) => val(b) - val(a) || b.pts - a.pts || a.name.localeCompare(b.name));
+  let rank = 0, prev = null;
+  data.forEach(p => { const v = val(p); if (prev === null || v < prev) { rank++; prev = v; } p.dispRank = rank; });
+  return data;
+}
+
+/* secondary line shows the two metrics the row isn't currently sorted by */
+function subLine(p, m) {
+  if (m === 'wr') return `${p.pts} 分 · ${p.played} 場`;
+  if (m === 'played') return `${p.pts} 分 · ${p.wr}% 勝率`;
+  return `${p.wr}% 勝率 · ${p.played} 場`;
+}
+
+function rowHTML(p, m = 'pts') {
+  const rank = p.dispRank != null ? p.dispRank : p.rank;
+  const score = m === 'wr' ? p.wr + '%' : m === 'played' ? p.played : p.pts;
+  return `<li class="li">` +
+    `<span class="rk${medal(rank)}">${rank}</span>` +
+    `<span class="ava">${initials(p.name)}</span>` +
+    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="sub">${subLine(p, m)}</span></span>` +
+    `<span class="score">${score}</span></li>`;
+}
+
+function renderBoard() {
+  const data = rankBy(standings(viewGames()), metric);
+  document.getElementById('lb-sub').textContent = SUB[metric];
+  const list = document.getElementById('list');
   if (!data.length) {
-    pod.innerHTML = '';
     list.innerHTML =
       `<li class="board-empty"><div class="em-ico">🎲</div>` +
-      `<h3>仲未有積分</h3><p>去「紀錄」分頁加一場,排名就會喺度出。</p></li>`;
+      `<h3>未有積分</h3><p>調整篩選,或去「紀錄」分頁加一場。</p></li>`;
     return;
   }
-
-  pod.innerHTML = '';
-  const order = [1, 0, 2]; // 2nd · 1st · 3rd
-  order.forEach(i => {
-    if (!data[i]) return;
-    const p = data[i];
-    const place = i + 1;
-    const div = document.createElement('div');
-    div.className = `pod pod-${place}`;
-    div.innerHTML =
-      `<div class="pod-crown">👑</div>` +
-      `<div class="pod-ava">${initials(p.name)}</div>` +
-      `<div class="pod-pts">${p.pts}<span>pts</span></div>` +
-      `<div class="pod-name">${esc(p.name)}</div>` +
-      `<div class="pod-meta">${p.wr}% · ${p.played} 場</div>` +
-      `<div class="pod-base"><span class="n">${place}</span></div>`;
-    pod.appendChild(div);
-  });
-
-  list.innerHTML = '';
-  data.slice(3).forEach(p => {
-    const li = document.createElement('li');
-    li.className = 'li';
-    li.innerHTML =
-      `<span class="rk">${p.rank}</span>` +
-      `<span class="ava">${initials(p.name)}</span>` +
-      `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
-      `<span class="pt">${p.pts}<span>pts</span></span>`;
-    list.appendChild(li);
-  });
+  list.innerHTML = data.map(p => rowHTML(p, metric)).join('');
 }
 
 /* ---------- render: 紀錄 ---------- */
@@ -451,12 +453,6 @@ function recHTML(g, idx, { link, del }) {
   return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}${note}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
 }
 
-function boardRowHTML(p) {
-  const m = medal(p.rank);
-  return `<li class="li"><span class="rk${m}">${p.rank}</span><span class="ava${m}">${initials(p.name)}</span>` +
-    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
-    `<span class="pt">${p.pts}<span>pts</span></span></li>`;
-}
 
 function renderRecords() {
   const list = document.getElementById('records');
@@ -475,7 +471,7 @@ function openGame(name) {
   const data = standings(list);
   document.getElementById('detail-title').textContent = name;
   document.getElementById('detail-sub').textContent = `${list.length} 場 · ${data.length} 位玩家`;
-  document.getElementById('detail-board').innerHTML = data.map(boardRowHTML).join('');
+  document.getElementById('detail-board').innerHTML = data.map(p => rowHTML(p, 'pts')).join('');
   document.getElementById('detail-records').innerHTML = list.slice()
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map(g => recHTML(g, -1, { link: false, del: false })).join('');
@@ -486,7 +482,39 @@ function openGame(name) {
   window.scrollTo(0, 0);
 }
 
-function renderAll() { renderBoard(); renderRecords(); }
+function renderAll() { refreshFilters(); renderBoard(); renderRecords(); }
+
+/* ---------- ranking metric + filters ---------- */
+function refreshFilters() {
+  const sel = document.getElementById('filter-game');
+  const list = [...new Set(games.map(g => g.game || '').filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  sel.innerHTML = '<option value="">全部遊戲</option>' +
+    list.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join('');
+  if (!list.includes(fGame)) fGame = '';
+  sel.value = fGame;
+  document.getElementById('game-label').textContent = fGame || '全部遊戲';
+  document.getElementById('pill-game').classList.toggle('set', !!fGame);
+}
+
+document.getElementById('metric-tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-metric]');
+  if (!b) return;
+  metric = b.dataset.metric;
+  [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
+  renderBoard();
+});
+document.getElementById('filter-game').addEventListener('change', e => {
+  fGame = e.target.value;
+  document.getElementById('game-label').textContent = fGame || '全部遊戲';
+  document.getElementById('pill-game').classList.toggle('set', !!fGame);
+  renderBoard();
+});
+document.getElementById('filter-mode').addEventListener('change', e => {
+  fMode = e.target.value;
+  document.getElementById('mode-label').textContent = e.target.selectedOptions[0].textContent;
+  document.getElementById('pill-mode').classList.toggle('set', !!fMode);
+  renderBoard();
+});
 
 /* ---------- tabs ---------- */
 function activateTab(name) {
