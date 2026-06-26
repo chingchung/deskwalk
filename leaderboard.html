@@ -25,29 +25,45 @@
 
   .podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.55rem; }
   .pod { display: flex; flex-direction: column; align-items: center; width: 30%; }
-  .pod-ava { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.05rem; font-weight: 800; color: var(--ink); background: var(--card-strong); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--shadow); margin-bottom: 0.5rem; }
-  .pod-1 .pod-ava { width: 70px; height: 70px; font-size: 1.2rem; border: 2px solid #E6B23A; }
-  .pod-2 .pod-ava { border: 2px solid #AFA89B; }
-  .pod-3 .pod-ava { border: 2px solid #CF8A57; }
-  .pod-pts { font-size: 1.35rem; font-weight: 800; color: var(--ink); line-height: 1; }
+  /* crown sits above #1 only; 2nd/3rd keep an invisible one so avatars stay baseline-aligned */
+  .pod-crown { font-size: 1.15rem; line-height: 1; margin-bottom: 0.3rem; filter: drop-shadow(0 2px 3px rgba(197, 63, 31, 0.4)); }
+  .pod-2 .pod-crown, .pod-3 .pod-crown { visibility: hidden; }
+  .pod-ava { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.05rem; font-weight: 800; color: var(--ink); background: var(--card-strong); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); margin-bottom: 0.5rem; box-shadow: 0 0 0 1.5px var(--line), var(--shadow); }
+  /* rank read from scale + the single brand accent, not medal metallics */
+  .pod-1 .pod-ava { width: 72px; height: 72px; font-size: 1.25rem; box-shadow: 0 0 0 2.5px var(--accent), 0 10px 22px -10px rgba(240, 82, 46, 0.5), inset 0 1px 0 var(--glass-rim); }
+  .pod-pts { font-size: 1.35rem; font-weight: 800; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+  .pod-1 .pod-pts { color: var(--accent-deep); }
   .pod-pts span { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); }
   .pod-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); margin-top: 0.15rem; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .pod-wr { font-size: 0.72rem; font-weight: 700; color: var(--good); margin-bottom: 0.5rem; }
+  .pod-1 .pod-name { font-size: 0.92rem; }
+  .pod-meta { font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.5rem; font-variant-numeric: tabular-nums; }
+  .pod-lead { color: var(--accent-deep); }
   .pod-base { width: 100%; border-radius: 12px 12px 0 0; display: grid; place-items: center; background: var(--card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--line); border-bottom: none; box-shadow: inset 0 1px 0 var(--glass-rim); }
-  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: color-mix(in srgb, var(--accent) 45%, var(--ink-soft)); opacity: 0.55; }
-  .pod-1 .pod-base { height: 96px; } .pod-2 .pod-base { height: 70px; } .pod-3 .pod-base { height: 56px; }
+  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: color-mix(in srgb, var(--accent) 45%, var(--ink-soft)); opacity: 0.5; }
+  .pod-1 .pod-base { height: 96px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 80%, var(--card)), var(--card)); }
+  .pod-1 .pod-base .n { color: var(--accent-deep); opacity: 0.85; }
+  .pod-2 .pod-base { height: 70px; } .pod-3 .pod-base { height: 56px; }
 
   /* ---------- list ---------- */
   .list { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0; }
-  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0.3rem; border-bottom: 1px solid var(--line); }
-  .li:last-child { border-bottom: none; }
-  .li .rk { width: 22px; text-align: center; font-size: 1.05rem; font-weight: 800; color: var(--ink-soft); flex: none; }
-  .li .ava { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 800; color: var(--ink); background: var(--card-strong); border: 1.5px solid color-mix(in srgb, var(--good) 45%, var(--line)); flex: none; }
+  .li { position: relative; display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0.3rem 1rem; }
+  .li + .li { border-top: 1px solid var(--line); }
+  .li .rk { width: 22px; text-align: center; font-size: 1.05rem; font-weight: 800; color: var(--ink-soft); flex: none; font-variant-numeric: tabular-nums; }
+  .li .ava { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1.5px var(--line); flex: none; }
   .li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .li .who .nm { font-size: 0.95rem; font-weight: 800; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .li .who .wr { font-size: 0.78rem; font-weight: 700; color: var(--good); }
+  .li .who .wr { font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .li .pt { font-size: 1.1rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; flex: none; }
   .li .pt span { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
+  /* standings-strength bar: each player's points relative to the leader */
+  .li .bar { position: absolute; left: 0.3rem; right: 0.3rem; bottom: 0.45rem; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .li .bar i { display: block; height: 100%; border-radius: 2px; background: color-mix(in srgb, var(--accent) 32%, var(--line)); transform-origin: left; transform: scaleX(var(--w, 0)); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+
+  /* ---------- empty board ---------- */
+  .board-empty { text-align: center; padding: 3.4rem 1.6rem; color: var(--ink-soft); }
+  .board-empty .em-ico { font-size: 2.2rem; }
+  .board-empty h3 { margin: 0.7rem 0 0.3rem; font-size: 1.05rem; font-weight: 800; color: var(--ink); }
+  .board-empty p { margin: 0; font-size: 0.85rem; line-height: 1.6; }
 
   /* ---------- shared section heads ---------- */
   .pad { padding: calc(1.8rem + env(safe-area-inset-top)) 1.2rem 1rem; }
@@ -341,37 +357,64 @@ function standings(list = games) {
 function initials(name) { const t = name.trim(); return /^[A-Za-z]/.test(t) ? t.slice(0, 2) : t.slice(0, 1); }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
+/* a soft, paper-light tint per person so friends are recognisable at a glance —
+   deterministic from the name, low chroma so it stays quiet against the brand. */
+function avaStyle(name) {
+  let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return `background:hsl(${h} 48% 93%);box-shadow:0 0 0 1.5px hsl(${h} 38% 78%);color:hsl(${h} 35% 30%)`;
+}
+
 /* ---------- render: 排名 ---------- */
 function renderBoard() {
   const data = standings();
   const pod = document.getElementById('podium');
+  const list = document.getElementById('list');
+
+  if (!data.length) {
+    pod.innerHTML = '';
+    list.innerHTML =
+      `<li class="board-empty"><div class="em-ico">🎲</div>` +
+      `<h3>仲未有積分</h3><p>去「紀錄」分頁加一場,排名就會喺度出。</p></li>`;
+    return;
+  }
+
+  const top = data[0].pts || 1; // leader's points scale the strength bars
   pod.innerHTML = '';
   const order = [1, 0, 2]; // 2nd · 1st · 3rd
   order.forEach(i => {
     if (!data[i]) return;
     const p = data[i];
     const place = i + 1;
+    // champion reads as unified vermilion (accent = leader); 2nd/3rd take the soft per-name tint
+    const avaSty = place === 1
+      ? 'background:var(--accent-soft);color:var(--accent-deep)'
+      : avaStyle(p.name);
+    const lead = place === 1
+      ? `<div class="pod-meta"><span class="pod-lead">${data[1] ? (p.pts > data[1].pts ? '領先 ' + (p.pts - data[1].pts) + ' 分' : '並列領先') : '獨佔鰲頭'}</span></div>`
+      : `<div class="pod-meta">${p.wr}% · ${p.played} 場</div>`;
     const div = document.createElement('div');
     div.className = `pod pod-${place}`;
     div.innerHTML =
-      `<div class="pod-ava">${initials(p.name)}</div>` +
+      `<div class="pod-crown">👑</div>` +
+      `<div class="pod-ava" style="${avaSty}">${initials(p.name)}</div>` +
       `<div class="pod-pts">${p.pts}<span>pts</span></div>` +
       `<div class="pod-name">${esc(p.name)}</div>` +
-      `<div class="pod-wr">${p.wr}% WR</div>` +
+      lead +
       `<div class="pod-base"><span class="n">${place}</span></div>`;
     pod.appendChild(div);
   });
 
-  const list = document.getElementById('list');
   list.innerHTML = '';
   data.slice(3).forEach(p => {
+    const w = Math.max(0.04, p.pts / top).toFixed(3);
     const li = document.createElement('li');
     li.className = 'li';
     li.innerHTML =
       `<span class="rk">${p.rank}</span>` +
-      `<span class="ava">${initials(p.name)}</span>` +
-      `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% WR</span></span>` +
-      `<span class="pt">${p.pts}<span>pts</span></span>`;
+      `<span class="ava" style="${avaStyle(p.name)}">${initials(p.name)}</span>` +
+      `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
+      `<span class="pt">${p.pts}<span>pts</span></span>` +
+      `<span class="bar"><i style="--w:${w}"></i></span>`;
     list.appendChild(li);
   });
 }
@@ -390,10 +433,12 @@ function recHTML(g, idx, { link, del }) {
   return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}${note}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
 }
 
-function boardRowHTML(p) {
-  return `<li class="li"><span class="rk">${p.rank}</span><span class="ava">${initials(p.name)}</span>` +
-    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% WR</span></span>` +
-    `<span class="pt">${p.pts}<span>pts</span></span></li>`;
+function boardRowHTML(p, top = 1) {
+  const w = Math.max(0.04, p.pts / top).toFixed(3);
+  return `<li class="li"><span class="rk">${p.rank}</span><span class="ava" style="${avaStyle(p.name)}">${initials(p.name)}</span>` +
+    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
+    `<span class="pt">${p.pts}<span>pts</span></span>` +
+    `<span class="bar"><i style="--w:${w}"></i></span></li>`;
 }
 
 function renderRecords() {
@@ -413,7 +458,7 @@ function openGame(name) {
   const data = standings(list);
   document.getElementById('detail-title').textContent = name;
   document.getElementById('detail-sub').textContent = `${list.length} 場 · ${data.length} 位玩家`;
-  document.getElementById('detail-board').innerHTML = data.map(boardRowHTML).join('');
+  document.getElementById('detail-board').innerHTML = data.map(p => boardRowHTML(p, data[0] ? data[0].pts || 1 : 1)).join('');
   document.getElementById('detail-records').innerHTML = list.slice()
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map(g => recHTML(g, -1, { link: false, del: false })).join('');
