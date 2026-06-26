@@ -10,13 +10,41 @@
   main { max-width: 460px; margin: 0 auto; }
   .tab[hidden] { display: none; }
 
+  /* ============================================================
+     monochrome theme (this page only) — black & white UI; the
+     gold / silver / bronze medal on the top-3 ranks is the only
+     colour. Overrides brand.css tokens; brand.css stays untouched.
+     ============================================================ */
+  :root {
+    --accent: #221E18;        /* ink replaces the vermilion accent */
+    --accent-deep: #1A1712;
+    --accent-soft: #ECE8E1;   /* neutral warm-grey tint */
+    --good: var(--ink-soft);  /* WR / positive text goes neutral */
+    --shadow-pop:
+      0 10px 22px -12px rgba(26, 23, 18, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -2px 5px rgba(26, 23, 18, 0.12);
+    --shadow-press:
+      0 6px 14px -8px rgba(26, 23, 18, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    --gold: #B5891F;
+    --silver: #94949B;
+    --bronze: #A86E3C;
+  }
+  /* drop the warm colour glows so the glass refracts neutral grey */
+  body::before {
+    background:
+      radial-gradient(40vw 38vw at 18% 8%, rgba(26, 23, 18, 0.05), transparent 60%),
+      radial-gradient(40vw 38vw at 84% 24%, rgba(26, 23, 18, 0.04), transparent 62%);
+  }
+
   /* ---------- hero + podium (排名) ---------- */
   .hero {
     position: relative;
     padding: calc(2.6rem + env(safe-area-inset-top)) 1.2rem 1.4rem;
     background:
-      radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--hl) 38%, transparent), transparent 60%),
-      linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, var(--paper)), var(--paper) 92%);
+      radial-gradient(120% 80% at 50% -10%, rgba(26, 23, 18, 0.06), transparent 60%),
+      linear-gradient(180deg, color-mix(in srgb, var(--ink) 6%, var(--paper)), var(--paper) 92%);
     border-bottom-left-radius: 26px; border-bottom-right-radius: 26px;
     overflow: hidden;
   }
@@ -26,27 +54,29 @@
   .podium { display: flex; align-items: flex-end; justify-content: center; gap: 0.55rem; }
   .pod { display: flex; flex-direction: column; align-items: center; width: 30%; }
   /* crown sits above #1 only; 2nd/3rd keep an invisible one so avatars stay baseline-aligned */
-  .pod-crown { font-size: 1.15rem; line-height: 1; margin-bottom: 0.3rem; filter: drop-shadow(0 2px 3px rgba(197, 63, 31, 0.4)); }
+  .pod-crown { font-size: 1.15rem; line-height: 1; margin-bottom: 0.3rem; filter: drop-shadow(0 2px 3px rgba(26, 23, 18, 0.28)); }
   .pod-2 .pod-crown, .pod-3 .pod-crown { visibility: hidden; }
   .pod-ava { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-size: 1.05rem; font-weight: 800; color: var(--ink); background: var(--card-strong); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); margin-bottom: 0.5rem; box-shadow: 0 0 0 1.5px var(--line), var(--shadow); }
-  /* rank read from scale + the single brand accent, not medal metallics */
-  .pod-1 .pod-ava { width: 72px; height: 72px; font-size: 1.25rem; box-shadow: 0 0 0 2.5px var(--accent), 0 10px 22px -10px rgba(240, 82, 46, 0.5), inset 0 1px 0 var(--glass-rim); }
+  /* the only colour on the page: gold / silver / bronze for the top 3 */
+  .pod-1 .pod-ava { width: 72px; height: 72px; font-size: 1.25rem; box-shadow: 0 0 0 2.5px var(--gold), 0 10px 22px -10px rgba(181, 137, 31, 0.45), inset 0 1px 0 var(--glass-rim); }
+  .pod-2 .pod-ava { box-shadow: 0 0 0 2px var(--silver), var(--shadow); }
+  .pod-3 .pod-ava { box-shadow: 0 0 0 2px var(--bronze), var(--shadow); }
   .pod-pts { font-size: 1.35rem; font-weight: 800; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
-  .pod-1 .pod-pts { color: var(--accent-deep); }
   .pod-pts span { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); }
   .pod-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); margin-top: 0.15rem; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pod-1 .pod-name { font-size: 0.92rem; }
   .pod-meta { font-size: 0.7rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.5rem; font-variant-numeric: tabular-nums; }
-  .pod-lead { color: var(--accent-deep); }
   .pod-base { width: 100%; border-radius: 12px 12px 0 0; display: grid; place-items: center; background: var(--card); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--line); border-bottom: none; box-shadow: inset 0 1px 0 var(--glass-rim); }
-  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: color-mix(in srgb, var(--accent) 45%, var(--ink-soft)); opacity: 0.5; }
-  .pod-1 .pod-base { height: 96px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 80%, var(--card)), var(--card)); }
-  .pod-1 .pod-base .n { color: var(--accent-deep); opacity: 0.85; }
+  .pod-base .n { font-size: 1.6rem; font-weight: 800; color: var(--ink-soft); opacity: 0.5; }
+  .pod-1 .pod-base { height: 96px; }
+  .pod-1 .pod-base .n { color: var(--gold); opacity: 0.9; }
+  .pod-2 .pod-base .n { color: var(--silver); opacity: 0.9; }
+  .pod-3 .pod-base .n { color: var(--bronze); opacity: 0.9; }
   .pod-2 .pod-base { height: 70px; } .pod-3 .pod-base { height: 56px; }
 
   /* ---------- list ---------- */
   .list { list-style: none; margin: 0; padding: 0.4rem 0.9rem 0; }
-  .li { position: relative; display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0.3rem 1rem; }
+  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 0.3rem; }
   .li + .li { border-top: 1px solid var(--line); }
   .li .rk { width: 22px; text-align: center; font-size: 1.05rem; font-weight: 800; color: var(--ink-soft); flex: none; font-variant-numeric: tabular-nums; }
   .li .ava { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 0.85rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1.5px var(--line); flex: none; }
@@ -55,9 +85,11 @@
   .li .who .wr { font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .li .pt { font-size: 1.1rem; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; flex: none; }
   .li .pt span { font-size: 0.72rem; color: var(--ink-soft); font-weight: 700; }
-  /* standings-strength bar: each player's points relative to the leader */
-  .li .bar { position: absolute; left: 0.3rem; right: 0.3rem; bottom: 0.45rem; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
-  .li .bar i { display: block; height: 100%; border-radius: 2px; background: color-mix(in srgb, var(--accent) 32%, var(--line)); transform-origin: left; transform: scaleX(var(--w, 0)); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  /* medal accents — top-3 ranks in any list (e.g. per-game detail) */
+  .rk.m1 { color: var(--gold); } .rk.m2 { color: var(--silver); } .rk.m3 { color: var(--bronze); }
+  .ava.m1 { box-shadow: 0 0 0 2px var(--gold); }
+  .ava.m2 { box-shadow: 0 0 0 2px var(--silver); }
+  .ava.m3 { box-shadow: 0 0 0 2px var(--bronze); }
 
   /* ---------- empty board ---------- */
   .board-empty { text-align: center; padding: 3.4rem 1.6rem; color: var(--ink-soft); }
@@ -357,12 +389,8 @@ function standings(list = games) {
 function initials(name) { const t = name.trim(); return /^[A-Za-z]/.test(t) ? t.slice(0, 2) : t.slice(0, 1); }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
-/* a soft, paper-light tint per person so friends are recognisable at a glance —
-   deterministic from the name, low chroma so it stays quiet against the brand. */
-function avaStyle(name) {
-  let h = 0; for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
-  return `background:hsl(${h} 48% 93%);box-shadow:0 0 0 1.5px hsl(${h} 38% 78%);color:hsl(${h} 35% 30%)`;
-}
+/* medal class for the top-3 ranks — the only colour in the UI */
+function medal(rank) { return rank <= 3 ? ' m' + rank : ''; }
 
 /* ---------- render: 排名 ---------- */
 function renderBoard() {
@@ -378,43 +406,33 @@ function renderBoard() {
     return;
   }
 
-  const top = data[0].pts || 1; // leader's points scale the strength bars
   pod.innerHTML = '';
   const order = [1, 0, 2]; // 2nd · 1st · 3rd
   order.forEach(i => {
     if (!data[i]) return;
     const p = data[i];
     const place = i + 1;
-    // champion reads as unified vermilion (accent = leader); 2nd/3rd take the soft per-name tint
-    const avaSty = place === 1
-      ? 'background:var(--accent-soft);color:var(--accent-deep)'
-      : avaStyle(p.name);
-    const lead = place === 1
-      ? `<div class="pod-meta"><span class="pod-lead">${data[1] ? (p.pts > data[1].pts ? '領先 ' + (p.pts - data[1].pts) + ' 分' : '並列領先') : '獨佔鰲頭'}</span></div>`
-      : `<div class="pod-meta">${p.wr}% · ${p.played} 場</div>`;
     const div = document.createElement('div');
     div.className = `pod pod-${place}`;
     div.innerHTML =
       `<div class="pod-crown">👑</div>` +
-      `<div class="pod-ava" style="${avaSty}">${initials(p.name)}</div>` +
+      `<div class="pod-ava">${initials(p.name)}</div>` +
       `<div class="pod-pts">${p.pts}<span>pts</span></div>` +
       `<div class="pod-name">${esc(p.name)}</div>` +
-      lead +
+      `<div class="pod-meta">${p.wr}% · ${p.played} 場</div>` +
       `<div class="pod-base"><span class="n">${place}</span></div>`;
     pod.appendChild(div);
   });
 
   list.innerHTML = '';
   data.slice(3).forEach(p => {
-    const w = Math.max(0.04, p.pts / top).toFixed(3);
     const li = document.createElement('li');
     li.className = 'li';
     li.innerHTML =
       `<span class="rk">${p.rank}</span>` +
-      `<span class="ava" style="${avaStyle(p.name)}">${initials(p.name)}</span>` +
+      `<span class="ava">${initials(p.name)}</span>` +
       `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
-      `<span class="pt">${p.pts}<span>pts</span></span>` +
-      `<span class="bar"><i style="--w:${w}"></i></span>`;
+      `<span class="pt">${p.pts}<span>pts</span></span>`;
     list.appendChild(li);
   });
 }
@@ -433,12 +451,11 @@ function recHTML(g, idx, { link, del }) {
   return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}${note}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
 }
 
-function boardRowHTML(p, top = 1) {
-  const w = Math.max(0.04, p.pts / top).toFixed(3);
-  return `<li class="li"><span class="rk">${p.rank}</span><span class="ava" style="${avaStyle(p.name)}">${initials(p.name)}</span>` +
+function boardRowHTML(p) {
+  const m = medal(p.rank);
+  return `<li class="li"><span class="rk${m}">${p.rank}</span><span class="ava${m}">${initials(p.name)}</span>` +
     `<span class="who"><span class="nm">${esc(p.name)}</span><span class="wr">${p.wr}% · ${p.played} 場</span></span>` +
-    `<span class="pt">${p.pts}<span>pts</span></span>` +
-    `<span class="bar"><i style="--w:${w}"></i></span></li>`;
+    `<span class="pt">${p.pts}<span>pts</span></span></li>`;
 }
 
 function renderRecords() {
@@ -458,7 +475,7 @@ function openGame(name) {
   const data = standings(list);
   document.getElementById('detail-title').textContent = name;
   document.getElementById('detail-sub').textContent = `${list.length} 場 · ${data.length} 位玩家`;
-  document.getElementById('detail-board').innerHTML = data.map(p => boardRowHTML(p, data[0] ? data[0].pts || 1 : 1)).join('');
+  document.getElementById('detail-board').innerHTML = data.map(boardRowHTML).join('');
   document.getElementById('detail-records').innerHTML = list.slice()
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map(g => recHTML(g, -1, { link: false, del: false })).join('');
