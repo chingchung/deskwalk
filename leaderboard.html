@@ -44,10 +44,11 @@
 
   /* ---------- ranking header (排名) ---------- */
   .lb-head { padding: calc(1.3rem + env(safe-area-inset-top)) 1.3rem 0; }
-  .lb-title { font-family: var(--serif); font-size: 2.45rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 1.1rem; color: var(--ink); }
+  .lb-topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .lb-title { font-family: var(--serif); font-size: 2.45rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
 
-  .lb-filters { display: flex; gap: 0.6rem; }
-  .lb-sub { margin: 0.9rem 0 0.3rem; font-size: 1rem; font-weight: 500; color: var(--ink-soft); }
+  .filter-pill#pill-game { flex: none; }
+  .lb-sub { margin: 0.75rem 0 0.3rem; font-size: 1rem; font-weight: 500; color: var(--ink-soft); }
   .filter-pill { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line)); border-radius: var(--pill); padding: 0.5rem 0.95rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); font-size: 0.95rem; font-weight: 800; color: var(--ink); cursor: pointer; }
   .filter-pill .chev { font-size: 0.7rem; opacity: 0.6; }
   .filter-pill.set { border-color: var(--ink); }
@@ -170,8 +171,8 @@
   <!-- ========== 排名 ========== -->
   <section class="tab" id="tab-rank">
     <header class="lb-head">
-      <h1 class="lb-title">積分榜</h1>
-      <div class="lb-filters">
+      <div class="lb-topline">
+        <h1 class="lb-title">積分榜</h1>
         <label class="filter-pill" id="pill-game">
           <span id="game-label">全部遊戲</span><span class="chev">▾</span>
           <select id="filter-game" aria-label="篩選遊戲"></select>
