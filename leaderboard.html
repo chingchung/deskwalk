@@ -75,16 +75,20 @@
   /* ---------- shared section heads ---------- */
   .pad { padding: calc(1.8rem + env(safe-area-inset-top)) 1.2rem 1rem; }
   .pad h2 { margin: 0 0 1rem; font-family: var(--serif); font-size: 1.85rem; font-weight: 800; letter-spacing: -0.01em; }
+  .log-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .log-head h2 { margin: 0; }
 
   /* ---------- records (紀錄) ---------- */
   .btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.1rem; font: inherit; font-size: 0.9rem; font-weight: 800; box-shadow: var(--shadow-pop); }
   .lock-link { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.78rem; text-decoration: underline; }
   .err { color: var(--bad); font-size: 0.8rem; min-height: 1.1em; margin: 0.5rem 0; }
 
-  /* FAB + bottom sheet */
-  .fab { position: fixed; top: max(0.9rem, env(safe-area-inset-top)); right: max(0.9rem, env(safe-area-inset-right)); z-index: 96; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 1.7rem; font-weight: 400; line-height: 1; display: grid; place-items: center; box-shadow: var(--shadow-pop); transition: transform 0.15s ease; }
-  .fab:active { transform: scale(0.93); }
-  .fab[hidden] { display: none; }
+  /* add-record button — circular, filter-pill style, inline in the 紀錄 header */
+  .add-btn { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line)); background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); color: var(--ink); font-size: 1.5rem; font-weight: 400; line-height: 1; transition: transform 0.15s ease; }
+  .add-btn:active { transform: scale(0.94); }
+  .add-btn[hidden] { display: none; }
+
+  /* bottom sheet */
   .sheet-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(26, 23, 18, 0.34); display: flex; align-items: flex-end; justify-content: center; }
   .sheet-backdrop[hidden] { display: none; }
   .sheet { width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto; background: rgba(251, 250, 246, 0.97); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-radius: 24px 24px 0 0; padding: 0.7rem 1.3rem calc(1.5rem + env(safe-area-inset-bottom)); box-shadow: 0 -16px 44px -16px rgba(26, 23, 18, 0.4), inset 0 1px 0 var(--glass-rim); animation: sheetUp 0.26s ease; }
@@ -186,7 +190,10 @@
   <!-- ========== 紀錄 ========== -->
   <section class="tab" id="tab-log" hidden>
     <div class="pad">
-      <h2>場次紀錄</h2>
+      <div class="log-head">
+        <h2>場次紀錄</h2>
+        <button class="add-btn" id="fab" aria-label="新增場次">＋</button>
+      </div>
       <ul class="records" id="records"></ul>
     </div>
   </section>
@@ -237,7 +244,6 @@
   </section>
 </main>
 
-<button class="fab" id="fab" hidden aria-label="新增場次">＋</button>
 
 <nav class="tabbar" id="tabbar">
   <button data-tab="rank" class="on">排名</button>
