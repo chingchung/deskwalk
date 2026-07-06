@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>疊注賭盤 · 冷知識</title>
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      main {
+        max-width: 540px;
+        margin: 0 auto;
+        padding: 4.6rem 1.15rem 2rem;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ---- header ---- */
+      .top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .top h1 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .top h1 span { color: var(--accent); }
+      .counter {
+        flex: none;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.04em;
+      }
+
+      /* ---- rule chip (collapsible) ---- */
+      .rules {
+        margin-bottom: 1.1rem;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .rules summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .rules summary::-webkit-details-marker { display: none; }
+      .rules summary::before {
+        content: "玩法";
+        background: var(--accent-soft);
+        color: var(--accent-deep);
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        padding: 2px 7px;
+        border-radius: var(--pill);
+      }
+      .rules summary::after {
+        content: "▸";
+        margin-left: auto;
+        transition: transform 0.2s;
+        font-size: 0.7rem;
+      }
+      .rules[open] summary::after { transform: rotate(90deg); }
+      .rules ol {
+        margin: 0;
+        padding: 0 1.1rem 0.9rem 2.1rem;
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+        line-height: 1.65;
+      }
+      .rules li { margin-bottom: 0.35rem; }
+      .rules b { color: var(--ink); }
+
+      /* ---- the card ---- */
+      .card {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--card);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        min-height: 340px;
+        transition: transform 0.28s cubic-bezier(.2,.7,.2,1), opacity 0.28s;
+      }
+      .card.swap { opacity: 0; transform: translateY(10px) scale(0.985); }
+
+      .cat {
+        align-self: center;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: var(--accent-deep);
+        background: var(--accent-soft);
+        padding: 4px 12px;
+        border-radius: var(--pill);
+        margin-bottom: 1.3rem;
+      }
+      .q {
+        font-size: 1.5rem;
+        line-height: 1.5;
+        font-weight: 700;
+        letter-spacing: -0.005em;
+        margin: 0 0 0.4rem;
+        text-wrap: balance;
+      }
+      .hint {
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+        margin: 0.6rem 0 0;
+      }
+
+      /* ---- answer reveal ---- */
+      .answer {
+        margin-top: 1.7rem;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.32s, transform 0.32s;
+        pointer-events: none;
+      }
+      .answer.show { opacity: 1; transform: none; }
+      .answer .num {
+        font-size: 2.9rem;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+      }
+      .answer .num small {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin-left: 0.25rem;
+      }
+      .answer .note {
+        font-size: 0.82rem;
+        color: var(--ink-soft);
+        margin: 0.55rem auto 0;
+        max-width: 30ch;
+        line-height: 1.55;
+      }
+      .divider {
+        width: 46px;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--line);
+        margin: 1.6rem auto 0;
+      }
+
+      /* ---- controls ---- */
+      .controls {
+        display: flex;
+        gap: 0.7rem;
+        margin-top: 1.15rem;
+        align-items: stretch;
+      }
+      button {
+        border: none;
+        border-radius: var(--radius-sm);
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        transition: transform 0.12s, box-shadow 0.18s, background 0.18s;
+      }
+      button:active { transform: translateY(1px); }
+      .btn-reveal {
+        flex: 1;
+        font-size: 1.02rem;
+        padding: 1rem;
+        color: #fff;
+        background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+        box-shadow: var(--shadow-pop);
+      }
+      .btn-reveal:active { box-shadow: var(--shadow-press); }
+      .btn-reveal.done {
+        color: var(--accent-deep);
+        background: var(--card-strong);
+        -webkit-backdrop-filter: var(--glass-blur-sm);
+        backdrop-filter: var(--glass-blur-sm);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+      .btn-next {
+        flex: 1;
+        font-size: 1.02rem;
+        padding: 1rem;
+        color: #fff;
+        background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+        box-shadow: var(--shadow-pop);
+      }
+      .btn-icon {
+        flex: none;
+        width: 3.1rem;
+        font-size: 1.1rem;
+        color: var(--ink-soft);
+        background: var(--card-strong);
+        -webkit-backdrop-filter: var(--glass-blur-sm);
+        backdrop-filter: var(--glass-blur-sm);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <a class="dw-mark" href="index.html">deskwalk</a>
+
+    <main>
+      <div class="top">
+        <h1>疊<span>注</span>賭盤 · 冷知識</h1>
+        <span class="counter" id="counter">–</span>
+      </div>
+
+      <details class="rules dw-glass">
+        <summary></summary>
+        <ol>
+          <li>翻題,讀出問題。答案係一個數字,大家心裡估。</li>
+          <li>莊家<b>必須先開注</b>:宣告「答案<b>至少</b> N」。順時針,人人三選一——<b>加注</b>(喊更高)/ <b>跟注</b>(半分,跟邊個綁邊個)/ <b>pass</b>(出局)。</li>
+          <li>場上永遠得一個最高注。被蓋咗嘅人輪返到就要再加注或 pass。冇人再加注就<b>揭曉</b>。</li>
+          <li>答案 <b>≥</b> 最高注 = 安全:最高注者食雙倍、跟注者食一半。答案 <b>&lt;</b> = 爆:最高注者倒扣,已 pass 嘅人<b>抓包</b>各加分。</li>
+          <li>莊家輪流做,打 8–10 題,總分最高贏。</li>
+        </ol>
+      </details>
+
+      <div class="card" id="card">
+        <span class="cat" id="cat">—</span>
+        <p class="q" id="q">載入中…</p>
+        <div class="answer" id="answer">
+          <div class="num" id="num"></div>
+          <p class="note" id="note"></p>
+          <div class="divider"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-icon" id="prev" aria-label="上一題">‹</button>
+        <button class="btn-reveal" id="reveal">揭曉答案</button>
+        <button class="btn-next hidden" id="next">下一題 ›</button>
+        <button class="btn-icon" id="shuffle" aria-label="重新洗牌">⤮</button>
+      </div>
+    </main>
+
+    <script>
+      // ── 題庫 ──────────────────────────────────────────────
+      // 以「估得出範圍、釘唔死」嘅紀錄/極端題為主,夾幾條低數字陷阱題調節奏。
+      // 想改題:直接編呢個 array。unit 係數字後面嘅單位。
+      const BANK = [
+        // 人體
+        { c: "人體", q: "成年人全身有幾多塊骨？", a: "206", u: "塊", note: "陷阱題:太多人知,下注空間細。" },
+        { c: "人體", q: "BB 出生時全身約有幾多塊骨？", a: "≈300", u: "塊", note: "長大後部分融合,先變成 206 塊。" },
+        { c: "人體", q: "人腦大約有幾多億個神經元？", a: "≈860", u: "億", note: "同銀河系恆星數量同一個量級。" },
+        { c: "人體", q: "成年人身體大約有幾多 % 係水？", a: "≈60", u: "%", note: "BB 更高,約 75%。" },
+        { c: "人體", q: "成年人一日心臟大約跳幾多下？", a: "≈100,000", u: "下", note: "一年約 3,600 萬下。" },
+        { c: "人體", q: "打乞嗤噴出嘅氣流時速最高可達約幾多？", a: "≈160", u: "km/h", note: "有研究話可達 100 mph。" },
+        { c: "人體", q: "指甲一個月大約長幾多？", a: "≈3.5", u: "mm", note: "手指甲快過腳趾甲。" },
+
+        // 動物
+        { c: "動物", q: "獵豹最高時速約幾多？", a: "≈115", u: "km/h", note: "但只能維持幾十秒。" },
+        { c: "動物", q: "蜂鳥心跳每分鐘最高約幾多下？", a: "≈1,200", u: "下", note: "人類靜止先約 70 下。" },
+        { c: "動物", q: "藍鯨個心臟約重幾多？", a: "≈180", u: "kg", note: "細路仔可以爬得入條主動脈。" },
+        { c: "動物", q: "藍鯨條脷約重幾多？", a: "≈2,700", u: "kg", note: "差唔多等於一隻成年大象。" },
+        { c: "動物", q: "長頸鹿條頸有幾多塊頸椎？", a: "7", u: "塊", note: "陷阱題:同人類一樣得 7 塊,只係每塊超長。" },
+        { c: "動物", q: "樹熊一日大約瞓幾多個鐘？", a: "≈20", u: "個鐘", note: "食尤加利葉好難消化,慳返力氣。" },
+        { c: "動物", q: "大象懷孕大約幾多個月？", a: "≈22", u: "個月", note: "哺乳類之中最長之一。" },
+        { c: "動物", q: "蟑螂俾人斬咗頭大約仲捱到幾多日？", a: "≈7", u: "日", note: "唔係即死,最後係渴死/餓死。" },
+        { c: "動物", q: "鴕鳥一隻蛋約重幾多？", a: "≈1.4", u: "kg", note: "現存最大嘅鳥蛋。" },
+        { c: "動物", q: "蝸牛（齒舌）大約有幾多隻「牙」？", a: "≈14,000", u: "隻", note: "部分品種超過 20,000。" },
+
+        // 紀錄
+        { c: "紀錄", q: "史上最高嘅人 Robert Wadlow 最終身高幾多？", a: "272", u: "cm", note: "美國人,22 歲離世時仍在長高。" },
+        { c: "紀錄", q: "史上最矮成年男性約幾多？", a: "≈54.6", u: "cm", note: "尼泊爾 Chandra Bahadur Dangi。" },
+        { c: "紀錄", q: "Joey Chestnut 10 分鐘食最多熱狗紀錄約幾多條？", a: "76", u: "條", note: "2021 年紀錄,或已被刷新。" },
+        { c: "紀錄", q: "史上最長頭髮約幾多米？", a: "≈5.6", u: "米", note: "中國謝秋萍,量度時已留咗幾十年。" },
+        { c: "紀錄", q: "有人連續打嗝最長維持咗幾多年？", a: "68", u: "年", note: "Charles Osborne,1922–1990。" },
+        { c: "紀錄", q: "有紀錄唔瞓覺最長約幾多個鐘？", a: "≈264", u: "個鐘", note: "即約 11 日(Randy Gardner)。" },
+        { c: "紀錄", q: "世界最辣辣椒 Pepper X 約幾多萬 SHU？", a: "≈269", u: "萬 SHU", note: "普通指天椒得約 5 萬。" },
+        { c: "紀錄", q: "最長壽嘅貓活到幾多歲？", a: "38", u: "歲", note: "美國嘅 Creme Puff。" },
+        { c: "紀錄", q: "世界最重南瓜約幾多？", a: "≈1,200", u: "kg", note: "紀錄逐年刷新,已超過 1,200 kg。" },
+
+        // 自然 / 地理
+        { c: "自然", q: "珠穆朗瑪峰高約幾多米？", a: "8,849", u: "米", note: "2020 中尼聯合公布新高度。" },
+        { c: "自然", q: "馬里亞納海溝最深約幾多米？", a: "≈10,935", u: "米", note: "深過珠峰嘅高度。" },
+        { c: "自然", q: "閃電通道瞬間溫度可達約幾多？", a: "≈30,000", u: "°C", note: "約係太陽表面溫度嘅 5 倍。" },
+        { c: "自然", q: "地球赤道周長約幾多？", a: "≈40,075", u: "km", note: "所以一秒等於光走 7.5 個圈。" },
+        { c: "自然", q: "世界最高瀑布安赫爾瀑布落差約幾多米？", a: "≈979", u: "米", note: "位於委內瑞拉。" },
+        { c: "自然", q: "世界最長河（尼羅河）約幾多 km？", a: "≈6,650", u: "km", note: "亞馬遜河同佢爭第一。" },
+
+        // 雜項
+        { c: "雜項", q: "埃菲爾鐵塔連天線高約幾多米？", a: "≈330", u: "米", note: "天氣熱膨脹時仲會高多 15 cm。" },
+        { c: "雜項", q: "自由神像連底座高約幾多米？", a: "≈93", u: "米", note: "神像本身得約 46 米。" },
+        { c: "雜項", q: "鋼琴有幾多個琴鍵？", a: "88", u: "個", note: "陷阱題:52 白 + 36 黑。" },
+        { c: "雜項", q: "麥當勞全球大約有幾多間分店？", a: "≈40,000", u: "間", note: "遍佈超過 100 個國家。" },
+        { c: "雜項", q: "一年大約有幾多秒？", a: "≈3,153", u: "萬秒", note: "31,536,000 秒(平年)。" },
+      ];
+
+      // ── 狀態 ──────────────────────────────────────────────
+      let order = [];
+      let pos = 0;
+
+      const el = {
+        card: document.getElementById("card"),
+        cat: document.getElementById("cat"),
+        q: document.getElementById("q"),
+        answer: document.getElementById("answer"),
+        num: document.getElementById("num"),
+        note: document.getElementById("note"),
+        counter: document.getElementById("counter"),
+        reveal: document.getElementById("reveal"),
+        next: document.getElementById("next"),
+        prev: document.getElementById("prev"),
+        shuffle: document.getElementById("shuffle"),
+      };
+
+      function shuffle() {
+        order = BANK.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+        pos = 0;
+        render();
+      }
+
+      function render(animate) {
+        const item = BANK[order[pos]];
+        const paint = () => {
+          el.cat.textContent = item.c;
+          el.q.textContent = item.q;
+          el.num.innerHTML =
+            item.a + (item.u ? ' <small>' + item.u + "</small>" : "");
+          el.note.textContent = item.note || "";
+          el.note.style.display = item.note ? "" : "none";
+          el.counter.textContent = pos + 1 + " / " + BANK.length;
+          // 收起答案
+          el.answer.classList.remove("show");
+          el.reveal.classList.remove("done", "hidden");
+          el.reveal.textContent = "揭曉答案";
+          el.next.classList.add("hidden");
+          if (animate) el.card.classList.remove("swap");
+        };
+        if (animate) {
+          el.card.classList.add("swap");
+          setTimeout(paint, 180);
+        } else {
+          paint();
+        }
+      }
+
+      function reveal() {
+        el.answer.classList.add("show");
+        el.reveal.classList.add("hidden");
+        el.next.classList.remove("hidden");
+      }
+
+      function go(delta) {
+        pos = (pos + delta + BANK.length) % BANK.length;
+        render(true);
+      }
+
+      el.reveal.addEventListener("click", reveal);
+      el.next.addEventListener("click", () => go(1));
+      el.prev.addEventListener("click", () => go(-1));
+      el.shuffle.addEventListener("click", shuffle);
+
+      // 鍵盤:空白/→ 揭曉或下一題,← 上一題
+      document.addEventListener("keydown", (e) => {
+        if (e.key === " " || e.key === "ArrowRight") {
+          e.preventDefault();
+          if (el.next.classList.contains("hidden")) reveal();
+          else go(1);
+        } else if (e.key === "ArrowLeft") {
+          go(-1);
+        }
+      });
+
+      shuffle();
+    </script>
+  </body>
+</html>
