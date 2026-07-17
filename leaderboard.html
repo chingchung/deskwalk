@@ -168,9 +168,6 @@
   }
   .tabbar button { flex: 1; border: none; background: none; padding: 0.6rem 0; font: inherit; font-size: 0.86rem; font-weight: 800; color: var(--ink-soft); border-radius: var(--pill); }
   .tabbar button.on { background: var(--accent-soft); color: var(--accent-deep); }
-
-  /* ---------- version tag ---------- */
-  #version-tag { text-align: center; padding: 1.6rem 0 0.2rem; color: var(--ink-soft); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; }
 </style>
 </head>
 <body>
@@ -217,15 +214,15 @@
 
       <div class="rule">
         <h3>勝負制 · 分陣營（含不對稱對抗,如狼人殺）</h3>
-        <p>贏方每人攞同一個整數,輸方 0。無平分、無小數:</p>
-        <p style="margin:.4rem 0;"><b>每人 = ⌊6 ÷ 贏方人數⌋（最少 1），少數派贏每人再 +1。</b></p>
+        <p>贏方每人攞同一個分數,輸方 0:</p>
+        <p style="margin:.4rem 0;"><b>每人 = 6 ÷ 贏方人數（向下取一位小數），少數派贏每人再 +1。</b></p>
         <table class="tbl">
           <thead><tr><th>贏方人數</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
           <tbody>
-            <tr><td>每人(對稱/多數勝)</td><td>6</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td></tr>
+            <tr><td>每人(對稱/多數勝)</td><td>6</td><td>3</td><td>2</td><td>1.5</td><td>1.2</td><td>1</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:.7rem;">少數派勝（贏方 &lt; 輸方）每人再 <span class="pip">+1</span>:4 贏 5 → 2、3 贏 4 → 3、2 贏 6（狼隊）→ 4。</p>
+        <p style="margin-top:.7rem;">少數派勝（贏方 &lt; 輸方）每人再 <span class="pip">+1</span>:4 贏 5 → 2.5、3 贏 4 → 3、2 贏 6（狼隊）→ 4。</p>
       </div>
 
       <div class="rule" style="margin-bottom:0;">
@@ -246,8 +243,6 @@
       <ul class="records" id="detail-records"></ul>
     </div>
   </section>
-
-  <div id="version-tag">積分榜 · Leaderboard · v1.0 · 2026-07-17</div>
 </main>
 
 
@@ -325,7 +320,7 @@ function scoreTeam(winners, loseCount) {
   const out = {};
   const W = winners.length;
   if (W === 0) return out;
-  let p = Math.max(1, Math.floor(6 / W));
+  let p = floor1(6 / W);
   if (loseCount > W) p += 1;
   winners.forEach(w => out[w] = p);
   return out;
