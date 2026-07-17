@@ -126,7 +126,6 @@
   .rec-date { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .rec-title { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0.45rem; }
   .rec-game { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
-  .rec-note { font-size: 0.68rem; font-weight: 700; color: var(--ink-soft); background: var(--card-strong); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
   .rec-game-link { background: none; border: none; text-align: left; padding: 0; cursor: pointer; }
   .rec-game-link:hover { color: var(--accent-deep); }
   .detail-back { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.9rem; font-weight: 700; padding: 0; margin-bottom: 0.5rem; }
@@ -165,6 +164,9 @@
   .lead { margin: 0 0 1.5rem; font-size: 1rem; line-height: 1.6; color: var(--ink); }
   .rule { margin-bottom: 1.1rem; }
   .rule:last-child { margin-bottom: 0; }
+  /* 備註 holds several separate remarks — let them breathe apart */
+  .notes p { margin: 0 0 0.55rem; }
+  .notes p:last-child { margin-bottom: 0; }
   .rule h3 { margin: 0 0 0.3rem; font-size: 0.92rem; font-weight: 800; color: var(--ink); }
   .rule p { margin: 0.15rem 0; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.6; }
   .rule b { color: var(--ink); }
@@ -230,21 +232,13 @@
       <div class="rule">
         <h3>分陣營</h3>
         <p>勝方<b>平分 6 分</b>,敗方 0。兩人獲勝每人 3 分;三人獲勝每人 2 分——<b>勝方人數越少,每人所得越多</b>。</p>
-        <p>以少勝多(如狼人殺的狼隊)每人另加 <span class="pip">+1</span>。</p>
       </div>
 
-      <div class="rule">
-        <h3>小數</h3>
-        <p>最多保留一位小數,除不盡時<b>向下取整</b>。例:1 分由三人平分,每人 <b>0.3</b>。</p>
-      </div>
-
-      <div class="rule">
-        <h3>排名</h3>
-        <p>以<b>累積總分</b>排序,同分並列。勝率 = 得分場數 ÷ 出場場數。</p>
-      </div>
-
-      <div class="rule">
+      <div class="rule notes">
         <h3>備註</h3>
+        <p>如遊戲時長較短,並在當天遊玩多局,可按<b>勝利局數</b>計算。</p>
+        <p>分數最多保留一位小數,除不盡時<b>向下取整</b>。例:1 分由三人平分,每人 <b>0.3</b>。</p>
+        <p>排名以<b>累積總分</b>計,同分並列。勝率 = 得分場數 ÷ 出場場數。</p>
         <p>以上為<b>基準</b>,並非硬性規定。主持可按當場情況調整——例如僅三人參與,競爭性較低,可酌量減少派分。故每場總分<b>未必剛好 6 分</b>。</p>
       </div>
     </div>
@@ -308,14 +302,17 @@
       <div class="add-form" id="add-form">
         <div class="two">
           <div class="field"><label>日期</label><input type="date" id="f-date"></div>
-          <div class="field"><label>遊戲</label><input type="text" id="f-game" placeholder="例:卡卡頌"></div>
+          <div class="field"><label>遊戲</label><input type="text" id="f-game" list="dl-games" autocomplete="off" placeholder="揀或打新嘅"></div>
         </div>
-        <div class="field"><label>備注（可選）</label><input type="text" id="f-note" placeholder="同名遊戲嘅變體 / 場合,例:撞機"></div>
         <div class="field">
           <label>玩家同得分</label>
           <div id="players"></div>
           <button type="button" class="addrow" id="add-row">＋ 加一位</button>
         </div>
+
+        <!-- 揀得,亦打得 — 打新嘅就當新增 -->
+        <datalist id="dl-games"></datalist>
+        <datalist id="dl-players"></datalist>
         <div class="preview" id="preview"></div>
         <button class="btn btn-save" id="save" disabled>儲存場次</button>
       </div>
@@ -331,7 +328,7 @@ const PW = '2444';
 const SEED = [
   { date: '2026-06-17', game: 'One Shot', scores: [
     { name: 'Nicole', pts: 3 }, { name: 'Charles', pts: 2 }, { name: 'Kenny', pts: 1 }] },
-  { date: '2026-06-18', game: 'One Shot', note: '撞機', scores: [
+  { date: '2026-06-18', game: 'One Shot', scores: [
     { name: 'Nicole', pts: 2 }, { name: 'Sam', pts: 2 }, { name: 'Kaman', pts: 2 }] },
   { date: '2026-06-22', game: '卡卡頌', scores: [
     { name: 'Kenny', pts: 3 }, { name: 'Step', pts: 2 }, { name: 'Nicole', pts: 1 },
@@ -478,9 +475,8 @@ function recHTML(g, idx, { link, del, me }) {
   const game = link
     ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
     : `<span class="rec-game">${esc(g.game || '未命名')}</span>`;
-  const note = g.note ? `<span class="rec-note">${esc(g.note)}</span>` : '';
   const delEl = del ? `<button class="del" data-idx="${idx}" title="刪除">×</button>` : '';
-  return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}${note}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
+  return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
 }
 
 
@@ -548,7 +544,16 @@ function openPlayer(name, back) {
   showOnly('player');
 }
 
-function renderAll() { refreshFilters(); renderBoard(); renderRecords(); }
+function renderAll() { refreshFilters(); refreshDatalists(); renderBoard(); renderRecords(); }
+
+/* add-form suggestions: every game / player logged so far. Typing something
+   new is still allowed — that's how a new game or player gets added. */
+function refreshDatalists() {
+  const opts = names => [...new Set(names)].filter(Boolean)
+    .sort((a, b) => a.localeCompare(b)).map(v => `<option value="${esc(v)}">`).join('');
+  document.getElementById('dl-games').innerHTML = opts(games.map(g => g.game || ''));
+  document.getElementById('dl-players').innerHTML = opts(games.flatMap(g => Object.keys(scoreGame(g))));
+}
 
 /* ---------- ranking metric + filters ---------- */
 function refreshFilters() {
@@ -649,7 +654,7 @@ function addPlayerRow(name = '', pts = '') {
   const row = document.createElement('div');
   row.className = 'prow';
   row.innerHTML =
-    `<input type="text" class="pname" placeholder="名字" value="${esc(name)}">` +
+    `<input type="text" class="pname" list="dl-players" autocomplete="off" placeholder="揀或打新嘅" value="${esc(name)}">` +
     `<input type="number" class="ppts" inputmode="decimal" step="0.1" placeholder="分" value="${pts}">` +
     `<button type="button" class="rm" title="移除">×</button>`;
   row.querySelector('.rm').addEventListener('click', () => { row.remove(); updatePreview(); });
@@ -662,10 +667,7 @@ function readForm() {
     name: r.querySelector('.pname').value.trim(),
     pts: floor1(parseFloat(r.querySelector('.ppts').value)),
   })).filter(p => p.name && Number.isFinite(p.pts));
-  const g = { date: document.getElementById('f-date').value, game: document.getElementById('f-game').value.trim(), scores };
-  const note = document.getElementById('f-note').value.trim();
-  if (note) g.note = note;
-  return g;
+  return { date: document.getElementById('f-date').value, game: document.getElementById('f-game').value.trim(), scores };
 }
 
 function valid(g) {
@@ -695,7 +697,6 @@ document.getElementById('save').addEventListener('click', () => {
 function resetForm() {
   document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
   document.getElementById('f-game').value = '';
-  document.getElementById('f-note').value = '';
   playersBox.innerHTML = '';
   addPlayerRow(); addPlayerRow(); addPlayerRow();
   updatePreview();
