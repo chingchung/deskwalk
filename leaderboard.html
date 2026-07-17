@@ -168,6 +168,9 @@
   }
   .tabbar button { flex: 1; border: none; background: none; padding: 0.6rem 0; font: inherit; font-size: 0.86rem; font-weight: 800; color: var(--ink-soft); border-radius: var(--pill); }
   .tabbar button.on { background: var(--accent-soft); color: var(--accent-deep); }
+
+  /* ---------- version tag ---------- */
+  #version-tag { text-align: center; padding: 1.6rem 0 0.2rem; color: var(--ink-soft); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; }
 </style>
 </head>
 <body>
@@ -202,13 +205,14 @@
   <section class="tab" id="tab-rules" hidden>
     <div class="pad">
       <h2>積分準則</h2>
-      <p class="rule" style="color:var(--ink-soft);font-size:.85rem;line-height:1.6;">每場遊戲派分,<b>全程整數</b>。先睇「個人有冇名次」決定用邊種。WR(勝率)= 有得分嘅場數 ÷ 總出場數。</p>
+      <p class="rule" style="color:var(--ink-soft);font-size:.85rem;line-height:1.6;">每場遊戲派分,分數<b>最多一個小數位,一律向下取整</b>。先睇「個人有冇名次」決定用邊種。WR(勝率)= 有得分嘅場數 ÷ 總出場數。</p>
 
       <div class="rule">
         <h3>名次制 · 個人分先後</h3>
         <p>🥇 第一 <span class="pip">3</span> ／ 🥈 第二 <span class="pip">2</span> ／ 🥉 第三 <span class="pip">1</span>,其餘 0 → 合計固定 6。</p>
-        <p><b>並列取高位:</b>並列者同取較高名次嘅分,低位取消(該場可能變 7)。例:第一 3、並列第二 2 / 2。</p>
-        <p><b>全員平手:</b>當勝負制對稱勝派(3 人 → 2/2/2)。</p>
+        <p><b>並列平分:</b>並列者攤分佢哋佔用嗰幾個名次嘅總分,再除以人數,向下取一位小數。</p>
+        <p style="margin:.4rem 0;">例:2 人並列第二 →(2+1)÷2 = 每人 <span class="pip">1.5</span>;3 人並列第一 →(3+2+1)÷3 = 每人 <span class="pip">2</span>;3 人並列第三 →(1+0+0)÷3 = 每人 <span class="pip">0.3</span>。</p>
+        <p><b>全員平手:</b>照上面攤分(3 人 → 每人 2)。</p>
       </div>
 
       <div class="rule">
@@ -226,7 +230,7 @@
 
       <div class="rule" style="margin-bottom:0;">
         <h3>排名</h3>
-        <p>以<b>累積總分</b>計,同分並列。名次制每場鎖 6 分;勝負制該場合計隨人數浮動,反映「贏得有幾難」。</p>
+        <p>以<b>累積總分</b>計,同分並列。名次制每場派滿 6 分(向下取整時可能蒸發少少);勝負制該場合計隨人數浮動,反映「贏得有幾難」。</p>
       </div>
     </div>
   </section>
@@ -242,6 +246,8 @@
       <ul class="records" id="detail-records"></ul>
     </div>
   </section>
+
+  <div id="version-tag">積分榜 · Leaderboard · v1.0 · 2026-07-17</div>
 </main>
 
 
@@ -287,7 +293,8 @@
 </div>
 
 <script>
-const STORE = 'deskwalk_leaderboard_v4';
+/* v1.0 (2026-07-17) — bumped key: old boards re-seed under the new tie rule */
+const STORE = 'deskwalk_leaderboard_v1_0';
 const PW = '2444';
 
 const SEED = [
@@ -309,6 +316,10 @@ function save() { localStorage.setItem(STORE, JSON.stringify(games)); }
 
 /* ---------- scoring engine ---------- */
 function podium(place) { return place === 1 ? 3 : place === 2 ? 2 : place === 3 ? 1 : 0; }
+
+/* points carry at most 1 decimal, always rounded down (1e-9 absorbs float error) */
+function floor1(v) { return Math.floor(v * 10 + 1e-9) / 10; }
+function fmt(v) { return Number.isInteger(v) ? String(v) : v.toFixed(1); }
 
 function scoreTeam(winners, loseCount) {
   const out = {};
@@ -338,7 +349,10 @@ function scoreGame(g) {
   const out = {};
   let place = 1;
   for (const grp of groups) {
-    const v = podium(place);
+    // tied players share the places they occupy: sum those places' points, split evenly
+    let pool = 0;
+    for (let i = 0; i < grp.length; i++) pool += podium(place + i);
+    const v = floor1(pool / grp.length);
     grp.forEach(name => out[name] = v);
     place += grp.length;
   }
@@ -357,7 +371,7 @@ function standings(list = games) {
     });
   });
   const data = Object.keys(pts).map(n => ({
-    name: n, pts: pts[n], played: played[n], wins: wins[n] || 0,
+    name: n, pts: Math.round(pts[n] * 10) / 10, played: played[n], wins: wins[n] || 0,
     wr: Math.round((wins[n] || 0) / played[n] * 100),
   })).sort((a, b) => b.pts - a.pts || b.wr - a.wr || a.name.localeCompare(b.name));
   let rank = 0, prev = null;
@@ -393,7 +407,7 @@ function rowHTML(p) {
     `<span class="rk${medal(rank)}">${rank}</span>` +
     `<span class="ava">${initials(p.name)}</span>` +
     `<span class="who"><span class="nm">${esc(p.name)}</span><span class="sub">${p.wr}% 勝率 · ${p.played} 場</span></span>` +
-    `<span class="score">${p.pts}</span></li>`;
+    `<span class="score">${fmt(p.pts)}</span></li>`;
 }
 
 function renderBoard() {
@@ -412,7 +426,7 @@ function renderBoard() {
 function recHTML(g, idx, { link, del }) {
   const s = scoreGame(g);
   const chips = Object.entries(s).sort((a, b) => b[1] - a[1]).map(([name, pts]) =>
-    `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${pts}</span></span>`
+    `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
   ).join('');
   const game = link
     ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
@@ -538,7 +552,7 @@ function addPlayerRow(name = '', pts = '') {
   row.className = 'prow';
   row.innerHTML =
     `<input type="text" class="pname" placeholder="名字" value="${esc(name)}">` +
-    `<input type="number" class="ppts" inputmode="numeric" placeholder="分" value="${pts}">` +
+    `<input type="number" class="ppts" inputmode="decimal" step="0.1" placeholder="分" value="${pts}">` +
     `<button type="button" class="rm" title="移除">×</button>`;
   row.querySelector('.rm').addEventListener('click', () => { row.remove(); updatePreview(); });
   row.querySelectorAll('input').forEach(el => el.addEventListener('input', updatePreview));
@@ -548,7 +562,7 @@ function addPlayerRow(name = '', pts = '') {
 function readForm() {
   const scores = [...playersBox.querySelectorAll('.prow')].map(r => ({
     name: r.querySelector('.pname').value.trim(),
-    pts: parseInt(r.querySelector('.ppts').value, 10),
+    pts: floor1(parseFloat(r.querySelector('.ppts').value)),
   })).filter(p => p.name && Number.isFinite(p.pts));
   const g = { date: document.getElementById('f-date').value, game: document.getElementById('f-game').value.trim(), scores };
   const note = document.getElementById('f-note').value.trim();
@@ -567,8 +581,8 @@ function updatePreview() {
   const pv = document.getElementById('preview');
   if (!ok) { pv.innerHTML = '每位填名字同得分,最少兩位。'; return; }
   const entries = g.scores.slice().sort((a, b) => b.pts - a.pts);
-  const sum = entries.reduce((a, p) => a + p.pts, 0);
-  pv.innerHTML = entries.map(p => `${esc(p.name)} <b>${p.pts >= 0 ? '+' : ''}${p.pts}</b>`).join(' · ') + ` <span style="opacity:.7">(合計 ${sum} 分)</span>`;
+  const sum = Math.round(entries.reduce((a, p) => a + p.pts, 0) * 10) / 10;
+  pv.innerHTML = entries.map(p => `${esc(p.name)} <b>${p.pts >= 0 ? '+' : ''}${fmt(p.pts)}</b>`).join(' · ') + ` <span style="opacity:.7">(合計 ${fmt(sum)} 分)</span>`;
 }
 
 document.getElementById('add-row').addEventListener('click', () => addPlayerRow());
