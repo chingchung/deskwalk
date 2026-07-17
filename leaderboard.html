@@ -48,7 +48,6 @@
   .lb-title { font-family: var(--serif); font-size: 2.45rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
 
   .filter-pill#pill-game { flex: none; }
-  .lb-sub { margin: 0.75rem 0 0.3rem; font-size: 1rem; font-weight: 500; color: var(--ink-soft); }
   .filter-pill { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line)); border-radius: var(--pill); padding: 0.5rem 0.95rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); font-size: 0.95rem; font-weight: 800; color: var(--ink); cursor: pointer; }
   .filter-pill .chev { font-size: 0.7rem; opacity: 0.6; }
   .filter-pill.set { border-color: var(--ink); }
@@ -182,7 +181,6 @@
           <select id="filter-game" aria-label="篩選遊戲"></select>
         </label>
       </div>
-      <p class="lb-sub">累積總分</p>
     </header>
     <ol class="list" id="list"></ol>
   </section>
@@ -299,9 +297,9 @@ const STORE = 'deskwalk_leaderboard_v1_1';
 const PW = '2444';
 
 const SEED = [
-  { date: '2026-06-17', game: 'one shot', scores: [
+  { date: '2026-06-17', game: 'One Shot', scores: [
     { name: 'Nicole', pts: 3 }, { name: 'Charles', pts: 2 }, { name: 'Kenny', pts: 1 }] },
-  { date: '2026-06-18', game: 'one shot', note: '撞機', scores: [
+  { date: '2026-06-18', game: 'One Shot', note: '撞機', scores: [
     { name: 'Nicole', pts: 2 }, { name: 'Sam', pts: 2 }, { name: 'Kaman', pts: 2 }] },
   { date: '2026-06-22', game: '卡卡頌', scores: [
     { name: 'Kenny', pts: 3 }, { name: 'Step', pts: 2 }, { name: 'Nicole', pts: 1 },
