@@ -43,9 +43,9 @@
   }
 
   /* ---------- ranking header (排名) ---------- */
-  .lb-head { padding: calc(1.3rem + env(safe-area-inset-top)) 1.3rem 0; }
-  .lb-topline { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-  .lb-title { font-family: var(--serif); font-size: 2.45rem; line-height: 1.05; font-weight: 800; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+  /* shares .pad / .log-head / h2 with 場次紀錄 + 積分準則; the list sits flush under it */
+  #tab-rank .pad { padding-bottom: 0; }
+  #tab-rank .log-head { margin-bottom: 0.2rem; }
 
   .filter-pill#pill-game { flex: none; }
   .filter-pill { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid color-mix(in srgb, var(--ink) 16%, var(--line)); border-radius: var(--pill); padding: 0.5rem 0.95rem; background: var(--card); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); font-size: 0.95rem; font-weight: 800; color: var(--ink); cursor: pointer; }
@@ -55,9 +55,12 @@
 
   /* ---------- list (Beli-style flat ranked rows) ---------- */
   .list { list-style: none; margin: 0; padding: 0.5rem 0 0; }
-  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 1.3rem; }
+  .li { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 1.2rem; }
+  .li[data-name] { cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
+  .li[data-name]:hover { background: var(--card); }
+  .li[data-name]:active { transform: scale(0.99); }
   .li .rk { width: 26px; text-align: left; font-size: 1.15rem; font-weight: 700; color: var(--ink-soft); flex: none; font-variant-numeric: tabular-nums; }
-  .li .ava { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1px var(--line); flex: none; overflow: hidden; }
+  .ava { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; font-weight: 800; color: var(--ink); background: var(--card-strong); box-shadow: 0 0 0 1px var(--line); flex: none; overflow: hidden; }
   .li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .li .who .nm { font-size: 1.08rem; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .li .who .sub { font-size: 0.88rem; font-weight: 600; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
@@ -130,7 +133,18 @@
   .detail-back:hover { color: var(--accent-deep); }
   .detail-sub { color: var(--ink-soft); font-size: 0.8rem; margin: -0.6rem 0 1.1rem; }
   .detail-h3 { font-size: 0.9rem; font-weight: 800; color: var(--ink); margin: 1.5rem 0 0.7rem; }
+
+  /* ---------- player detail ---------- */
+  .player-hero { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.4rem; }
+  .player-hero h2 { margin: 0; }
+  .player-hero .detail-sub { margin: 0.25rem 0 0; }
+  .ava-lg { width: 56px; height: 56px; font-size: 1.05rem; }
+  #player-games td:first-child { width: 100%; font-weight: 700; }
+  #player-games td:not(:first-child) { text-align: right; white-space: nowrap; color: var(--ink-soft); }
+  #player-games td .pts { color: var(--ink); font-weight: 800; }
+  /* this board already sits inside .pad — drop the row inset so it doesn't double up */
   #detail-board { padding-left: 0; padding-right: 0; }
+  #detail-board .li { padding-left: 0; padding-right: 0; }
   .mode-badge { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
   .mode-rank { background: var(--card-strong); color: var(--ink-soft); border: 1px solid var(--line); }
   .mode-team { background: var(--accent-soft); color: var(--accent-deep); }
@@ -142,10 +156,15 @@
   .chip.win { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
   .chip.lose { color: var(--ink-soft); }
   .chip.lose .s { color: var(--ink-soft); }
+  /* the viewed player's own chip inverts — must sit after .win / .lose to outrank them */
+  .chip.me { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .chip.me .s { color: inherit; }
   .reset { display: block; margin: 1.4rem auto 0; background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.74rem; text-decoration: underline; }
 
   /* ---------- rules (積分準則) ---------- */
+  .lead { margin: 0 0 1.5rem; font-size: 1rem; line-height: 1.6; color: var(--ink); }
   .rule { margin-bottom: 1.1rem; }
+  .rule:last-child { margin-bottom: 0; }
   .rule h3 { margin: 0 0 0.3rem; font-size: 0.92rem; font-weight: 800; color: var(--ink); }
   .rule p { margin: 0.15rem 0; font-size: 0.85rem; color: var(--ink-soft); line-height: 1.6; }
   .rule b { color: var(--ink); }
@@ -173,9 +192,9 @@
 <main>
   <!-- ========== 排名 ========== -->
   <section class="tab" id="tab-rank">
-    <header class="lb-head">
-      <div class="lb-topline">
-        <h1 class="lb-title">積分榜</h1>
+    <header class="pad">
+      <div class="log-head">
+        <h2>積分榜</h2>
         <label class="filter-pill" id="pill-game">
           <span id="game-label">全部遊戲</span><span class="chev">▾</span>
           <select id="filter-game" aria-label="篩選遊戲"></select>
@@ -200,38 +219,33 @@
   <section class="tab" id="tab-rules" hidden>
     <div class="pad">
       <h2>積分準則</h2>
-      <p class="rule" style="color:var(--ink-soft);font-size:.85rem;line-height:1.6;">每場遊戲派分,分數<b>最多一個小數位,一律向下取整</b>。先睇「個人有冇名次」決定用邊種。WR(勝率)= 有得分嘅場數 ÷ 總出場數。</p>
+      <p class="lead">每場派發 <b>6 分</b>,按遊戲形式分配。</p>
 
       <div class="rule">
-        <h3>名次制 · 個人分先後</h3>
-        <p>🥇 第一 <span class="pip">3</span> ／ 🥈 第二 <span class="pip">2</span> ／ 🥉 第三 <span class="pip">1</span>,其餘 0 → 合計固定 6。</p>
-        <p><b>並列平分:</b>並列者攤分佢哋佔用嗰幾個名次嘅總分,再除以人數,向下取一位小數。</p>
-        <p style="margin:.4rem 0;">例:2 人並列第二 →(2+1)÷2 = 每人 <span class="pip">1.5</span>;3 人並列第一 →(3+2+1)÷3 = 每人 <span class="pip">2</span>;3 人並列第三 →(1+0+0)÷3 = 每人 <span class="pip">0.3</span>。</p>
-        <p><b>全員平手:</b>照上面攤分(3 人 → 每人 2)。</p>
+        <h3>分名次</h3>
+        <p>由前三名瓜分:🥇 <span class="pip">3</span> ／ 🥈 <span class="pip">2</span> ／ 🥉 <span class="pip">1</span>,其餘 0。</p>
+        <p><b>並列者攤分。</b>兩人並列第二,即合併第二及第三名的分數平分:(2+1)÷2,每人 <b>1.5</b>。</p>
       </div>
 
       <div class="rule">
-        <h3>勝負制 · 分陣營（含不對稱對抗,如狼人殺）</h3>
-        <p>贏方每人攞同一個分數,輸方 0:</p>
-        <p style="margin:.4rem 0;"><b>每人 = 6 ÷ 贏方人數（向下取一位小數），少數派贏每人再 +1。</b></p>
-        <table class="tbl">
-          <thead><tr><th>贏方人數</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
-          <tbody>
-            <tr><td>每人(對稱/多數勝)</td><td>6</td><td>3</td><td>2</td><td>1.5</td><td>1.2</td><td>1</td></tr>
-          </tbody>
-        </table>
-        <p style="margin-top:.7rem;">少數派勝（贏方 &lt; 輸方）每人再 <span class="pip">+1</span>:4 贏 5 → 2.5、3 贏 4 → 3、2 贏 6（狼隊）→ 4。</p>
+        <h3>分陣營</h3>
+        <p>勝方<b>平分 6 分</b>,敗方 0。兩人獲勝每人 3 分;三人獲勝每人 2 分——<b>勝方人數越少,每人所得越多</b>。</p>
+        <p>以少勝多(如狼人殺的狼隊)每人另加 <span class="pip">+1</span>。</p>
+      </div>
+
+      <div class="rule">
+        <h3>小數</h3>
+        <p>最多保留一位小數,除不盡時<b>向下取整</b>。例:1 分由三人平分,每人 <b>0.3</b>。</p>
       </div>
 
       <div class="rule">
         <h3>排名</h3>
-        <p>以<b>累積總分</b>計,同分並列。名次制每場派滿 6 分(向下取整時可能蒸發少少);勝負制該場合計隨人數浮動,反映「贏得有幾難」。</p>
+        <p>以<b>累積總分</b>排序,同分並列。勝率 = 得分場數 ÷ 出場場數。</p>
       </div>
 
-      <div class="rule" style="margin-bottom:0;">
-        <h3>備注 · 主持可微調</h3>
-        <p>以上係派分<b>基準</b>,唔係鐵律。主持會按當場情況酌情調整——例如得三個人玩,競爭性細,就派少啲。</p>
-        <p>所以<b>每場合計唔一定係 6 分</b>,以紀錄入面實際派咗嘅分為準。</p>
+      <div class="rule">
+        <h3>備註</h3>
+        <p>以上為<b>基準</b>,並非硬性規定。主持可按當場情況調整——例如僅三人參與,競爭性較低,可酌量減少派分。故每場總分<b>未必剛好 6 分</b>。</p>
       </div>
     </div>
   </section>
@@ -245,6 +259,24 @@
       <ol class="list" id="detail-board"></ol>
       <h3 class="detail-h3">場次</h3>
       <ul class="records" id="detail-records"></ul>
+    </div>
+  </section>
+
+  <!-- ========== 玩家詳情 ========== -->
+  <section class="tab" id="tab-player" hidden>
+    <div class="pad">
+      <button class="detail-back" id="player-back">‹ 返回</button>
+      <div class="player-hero">
+        <span class="ava ava-lg" id="player-ava"></span>
+        <div>
+          <h2 id="player-name"></h2>
+          <p class="detail-sub" id="player-sub"></p>
+        </div>
+      </div>
+      <h3 class="detail-h3">各遊戲</h3>
+      <table class="tbl" id="player-games"></table>
+      <h3 class="detail-h3">對戰紀錄</h3>
+      <ul class="records" id="player-records"></ul>
     </div>
   </section>
 </main>
@@ -418,7 +450,7 @@ function rankBy(data) {
 
 function rowHTML(p) {
   const rank = p.dispRank != null ? p.dispRank : p.rank;
-  return `<li class="li">` +
+  return `<li class="li" data-name="${esc(p.name)}">` +
     `<span class="rk${medal(rank)}">${rank}</span>` +
     `<span class="ava">${initials(p.name)}</span>` +
     `<span class="who"><span class="nm">${esc(p.name)}</span><span class="sub">${p.wr}% 勝率 · ${p.played} 場</span></span>` +
@@ -438,10 +470,10 @@ function renderBoard() {
 }
 
 /* ---------- render: 紀錄 ---------- */
-function recHTML(g, idx, { link, del }) {
+function recHTML(g, idx, { link, del, me }) {
   const s = scoreGame(g);
   const chips = Object.entries(s).sort((a, b) => b[1] - a[1]).map(([name, pts]) =>
-    `<span class="chip ${pts > 0 ? 'win' : 'lose'}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
+    `<span class="chip ${pts > 0 ? 'win' : 'lose'}${name === me ? ' me' : ''}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
   ).join('');
   const game = link
     ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
@@ -464,7 +496,10 @@ function renderRecords() {
 }
 
 /* ---------- per-game detail ---------- */
+let curGame = '';
+
 function openGame(name) {
+  curGame = name;
   const list = games.filter(g => (g.game || '') === name);
   const data = standings(list);
   document.getElementById('detail-title').textContent = name;
@@ -473,11 +508,44 @@ function openGame(name) {
   document.getElementById('detail-records').innerHTML = list.slice()
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map(g => recHTML(g, -1, { link: false, del: false })).join('');
-  document.getElementById('tab-detail').hidden = false;
-  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = true);
-  document.querySelectorAll('#tabbar button').forEach(b => b.classList.remove('on'));
-  document.getElementById('fab').hidden = true;
-  window.scrollTo(0, 0);
+  showOnly('detail');
+}
+
+/* ---------- per-player detail ---------- */
+/* where ‹ 返回 goes — set by whoever opened the page */
+let playerBack = () => activateTab('rank');
+
+function openPlayer(name, back) {
+  const me = standings(games).find(p => p.name === name);
+  if (!me) return;
+  playerBack = back || (() => activateTab('rank'));
+
+  const played = games
+    .map(g => ({ g, pts: scoreGame(g)[name] }))
+    .filter(x => x.pts !== undefined)
+    .sort((a, b) => (b.g.date || '').localeCompare(a.g.date || ''));
+
+  document.getElementById('player-ava').textContent = initials(name);
+  document.getElementById('player-name').textContent = name;
+  document.getElementById('player-sub').textContent =
+    `${fmt(me.pts)} 分 · 總榜第 ${me.rank} · ${me.wr}% 勝率 · ${me.played} 場`;
+
+  /* per-game breakdown, biggest haul first */
+  const byGame = {};
+  played.forEach(({ g, pts }) => {
+    const k = g.game || '未命名';
+    const b = byGame[k] || (byGame[k] = { played: 0, pts: 0, wins: 0 });
+    b.played++; b.pts += pts; if (pts > 0) b.wins++;
+  });
+  document.getElementById('player-games').innerHTML = '<tbody>' + Object.entries(byGame)
+    .map(([k, b]) => ({ k, b, pts: Math.round(b.pts * 10) / 10 }))
+    .sort((a, b) => b.pts - a.pts || a.k.localeCompare(b.k))
+    .map(({ k, b, pts }) => `<tr><td>${esc(k)}</td><td>${b.wins}/${b.played} 場有分</td>` +
+      `<td><span class="pts">${fmt(pts)}</span> 分</td></tr>`).join('') + '</tbody>';
+
+  document.getElementById('player-records').innerHTML =
+    played.map(({ g }) => recHTML(g, -1, { link: false, del: false, me: name })).join('');
+  showOnly('player');
 }
 
 function renderAll() { refreshFilters(); renderBoard(); renderRecords(); }
@@ -502,18 +570,33 @@ document.getElementById('filter-game').addEventListener('change', e => {
 });
 
 /* ---------- tabs ---------- */
-function activateTab(name) {
-  document.getElementById('tab-detail').hidden = true;
-  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
-  ['rank', 'log', 'rules'].forEach(t => document.getElementById('tab-' + t).hidden = (t !== name));
-  document.getElementById('fab').hidden = (name !== 'log');
+/* every full-screen view, incl. the two drill-downs the tabbar can't reach */
+const TABS = ['rank', 'log', 'rules', 'detail', 'player'];
+
+function showOnly(id) {
+  TABS.forEach(t => document.getElementById('tab-' + t).hidden = (t !== id));
+  document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === id));
+  document.getElementById('fab').hidden = (id !== 'log');
   window.scrollTo(0, 0);
 }
+function activateTab(name) { showOnly(name); }
+
 document.getElementById('tabbar').addEventListener('click', e => {
   const btn = e.target.closest('button[data-tab]');
   if (btn) activateTab(btn.dataset.tab);
 });
 document.getElementById('detail-back').addEventListener('click', () => activateTab('log'));
+document.getElementById('player-back').addEventListener('click', () => playerBack());
+
+/* tap any ranked row to open that player — delegated, so it survives re-render */
+document.getElementById('list').addEventListener('click', e => {
+  const li = e.target.closest('.li[data-name]');
+  if (li) openPlayer(li.dataset.name, () => activateTab('rank'));
+});
+document.getElementById('detail-board').addEventListener('click', e => {
+  const li = e.target.closest('.li[data-name]');
+  if (li) { const from = curGame; openPlayer(li.dataset.name, () => openGame(from)); }
+});
 
 /* ---------- bottom sheet + lock ---------- */
 function showSheetForm() {
