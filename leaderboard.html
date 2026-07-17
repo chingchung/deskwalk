@@ -225,9 +225,15 @@
         <p style="margin-top:.7rem;">少數派勝（贏方 &lt; 輸方）每人再 <span class="pip">+1</span>:4 贏 5 → 2.5、3 贏 4 → 3、2 贏 6（狼隊）→ 4。</p>
       </div>
 
-      <div class="rule" style="margin-bottom:0;">
+      <div class="rule">
         <h3>排名</h3>
         <p>以<b>累積總分</b>計,同分並列。名次制每場派滿 6 分(向下取整時可能蒸發少少);勝負制該場合計隨人數浮動,反映「贏得有幾難」。</p>
+      </div>
+
+      <div class="rule" style="margin-bottom:0;">
+        <h3>備注 · 主持可微調</h3>
+        <p>以上係派分<b>基準</b>,唔係鐵律。主持會按當場情況酌情調整——例如得三個人玩,競爭性細,就派少啲。</p>
+        <p>所以<b>每場合計唔一定係 6 分</b>,以紀錄入面實際派咗嘅分為準。</p>
       </div>
     </div>
   </section>
@@ -288,16 +294,32 @@
 </div>
 
 <script>
-/* v1.0 (2026-07-17) — bumped key: old boards re-seed under the new tie rule */
-const STORE = 'deskwalk_leaderboard_v1_0';
+/* bumped key: old boards re-seed with the current session log */
+const STORE = 'deskwalk_leaderboard_v1_1';
 const PW = '2444';
 
 const SEED = [
-  { date: '2026-06-17', game: 'one shot', mode: 'rank', ranks: [['Nicole'], ['Charles'], ['Kenny']] },
-  { date: '2026-06-18', game: 'one shot', note: '撞機', mode: 'team', winners: ['Nicole', 'Sam', 'Kaman'], losers: [] },
-  { date: '2026-06-22', game: '卡卡頌',        mode: 'rank', ranks: [['Kenny'], ['Step'], ['Nicole'], ['Yoko', 'Phoebe']] },
-  { date: '2026-06-24', game: '機密代號',      mode: 'rank', ranks: [['Nicole'], ['Phoebe', 'Step'], ['Kenny', 'Samuel', 'Sam']] },
-  { date: '2026-06-25', game: '卡卡頌',        mode: 'rank', ranks: [['Step'], ['Nicole'], ['Charles'], ['Kenny', 'Samuel']] },
+  { date: '2026-06-17', game: 'one shot', scores: [
+    { name: 'Nicole', pts: 3 }, { name: 'Charles', pts: 2 }, { name: 'Kenny', pts: 1 }] },
+  { date: '2026-06-18', game: 'one shot', note: '撞機', scores: [
+    { name: 'Nicole', pts: 2 }, { name: 'Sam', pts: 2 }, { name: 'Kaman', pts: 2 }] },
+  { date: '2026-06-22', game: '卡卡頌', scores: [
+    { name: 'Kenny', pts: 3 }, { name: 'Step', pts: 2 }, { name: 'Nicole', pts: 1 },
+    { name: 'Yoko', pts: 0 }, { name: 'Phoebe', pts: 0 }] },
+  { date: '2026-06-24', game: '機密代號', scores: [
+    { name: 'Nicole', pts: 3 }, { name: 'Phoebe', pts: 1.5 }, { name: 'Step', pts: 1.5 },
+    { name: 'Kenny', pts: 0 }, { name: 'Samuel', pts: 0 }, { name: 'Sam', pts: 0 }] },
+  { date: '2026-06-25', game: '卡卡頌', scores: [
+    { name: 'Step', pts: 3 }, { name: 'Nicole', pts: 2 }, { name: 'Charles', pts: 1 },
+    { name: 'Kenny', pts: 0 }, { name: 'Samuel', pts: 0 }] },
+  { date: '2026-07-07', game: '卡卡頌', scores: [
+    { name: 'Nicole', pts: 2 }, { name: 'Yuki', pts: 1 }, { name: 'Kenny', pts: 1 }] },
+  { date: '2026-07-16', game: 'Skout', scores: [
+    { name: 'Kenny', pts: 3 }, { name: 'Nicole', pts: 2 }, { name: 'Yuki', pts: 1 },
+    { name: 'Charles', pts: 0 }] },
+  { date: '2026-07-17', game: 'Skout', scores: [
+    { name: 'Charles', pts: 3 }, { name: 'Samuel', pts: 1.5 }, { name: 'Yoko', pts: 1.5 },
+    { name: 'Yuki', pts: 0 }, { name: 'Kenny', pts: 0 }, { name: 'Nicole', pts: 0 }] },
 ];
 
 let games = load();
