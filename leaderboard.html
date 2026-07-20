@@ -438,7 +438,7 @@ async function pull() {
   if (dirty) return;                    // 未存嘅改動優先,唔好畀 server 蓋走
   refreshing = !loading;                // 有嘢喺畫面 = 淨係啲數字扮骨架
   setSync('loading');
-  if (refreshing) renderBoard();
+  if (refreshing) { renderBoard(); renderRecords(); }
   try {
     const d = await (await fetch(API)).json();
     if (!d.ok) throw new Error(d.error);
@@ -610,9 +610,15 @@ function renderBoard() {
 /* ---------- render: 紀錄 ---------- */
 function recHTML(g, { link, edit, me }) {
   const s = scoreGame(g);
-  const chips = Object.entries(s).sort((a, b) => b[1] - a[1]).map(([name, pts]) =>
-    `<span class="chip ${pts > 0 ? 'win' : 'lose'}${name === me ? ' me' : ''}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
-  ).join('');
+  const entries = Object.entries(s).sort((a, b) => b[1] - a[1]);
+  /* 更新緊:日期同遊戲(唔會變嘅身份)留低,得分嗰堆變骨頭。
+     骨頭數目同闊度照住真內容嚟,咁版面唔會跳。 */
+  const chips = refreshing
+    ? entries.map(([name]) =>
+        `<span class="sk-bar" style="font-size:.8rem;width:${name.length + 4.5}ch;height:1.72rem"></span>`).join('')
+    : entries.map(([name, pts]) =>
+        `<span class="chip ${pts > 0 ? 'win' : 'lose'}${name === me ? ' me' : ''}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
+      ).join('');
   const game = link
     ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
     : `<span class="rec-game">${esc(g.game || '未命名')}</span>`;
