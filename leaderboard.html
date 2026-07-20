@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>積分榜 · deskwalk</title>
+<title>Leaderboard · deskwalk</title>
 <link rel="stylesheet" href="brand.css" />
 <style>
   body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
@@ -85,6 +85,9 @@
   .pad h2 { margin: 0 0 1rem; font-family: var(--serif); font-size: 1.85rem; font-weight: 800; letter-spacing: -0.01em; }
   .log-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
   .log-head h2 { margin: 0; }
+  /* 積分準則 entry — sits above the log, quiet enough not to compete with it */
+  .rules-link { display: block; width: 100%; text-align: left; margin: -0.4rem 0 1rem; padding: 0; background: none; border: none; font: inherit; font-size: 0.85rem; font-weight: 700; color: var(--ink-soft); cursor: pointer; }
+  .rules-link:hover { color: var(--ink); }
 
   /* ---------- records (紀錄) ---------- */
   .btn { background: var(--accent); color: #fff; border: none; border-radius: 12px; padding: 0.55rem 1.1rem; font: inherit; font-size: 0.9rem; font-weight: 800; box-shadow: var(--shadow-pop); }
@@ -227,6 +230,7 @@
         <h2>場次紀錄</h2>
         <button class="add-btn" id="fab" aria-label="新增場次">＋</button>
       </div>
+      <button class="rules-link" id="open-rules">積分準則 ›</button>
       <ul class="records" id="records"></ul>
     </div>
   </section>
@@ -234,6 +238,7 @@
   <!-- ========== 積分準則 ========== -->
   <section class="tab" id="tab-rules" hidden>
     <div class="pad">
+      <button class="detail-back" id="rules-back">‹ 返回</button>
       <h2>積分準則</h2>
       <p class="lead">每場派發 <b>6 分</b>,按遊戲形式分配。</p>
 
@@ -293,7 +298,6 @@
 <nav class="tabbar" id="tabbar">
   <button data-tab="rank" class="on">排名</button>
   <button data-tab="log">紀錄</button>
-  <button data-tab="rules">積分準則</button>
 </nav>
 
 <div class="sheet-backdrop" id="sheet" hidden>
@@ -396,15 +400,15 @@ let dirty = false;
 function setSync(state) {
   const el = document.getElementById('sync');
   if (!online()) { el.hidden = true; return; }
+  /* 一切正常就唔使出聲,收埋成條線 */
+  if (state === 'ok') { el.hidden = true; return; }
   el.hidden = false;
   el.classList.toggle('bad', state === 'error');
   el.innerHTML =
     state === 'loading' ? '載入緊…' :
     state === 'saving' ? '儲存緊…' :
-    state === 'error' ? (dirty
-      ? '有改動未存到<button id="sync-retry">重試儲存</button>'
-      : '連唔到 Google Sheets<button id="sync-retry">重試</button>') :
-    '<button id="sync-retry">重新整理</button>';
+    dirty ? '有改動未存到<button id="sync-retry">重試儲存</button>'
+          : '連唔到 Google Sheets<button id="sync-retry">重試</button>';
   const btn = document.getElementById('sync-retry');
   /* 有未存嘅嘢就唔可以 pull — 咁會用 server 版本蓋死佢 */
   if (btn) btn.addEventListener('click', () => dirty ? save() : pull());
@@ -688,6 +692,8 @@ document.getElementById('tabbar').addEventListener('click', e => {
   if (btn) activateTab(btn.dataset.tab);
 });
 document.getElementById('detail-back').addEventListener('click', () => activateTab('log'));
+document.getElementById('open-rules').addEventListener('click', () => activateTab('rules'));
+document.getElementById('rules-back').addEventListener('click', () => activateTab('log'));
 document.getElementById('player-back').addEventListener('click', () => playerBack());
 
 /* tap any ranked row to open that player — delegated, so it survives re-render */
