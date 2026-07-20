@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="brand.css" />
 <style>
   body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  /* 下層頁冇底 bar,就唔使為佢留位 */
+  body.no-tabs { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
   main { max-width: 460px; margin: 0 auto; }
   .tab[hidden] { display: none; }
 
@@ -216,6 +218,7 @@
   }
   .tabbar button { flex: 1; border: none; background: none; padding: 0.6rem 0; font: inherit; font-size: 0.86rem; font-weight: 800; color: var(--ink-soft); border-radius: var(--pill); }
   .tabbar button.on { background: var(--accent-soft); color: var(--accent-deep); }
+  .tabbar[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -651,10 +654,7 @@ function renderRecords() {
 }
 
 /* ---------- per-game detail ---------- */
-let curGame = '';
-
 function openGame(name) {
-  curGame = name;
   const list = games.filter(g => (g.game || '') === name);
   const data = standings(list);
   document.getElementById('detail-title').textContent = name;
@@ -664,16 +664,14 @@ function openGame(name) {
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .map(g => recHTML(g, { link: false })).join('');
   showOnly('detail');
+  if (!replaying) history.pushState({ v: 'detail', game: name }, '');
 }
 
-/* ---------- per-player detail ---------- */
-/* where ‹ 返回 goes — set by whoever opened the page */
-let playerBack = () => activateTab('rank');
-
-function openPlayer(name, back) {
+/* ---------- per-player detail ----------
+   ‹返回 去邊由 history 決定,唔使自己記 */
+function openPlayer(name) {
   const me = standings(games).find(p => p.name === name);
   if (!me) return;
-  playerBack = back || (() => activateTab('rank'));
 
   const played = games
     .map(g => ({ g, pts: scoreGame(g)[name] }))
@@ -701,6 +699,7 @@ function openPlayer(name, back) {
   document.getElementById('player-records').innerHTML =
     played.map(({ g }) => recHTML(g, { link: false, me: name })).join('');
   showOnly('player');
+  if (!replaying) history.pushState({ v: 'player', name }, '');
 }
 
 function renderAll() { refreshFilters(); refreshDatalists(); renderBoard(); renderRecords(); }
@@ -734,37 +733,73 @@ document.getElementById('filter-game').addEventListener('change', e => {
 });
 
 /* ---------- tabs ---------- */
-/* every full-screen view, incl. the two drill-downs the tabbar can't reach */
 const TABS = ['rank', 'log', 'rules', 'detail', 'player'];
+/* 下層頁 — 有自己嘅 ‹返回,唔屬於底部任何一格 */
+const DRILL = ['rules', 'detail', 'player'];
 
 function showOnly(id) {
   TABS.forEach(t => document.getElementById('tab-' + t).hidden = (t !== id));
   document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === id));
   document.getElementById('fab').hidden = (id !== 'log');
-  /* 記住你喺邊 — refresh 之後返返嚟。下層頁(遊戲/玩家/準則)唔記,
+
+  /* 下層頁收起底 bar:佢一格都唔會著,留喺度只會令人以為撳漏咗嘢 */
+  const drill = DRILL.includes(id);
+  document.getElementById('tabbar').hidden = drill;
+  document.body.classList.toggle('no-tabs', drill);
+
+  /* 記住你喺邊 — refresh 之後返返嚟。下層頁唔記,
      咁 reload 就返返佢個母分頁,唔使重建佢哋要嘅 state。 */
   if (id === 'rank' || id === 'log') sessionStorage.setItem('dw_lb_tab', id);
   window.scrollTo(0, 0);
 }
-function activateTab(name) { showOnly(name); }
+
+/* ---------- history ----------
+   每個畫面 = 一個 history state。下層頁 push(所以 back 撳得),
+   分頁之間 replace(唔想撳五次 back 先離開得到)。       */
+let replaying = false;
+
+function activateTab(name) {
+  showOnly(name);
+  if (!replaying) history.replaceState({ v: name }, '');
+}
+function openRules() {
+  showOnly('rules');
+  if (!replaying) history.pushState({ v: 'rules' }, '');
+}
+
+function applyState(s) {
+  s = s || {};
+  replaying = true;
+  /* reload 時 history.state 仲喺度,但資料可能未到 —
+     開唔到就退返去分頁,唔好淨低一版白 */
+  const canPlayer = s.v === 'player' && games.some(g => s.name in scoreGame(g));
+  const canGame = s.v === 'detail' && games.some(g => (g.game || '') === s.game);
+  if (canPlayer) openPlayer(s.name);
+  else if (canGame) openGame(s.game);
+  else if (s.v === 'rules') showOnly('rules');
+  else if (s.v === 'rank' || s.v === 'log') activateTab(s.v);
+  else activateTab(sessionStorage.getItem('dw_lb_tab') === 'log' ? 'log' : 'rank');
+  replaying = false;
+}
+window.addEventListener('popstate', e => applyState(e.state));
 
 document.getElementById('tabbar').addEventListener('click', e => {
   const btn = e.target.closest('button[data-tab]');
   if (btn) activateTab(btn.dataset.tab);
 });
-document.getElementById('detail-back').addEventListener('click', () => activateTab('log'));
-document.getElementById('open-rules').addEventListener('click', () => activateTab('rules'));
-document.getElementById('rules-back').addEventListener('click', () => activateTab('log'));
-document.getElementById('player-back').addEventListener('click', () => playerBack());
+/* ‹返回 行返瀏覽器嗰條路,唔好自己跳 — 唔係 history 就同畫面脫節 */
+['detail-back', 'rules-back', 'player-back'].forEach(id =>
+  document.getElementById(id).addEventListener('click', () => history.back()));
+document.getElementById('open-rules').addEventListener('click', openRules);
 
 /* tap any ranked row to open that player — delegated, so it survives re-render */
 document.getElementById('list').addEventListener('click', e => {
   const li = e.target.closest('.li[data-name]');
-  if (li) openPlayer(li.dataset.name, () => activateTab('rank'));
+  if (li) openPlayer(li.dataset.name);
 });
 document.getElementById('detail-board').addEventListener('click', e => {
   const li = e.target.closest('.li[data-name]');
-  if (li) { const from = curGame; openPlayer(li.dataset.name, () => openGame(from)); }
+  if (li) openPlayer(li.dataset.name);
 });
 
 /* ---------- bottom sheet + lock ---------- */
@@ -950,7 +985,7 @@ function syncSheetMode() {
    先畫快取(即刻有嘢睇),再靜靜雞去 Google Sheets 攞最新 */
 resetForm();
 renderAll();
-activateTab(sessionStorage.getItem('dw_lb_tab') === 'log' ? 'log' : 'rank');
+applyState(history.state);      // reload 返返上次個分頁,亦係 history 嘅起點
 setSync('ok');
 pull();
 </script>
