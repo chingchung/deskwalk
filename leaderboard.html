@@ -76,11 +76,15 @@
 
   /* ---------- skeleton (第一次載入) ---------- */
   @keyframes sk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
-  .sk { animation: sk-pulse 1.5s ease-in-out infinite; }
+  /* 每條骨頭自己跳,咁部分骨架(得數字係骨頭)都跳得 */
+  .sk-bar, .sk .ava { animation: sk-pulse 1.5s ease-in-out infinite; }
   .sk .ava { box-shadow: none; background: var(--line); }
   .sk-bar { display: block; background: var(--line); border-radius: 999px; height: 0.7rem; }
   .sk .who .sk-bar + .sk-bar { margin-top: 0.42rem; }
-  @media (prefers-reduced-motion: reduce) { .sk { animation: none; opacity: 0.7; } }
+  .li .score .sk-bar { margin-left: auto; }
+  @media (prefers-reduced-motion: reduce) {
+    .sk-bar, .sk .ava { animation: none; opacity: 0.7; }
+  }
 
   /* ---------- empty board ---------- */
   .board-empty { text-align: center; padding: 3.4rem 1.6rem; color: var(--ink-soft); }
@@ -392,7 +396,8 @@ const cached = cacheRead();
 /* 連線模式而又冇快取 = 第一次開,拎唔到嘢畫。呢陣先出 skeleton,
    唔好畫 SEED — 佢可能同張表唔同,一閃就變會好突兀。 */
 let games = cached || (online() ? [] : structuredClone(SEED));
-let loading = online() && !cached;
+let loading = online() && !cached;   // 冷開機 — 成個榜都係骨架
+let refreshing = false;              // 有快取時更新緊 — 只有兩個數字係骨架
 
 let unlocked = sessionStorage.getItem('dw_lb_unlocked') === '1';
 let pw = sessionStorage.getItem('dw_lb_pw') || '';   // 解鎖後記住,寫入時交畀 server 驗
@@ -415,12 +420,11 @@ let dirty = false;
 function setSync(state) {
   const el = document.getElementById('sync');
   if (!online()) { el.hidden = true; return; }
-  /* 一切正常就唔使出聲;骨架已經表達緊「載入緊」,唔使再寫多次 */
-  if (state === 'ok' || (state === 'loading' && loading)) { el.hidden = true; return; }
+  /* 一切正常就唔使出聲;拉取時骨架已經表達緊,唔使再寫多次 */
+  if (state === 'ok' || state === 'loading') { el.hidden = true; return; }
   el.hidden = false;
   el.classList.toggle('bad', state === 'error');
   el.innerHTML =
-    state === 'loading' ? '更新緊…' :
     state === 'saving' ? '儲存緊…' :
     dirty ? '有改動未存到<button id="sync-retry">重試儲存</button>'
           : '連唔到 Google Sheets<button id="sync-retry">重試</button>';
@@ -432,15 +436,17 @@ function setSync(state) {
 async function pull() {
   if (!online()) return;
   if (dirty) return;                    // 未存嘅改動優先,唔好畀 server 蓋走
+  refreshing = !loading;                // 有嘢喺畫面 = 淨係啲數字扮骨架
   setSync('loading');
+  if (refreshing) renderBoard();
   try {
     const d = await (await fetch(API)).json();
     if (!d.ok) throw new Error(d.error);
     games = d.sessions || [];
-    loading = false;
+    loading = refreshing = false;
     cacheWrite(); renderAll(); setSync('ok');
   } catch (e) {
-    loading = false;                    // 唔好永遠卡住喺骨架
+    loading = refreshing = false;       // 唔好永遠卡住喺骨架
     renderAll(); setSync('error');
   }
 }
@@ -562,11 +568,18 @@ function rankBy(data) {
 
 function rowHTML(p) {
   const rank = p.dispRank != null ? p.dispRank : p.rank;
+  /* 更新緊嗰陣,身份(名次/頭像/名)照留,得住兩個會變嘅數字扮骨架 */
+  const sub = refreshing
+    ? `<span class="sub"><span class="sk-bar" style="width:9rem;height:.62rem;margin-top:.25rem"></span></span>`
+    : `<span class="sub">${p.wr}% 勝率 · ${p.played} 場</span>`;
+  const score = refreshing
+    ? `<span class="score"><span class="sk-bar" style="width:1.6rem;height:1.05rem"></span></span>`
+    : `<span class="score">${fmt(p.pts)}</span>`;
   return `<li class="li" data-name="${esc(p.name)}">` +
     `<span class="rk${medal(rank)}">${rank}</span>` +
     `<span class="ava">${initials(p.name)}</span>` +
-    `<span class="who"><span class="nm">${esc(p.name)}</span><span class="sub">${p.wr}% 勝率 · ${p.played} 場</span></span>` +
-    `<span class="score">${fmt(p.pts)}</span></li>`;
+    `<span class="who"><span class="nm">${esc(p.name)}</span>${sub}</span>` +
+    score + `</li>`;
 }
 
 /* 排名行嘅骨架 — 闊度唔一律,睇落似真名多啲 */
@@ -722,6 +735,9 @@ function showOnly(id) {
   TABS.forEach(t => document.getElementById('tab-' + t).hidden = (t !== id));
   document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === id));
   document.getElementById('fab').hidden = (id !== 'log');
+  /* 記住你喺邊 — refresh 之後返返嚟。下層頁(遊戲/玩家/準則)唔記,
+     咁 reload 就返返佢個母分頁,唔使重建佢哋要嘅 state。 */
+  if (id === 'rank' || id === 'log') sessionStorage.setItem('dw_lb_tab', id);
   window.scrollTo(0, 0);
 }
 function activateTab(name) { showOnly(name); }
@@ -928,6 +944,7 @@ function syncSheetMode() {
    先畫快取(即刻有嘢睇),再靜靜雞去 Google Sheets 攞最新 */
 resetForm();
 renderAll();
+activateTab(sessionStorage.getItem('dw_lb_tab') === 'log' ? 'log' : 'rank');
 setSync('ok');
 pull();
 </script>
