@@ -127,6 +127,13 @@
   .rec-title { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 0.45rem; }
   .rec-game { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
   .rec-game-link { background: none; border: none; text-align: left; padding: 0; cursor: pointer; }
+  /* unlocked: the whole card taps through to the edit sheet */
+  .rec-edit { cursor: pointer; transition: background 0.15s ease, transform 0.15s ease; }
+  .rec-edit:hover { background: var(--card-strong); }
+  .rec-edit:active { transform: scale(0.995); }
+  .del-link { display: block; width: 100%; margin-top: 0.7rem; background: none; border: none; font: inherit; font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); text-decoration: underline; }
+  .del-link:hover { color: var(--bad); }
+  .del-link[hidden] { display: none; }
   .rec-game-link:hover { color: var(--accent-deep); }
   .detail-back { background: none; border: none; color: var(--ink-soft); font: inherit; font-size: 0.9rem; font-weight: 700; padding: 0; margin-bottom: 0.5rem; }
   .detail-back:hover { color: var(--accent-deep); }
@@ -296,7 +303,7 @@
 
     <div id="sheet-form" hidden>
       <div class="sheet-head">
-        <h3 class="sheet-title">新增場次</h3>
+        <h3 class="sheet-title" id="form-title">新增場次</h3>
         <button class="lock-link" id="lock-again">鎖定</button>
       </div>
       <div class="add-form" id="add-form">
@@ -315,6 +322,7 @@
         <datalist id="dl-players"></datalist>
         <div class="preview" id="preview"></div>
         <button class="btn btn-save" id="save" disabled>儲存場次</button>
+        <button class="del-link" id="del-session" hidden>刪除呢場</button>
       </div>
     </div>
   </div>
@@ -467,7 +475,7 @@ function renderBoard() {
 }
 
 /* ---------- render: 紀錄 ---------- */
-function recHTML(g, idx, { link, del, me }) {
+function recHTML(g, idx, { link, edit, me }) {
   const s = scoreGame(g);
   const chips = Object.entries(s).sort((a, b) => b[1] - a[1]).map(([name, pts]) =>
     `<span class="chip ${pts > 0 ? 'win' : 'lose'}${name === me ? ' me' : ''}">${esc(name)} <span class="s">+${fmt(pts)}</span></span>`
@@ -475,8 +483,10 @@ function recHTML(g, idx, { link, del, me }) {
   const game = link
     ? `<button class="rec-game rec-game-link" data-game="${esc(g.game || '')}">${esc(g.game || '未命名')} ›</button>`
     : `<span class="rec-game">${esc(g.game || '未命名')}</span>`;
-  const delEl = del ? `<button class="del" data-idx="${idx}" title="刪除">×</button>` : '';
-  return `<li class="rec"><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span><span class="rec-title">${game}</span>${delEl}</div><div class="chips">${chips}</div></li>`;
+  const cls = edit ? 'rec rec-edit' : 'rec';
+  const attr = edit ? ` data-edit="${idx}"` : '';
+  return `<li class="${cls}"${attr}><div class="rec-head"><span class="rec-date">${esc(g.date || '')}</span>` +
+    `<span class="rec-title">${game}</span></div><div class="chips">${chips}</div></li>`;
 }
 
 
@@ -484,11 +494,13 @@ function renderRecords() {
   const list = document.getElementById('records');
   const ordered = games.map((g, idx) => ({ g, idx }))
     .sort((a, b) => (b.g.date || '').localeCompare(a.g.date || ''));
-  list.innerHTML = ordered.map(({ g, idx }) => recHTML(g, idx, { link: true, del: unlocked })).join('');
-  list.querySelectorAll('.del').forEach(b => b.addEventListener('click', () => {
-    if (confirm('刪除呢場紀錄?')) { games.splice(+b.dataset.idx, 1); save(); renderAll(); }
+  list.innerHTML = ordered.map(({ g, idx }) => recHTML(g, idx, { link: true, edit: unlocked })).join('');
+  list.querySelectorAll('.rec-game-link').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();          // the card underneath opens the editor — not this
+    openGame(b.dataset.game);
   }));
-  list.querySelectorAll('.rec-game-link').forEach(b => b.addEventListener('click', () => openGame(b.dataset.game)));
+  list.querySelectorAll('.rec-edit').forEach(li =>
+    li.addEventListener('click', () => openSheet(+li.dataset.edit)));
 }
 
 /* ---------- per-game detail ---------- */
@@ -503,7 +515,7 @@ function openGame(name) {
   document.getElementById('detail-board').innerHTML = data.map(rowHTML).join('');
   document.getElementById('detail-records').innerHTML = list.slice()
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-    .map(g => recHTML(g, -1, { link: false, del: false })).join('');
+    .map(g => recHTML(g, -1, { link: false })).join('');
   showOnly('detail');
 }
 
@@ -540,7 +552,7 @@ function openPlayer(name, back) {
       `<td><span class="pts">${fmt(pts)}</span> 分</td></tr>`).join('') + '</tbody>';
 
   document.getElementById('player-records').innerHTML =
-    played.map(({ g }) => recHTML(g, -1, { link: false, del: false, me: name })).join('');
+    played.map(({ g }) => recHTML(g, -1, { link: false, me: name })).join('');
   showOnly('player');
 }
 
@@ -604,13 +616,19 @@ document.getElementById('detail-board').addEventListener('click', e => {
 });
 
 /* ---------- bottom sheet + lock ---------- */
+/* -1 = adding a new session; >= 0 = editing games[editIdx] */
+let editIdx = -1;
+
 function showSheetForm() {
   document.getElementById('sheet-lock').hidden = true;
   document.getElementById('sheet-form').hidden = false;
-  if (!playersBox.children.length) resetForm(); else updatePreview();
+  if (editIdx >= 0) fillForm(games[editIdx]);
+  else if (!playersBox.children.length) resetForm();
+  else updatePreview();
   setTimeout(() => document.getElementById('f-game').focus(), 60);
 }
-function openSheet() {
+function openSheet(idx = -1) {
+  editIdx = idx;
   document.getElementById('sheet').hidden = false;
   if (unlocked) {
     showSheetForm();
@@ -622,9 +640,14 @@ function openSheet() {
     setTimeout(() => document.getElementById('pw').focus(), 60);
   }
 }
-function closeSheet() { document.getElementById('sheet').hidden = true; }
+function closeSheet() {
+  document.getElementById('sheet').hidden = true;
+  /* an abandoned edit must not linger — the next ＋ would save it as a new
+     session. A half-typed new session is kept, so dismissing isn't destructive. */
+  if (editIdx >= 0) resetForm();
+}
 
-document.getElementById('fab').addEventListener('click', openSheet);
+document.getElementById('fab').addEventListener('click', () => openSheet());
 document.getElementById('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
 document.getElementById('sheet-grip').addEventListener('click', closeSheet);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
@@ -691,15 +714,46 @@ document.getElementById('save').addEventListener('click', () => {
   const g = readForm();
   if (!valid(g)) return;
   if (!g.date) g.date = new Date().toISOString().slice(0, 10);
-  games.push(g); save(); renderAll(); resetForm(); closeSheet();
+  if (editIdx >= 0) games[editIdx] = g; else games.push(g);
+  save(); renderAll(); resetForm(); closeSheet();
 });
 
+document.getElementById('del-session').addEventListener('click', () => {
+  if (editIdx < 0) return;
+  const g = games[editIdx];
+  if (!confirm(`刪除 ${g.date} ${g.game || '未命名'}?`)) return;
+  games.splice(editIdx, 1);
+  save(); renderAll(); resetForm(); closeSheet();
+});
+
+/* load a session into the form for editing */
+function fillForm(g) {
+  document.getElementById('f-date').value = g.date || '';
+  document.getElementById('f-game').value = g.game || '';
+  playersBox.innerHTML = '';
+  const s = scoreGame(g);
+  Object.entries(s).sort((a, b) => b[1] - a[1]).forEach(([n, p]) => addPlayerRow(n, p));
+  addPlayerRow();                       // a spare row for adding someone
+  syncSheetMode();
+  updatePreview();
+}
+
 function resetForm() {
+  editIdx = -1;
   document.getElementById('f-date').value = new Date().toISOString().slice(0, 10);
   document.getElementById('f-game').value = '';
   playersBox.innerHTML = '';
   addPlayerRow(); addPlayerRow(); addPlayerRow();
+  syncSheetMode();
   updatePreview();
+}
+
+/* the sheet is one form in two modes — keep its labels honest */
+function syncSheetMode() {
+  const editing = editIdx >= 0;
+  document.getElementById('form-title').textContent = editing ? '編輯場次' : '新增場次';
+  document.getElementById('save').textContent = editing ? '更新場次' : '儲存場次';
+  document.getElementById('del-session').hidden = !editing;
 }
 
 /* ---------- boot ---------- */
