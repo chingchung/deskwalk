@@ -74,6 +74,14 @@
   /* the only colour: gold / silver / bronze on the top-3 rank numbers */
   .rk.m1 { color: var(--gold); } .rk.m2 { color: var(--silver); } .rk.m3 { color: var(--bronze); }
 
+  /* ---------- skeleton (第一次載入) ---------- */
+  @keyframes sk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+  .sk { animation: sk-pulse 1.5s ease-in-out infinite; }
+  .sk .ava { box-shadow: none; background: var(--line); }
+  .sk-bar { display: block; background: var(--line); border-radius: 999px; height: 0.7rem; }
+  .sk .who .sk-bar + .sk-bar { margin-top: 0.42rem; }
+  @media (prefers-reduced-motion: reduce) { .sk { animation: none; opacity: 0.7; } }
+
   /* ---------- empty board ---------- */
   .board-empty { text-align: center; padding: 3.4rem 1.6rem; color: var(--ink-soft); }
   .board-empty .em-ico { font-size: 2.2rem; }
@@ -212,7 +220,7 @@
   <section class="tab" id="tab-rank">
     <header class="pad">
       <div class="log-head">
-        <h2>積分榜</h2>
+        <h2>Leaderboard</h2>
         <label class="filter-pill" id="pill-game">
           <span id="game-label">全部遊戲</span><span class="chev">▾</span>
           <select id="filter-game" aria-label="篩選遊戲"></select>
@@ -227,10 +235,10 @@
   <section class="tab" id="tab-log" hidden>
     <div class="pad">
       <div class="log-head">
-        <h2>場次紀錄</h2>
+        <h2>Sessions</h2>
         <button class="add-btn" id="fab" aria-label="新增場次">＋</button>
       </div>
-      <button class="rules-link" id="open-rules">積分準則 ›</button>
+      <button class="rules-link" id="open-rules">Scoring · 積分準則 ›</button>
       <ul class="records" id="records"></ul>
     </div>
   </section>
@@ -239,7 +247,7 @@
   <section class="tab" id="tab-rules" hidden>
     <div class="pad">
       <button class="detail-back" id="rules-back">‹ 返回</button>
-      <h2>積分準則</h2>
+      <h2>Scoring</h2>
       <p class="lead">每場派發 <b>6 分</b>,按遊戲形式分配。</p>
 
       <div class="rule">
@@ -347,6 +355,8 @@
    ─────────────────────────────────────────────────────────────── */
 const API = 'https://script.google.com/macros/s/AKfycbw-vCUJg2mSy4cGWRCEp8NzUG9U7Cg2osZdSEYhT2HAqtftMnSme1FDktSC6uWh4_otSQ/exec';
 
+const online = () => !!API;
+
 /* 連到後端時呢個 key 只做離線快取 */
 const STORE = 'deskwalk_leaderboard_v1_1';
 
@@ -377,21 +387,26 @@ const SEED = [
     { name: 'Yuki', pts: 0 }, { name: 'Kenny', pts: 0 }, { name: 'Nicole', pts: 0 }] },
 ];
 
-let games = cacheRead();
+const cached = cacheRead();
+
+/* 連線模式而又冇快取 = 第一次開,拎唔到嘢畫。呢陣先出 skeleton,
+   唔好畫 SEED — 佢可能同張表唔同,一閃就變會好突兀。 */
+let games = cached || (online() ? [] : structuredClone(SEED));
+let loading = online() && !cached;
+
 let unlocked = sessionStorage.getItem('dw_lb_unlocked') === '1';
 let pw = sessionStorage.getItem('dw_lb_pw') || '';   // 解鎖後記住,寫入時交畀 server 驗
 
 /* ---------- 本機快取 ---------- */
 function cacheRead() {
   try { const raw = localStorage.getItem(STORE); if (raw) return JSON.parse(raw); } catch (e) {}
-  return structuredClone(SEED);
+  return null;
 }
 function cacheWrite() { try { localStorage.setItem(STORE, JSON.stringify(games)); } catch (e) {} }
 
 /* ---------- 同 Google Sheets 通訊 ----------
    POST 用 text/plain 係特登嘅:咁樣瀏覽器當佢係「簡單請求」,
    唔會先發一個 OPTIONS 去問准,而 Apps Script 唔識答 OPTIONS。   */
-const online = () => !!API;
 
 /* 有改動未寫得入 server — 決定咗「重試」係重試儲存定係重新拉取 */
 let dirty = false;
@@ -400,12 +415,12 @@ let dirty = false;
 function setSync(state) {
   const el = document.getElementById('sync');
   if (!online()) { el.hidden = true; return; }
-  /* 一切正常就唔使出聲,收埋成條線 */
-  if (state === 'ok') { el.hidden = true; return; }
+  /* 一切正常就唔使出聲;骨架已經表達緊「載入緊」,唔使再寫多次 */
+  if (state === 'ok' || (state === 'loading' && loading)) { el.hidden = true; return; }
   el.hidden = false;
   el.classList.toggle('bad', state === 'error');
   el.innerHTML =
-    state === 'loading' ? '載入緊…' :
+    state === 'loading' ? '更新緊…' :
     state === 'saving' ? '儲存緊…' :
     dirty ? '有改動未存到<button id="sync-retry">重試儲存</button>'
           : '連唔到 Google Sheets<button id="sync-retry">重試</button>';
@@ -422,9 +437,11 @@ async function pull() {
     const d = await (await fetch(API)).json();
     if (!d.ok) throw new Error(d.error);
     games = d.sessions || [];
+    loading = false;
     cacheWrite(); renderAll(); setSync('ok');
   } catch (e) {
-    setSync('error');
+    loading = false;                    // 唔好永遠卡住喺骨架
+    renderAll(); setSync('error');
   }
 }
 
@@ -552,9 +569,22 @@ function rowHTML(p) {
     `<span class="score">${fmt(p.pts)}</span></li>`;
 }
 
+/* 排名行嘅骨架 — 闊度唔一律,睇落似真名多啲 */
+function skRowHTML(i) {
+  const nm = [42, 33, 50, 38, 45, 30][i % 6];
+  const sub = [58, 66, 52, 62, 55, 70][i % 6];
+  return `<li class="li sk"><span class="rk"><span class="sk-bar" style="width:9px"></span></span>` +
+    `<span class="ava"></span>` +
+    `<span class="who"><span class="sk-bar" style="width:${nm}%;height:.9rem"></span>` +
+    `<span class="sk-bar" style="width:${sub}%;height:.62rem"></span></span>` +
+    `<span class="sk-bar" style="width:26px;height:1.05rem"></span></li>`;
+}
+
 function renderBoard() {
-  const data = rankBy(standings(viewGames()));
   const list = document.getElementById('list');
+  if (loading) { list.innerHTML = Array.from({ length: 6 }, (_, i) => skRowHTML(i)).join(''); return; }
+
+  const data = rankBy(standings(viewGames()));
   if (!data.length) {
     list.innerHTML =
       `<li class="board-empty"><div class="em-ico">🎲</div>` +
@@ -582,6 +612,15 @@ function recHTML(g, { link, edit, me }) {
 
 function renderRecords() {
   const list = document.getElementById('records');
+  if (loading) {
+    list.innerHTML = Array.from({ length: 3 }, (_, i) => `<li class="rec sk">` +
+      `<div class="rec-head"><span class="sk-bar" style="width:${[70,62,66][i]}px"></span>` +
+      `<span class="sk-bar" style="width:${[54,44,60][i]}px"></span></div>` +
+      `<div class="chips"><span class="sk-bar" style="width:${[86,74,92][i]}px;height:1.7rem"></span>` +
+      `<span class="sk-bar" style="width:${[78,90,70][i]}px;height:1.7rem"></span>` +
+      `<span class="sk-bar" style="width:${[92,68,84][i]}px;height:1.7rem"></span></div></li>`).join('');
+    return;
+  }
   const ordered = games.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   list.innerHTML = ordered.map(g => recHTML(g, { link: true, edit: unlocked })).join('');
   list.querySelectorAll('.rec-game-link').forEach(b => b.addEventListener('click', e => {
