@@ -160,9 +160,13 @@
   .sheet-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(20, 17, 10, 0.4); display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.2s ease; }
   .sheet-backdrop[hidden] { display: none; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .sheet { width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; background: #fff; border-radius: 26px 26px 0 0; padding: 0.6rem 1.3rem calc(1.6rem + env(safe-area-inset-bottom)); box-shadow: 0 -18px 46px -18px rgba(0, 0, 0, 0.45); animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+  /* max-height uses svh (small-viewport height — excludes the mobile browser
+     chrome) so a backdrop strip always stays tappable to dismiss */
+  .sheet { width: 100%; max-width: 460px; max-height: 82vh; max-height: 82svh; overflow-y: auto; background: #fff; border-radius: 26px 26px 0 0; padding: 0.6rem 1.3rem calc(1.6rem + env(safe-area-inset-bottom)); box-shadow: 0 -18px 46px -18px rgba(0, 0, 0, 0.45); animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
   @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-grip { width: 40px; height: 4px; border-radius: 999px; background: #DEDBD2; margin: 0.35rem auto 1rem; cursor: pointer; }
+  /* the grip is a drag handle — bigger invisible hit area, no scroll hijack */
+  .sheet-grip { position: relative; width: 44px; height: 5px; border-radius: 999px; background: #DEDBD2; margin: 0.35rem auto 0.9rem; cursor: grab; touch-action: none; }
+  .sheet-grip::before { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 150px; height: 32px; }
   .sheet-title { margin: 0; font-size: 1.1rem; font-weight: 900; color: var(--ink); }
   .sheet-sub { margin: 0.3rem 0 1rem; font-size: 0.85rem; color: var(--ink-soft); }
   .sheet-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.9rem; }
@@ -882,6 +886,56 @@ document.querySelectorAll('.sheet-backdrop.drill').forEach(bd => {
   bd.addEventListener('click', e => { if (e.target === bd) history.back(); });
   bd.querySelector('.sheet-grip').addEventListener('click', () => history.back());
 });
+
+/* drag the sheet down to dismiss — grip, or a downward pull when scrolled to the
+   top. Keeps native content scroll intact (direction is decided on the first move). */
+function enableSheetDrag(sheet, dismiss) {
+  if (!sheet) return;
+  let sy = 0, dy = 0, mode = null, moved = false, atTop = false, suppress = false;
+  const TH = 90;
+  const begin = (y, target) => {
+    suppress = false; sy = y; dy = 0; moved = false;
+    atTop = sheet.scrollTop <= 0;
+    mode = (target.closest && target.closest('.sheet-grip')) ? 'drag' : null;
+    if (mode === 'drag') sheet.style.transition = 'none';
+  };
+  const drag = (y, e) => {
+    if (mode === 'scroll') return;
+    dy = y - sy;
+    if (mode === null) {                         // decide: pull-down-at-top = drag, else let it scroll
+      if (Math.abs(dy) < 5) return;
+      if (dy > 0 && atTop) { mode = 'drag'; sheet.style.transition = 'none'; }
+      else { mode = 'scroll'; return; }
+    }
+    moved = moved || Math.abs(dy) > 5;
+    if (dy < 0) dy = 0;
+    if (e && e.cancelable) e.preventDefault();
+    sheet.style.transform = `translateY(${dy}px)`;
+  };
+  const finish = () => {
+    if (mode === 'drag') {
+      const go = dy > TH;
+      if (moved) suppress = true;                // swallow the click a drag would synthesize
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+      if (go) dismiss();
+    }
+    mode = null;
+  };
+  sheet.addEventListener('touchstart', e => begin(e.touches[0].clientY, e.target), { passive: true });
+  sheet.addEventListener('touchmove', e => drag(e.touches[0].clientY, e), { passive: false });
+  sheet.addEventListener('touchend', finish);
+  sheet.addEventListener('touchcancel', () => { sheet.style.transition = ''; sheet.style.transform = ''; mode = null; });
+  const grip = sheet.querySelector('.sheet-grip');
+  if (grip) {
+    grip.addEventListener('mousedown', e => { begin(e.clientY, e.target); e.preventDefault(); });
+    window.addEventListener('mousemove', e => { if (mode === 'drag') drag(e.clientY, e); });
+    window.addEventListener('mouseup', () => { if (mode === 'drag') finish(); });
+  }
+  sheet.addEventListener('click', e => { if (suppress) { e.stopImmediatePropagation(); e.preventDefault(); suppress = false; } }, true);
+}
+document.querySelectorAll('.sheet-backdrop.drill .sheet').forEach(s => enableSheetDrag(s, () => history.back()));
+enableSheetDrag(document.querySelector('#sheet .sheet'), closeSheet);
 
 /* ---------- bottom sheet + lock (add / edit session) ---------- */
 /* '' = adding a new session; otherwise the id of the one being edited.
