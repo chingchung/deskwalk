@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard — award lockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Fraunces (heavy high-contrast serif, soft bulb terminals) + Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,100..900,0..100,0..1&family=Inter:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ── editable content / sizing (swap freely, animation code untouched) ── */
+    --hero-text: "Championship";
+    --caption-text: "Boardgame Leaderboard FW26";
+    --loop: 3000ms;
+    --hero-size: clamp(44px, 8.6vw, 118px);
+    --caption-size: clamp(19px, 2.8vw, 36px);
+
+    --ink: #141414;
+    --gray: #8A8A8A;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #FFFFFF;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  .stage { display: flex; flex-direction: column; align-items: center; }
+
+  /* the wreath+word row; em here == hero size so the wreath scales with it */
+  .row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.14em; font-size: var(--hero-size);
+  }
+
+  .hero {
+    margin: 0; font-size: 1em; line-height: 1; white-space: nowrap;
+    font-family: 'Fraunces', 'Georgia', serif; font-weight: 900;
+    font-variation-settings: 'opsz' 144, 'wght' 900, 'SOFT' 100, 'WONK' 0;
+    letter-spacing: -0.038em; color: var(--ink);
+  }
+  .hero span { display: inline-block; text-align: center; will-change: opacity, filter; }
+
+  .wreath { height: 0.9em; width: auto; display: block; overflow: visible; fill: var(--ink); }
+  .wreath.wl { transform: scaleX(-1); }           /* left = mirror of right */
+  .leaf { transform-box: fill-box; transform-origin: 50% 100%; will-change: opacity, transform, filter; }
+
+  .caption {
+    margin: 0.35em 0 0; white-space: nowrap;
+    font-family: 'Inter', system-ui, sans-serif; font-weight: 400;
+    font-size: var(--caption-size); color: var(--gray);
+  }
+  .caption span { display: inline-block; will-change: opacity, filter; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="row">
+      <svg class="wreath wl" viewBox="0 0 80 205" aria-hidden="true"></svg>
+      <h1 class="hero" id="hero"></h1>
+      <svg class="wreath wr" viewBox="0 0 80 205" aria-hidden="true"></svg>
+    </div>
+    <p class="caption" id="caption" aria-label="caption"></p>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const rootCS = getComputedStyle(document.documentElement);
+  const cssStr = (name, fb) => {
+    const v = rootCS.getPropertyValue(name).trim();
+    if (!v) return fb;
+    return v.replace(/^["']|["']$/g, '');
+  };
+  const HERO_TEXT    = cssStr('--hero-text', 'Leaderboard');
+  const CAPTION_TEXT = cssStr('--caption-text', 'Moments captured this year');
+  const LOOP         = parseFloat(rootCS.getPropertyValue('--loop')) || 3000;
+
+  /* ───────── easing helpers ───────── */
+  const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
+  const lerp = (a, b, f) => a + (b - a) * f;
+  const easeInOutQuint = t => t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+  function cubicBezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const sx = t => ((ax * t + bx) * t + cx) * t;
+    const sy = t => ((ay * t + by) * t + cy) * t;
+    const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+    return function (x) {
+      let t = x;
+      for (let i = 0; i < 8; i++) { const e = sx(t) - x; if (Math.abs(e) < 1e-5) break; const d = dx(t); if (Math.abs(d) < 1e-6) break; t -= e / d; }
+      return sy(clamp01(t));
+    };
+  }
+  const bezDissolve = cubicBezier(0.65, 0, 0.35, 1);  // dissolve out
+  const bezLeaf     = cubicBezier(0.22, 1, 0.36, 1);  // leaf pop
+  const bezCaption  = cubicBezier(0.33, 1, 0.68, 1);  // caption blur wipe
+
+  const DARK = [20, 20, 20], LIGHT = [232, 232, 232];
+  const col = (c1, c2, f) => `rgb(${Math.round(lerp(c1[0], c2[0], f))},${Math.round(lerp(c1[1], c2[1], f))},${Math.round(lerp(c1[2], c2[2], f))})`;
+  const setBlur = (el, px) => { el.style.filter = px > 0.02 ? `blur(${px.toFixed(2)}px)` : 'none'; };
+
+  /* ───────── hero text (each char its own fixed-width span) ───────── */
+  const hero = document.getElementById('hero');
+  const heroLetters = HERO_TEXT.split('');
+  const heroSpans = heroLetters.map(ch => {
+    const s = document.createElement('span');
+    s.textContent = ch === ' ' ? ' ' : ch;
+    hero.appendChild(s);
+    return s;
+  });
+  const N = heroSpans.length;
+  const POOL = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789#%&*'.split('');
+  // dissolve stagger: 0–250ms, biased so middle chars linger last
+  const disDelay = heroSpans.map((_, i) => {
+    const c = (N - 1) / 2;
+    const bias = 120 * (1 - Math.abs(i - c) / (c || 1));
+    return Math.random() * 130 + bias;
+  });
+
+  /* ───────── caption (each char its own span) ───────── */
+  const caption = document.getElementById('caption');
+  const capSpans = CAPTION_TEXT.split('').map(ch => {
+    const s = document.createElement('span');
+    s.textContent = ch === ' ' ? ' ' : ch;
+    caption.appendChild(s);
+    return s;
+  });
+
+  /* ───────── laurel branches (leaves only, each its own <path>) ───────── */
+  // right branch: a gentle arc, leaf pairs along it, single leaf at the tip.
+  // ── the leaf artwork (from leaf.svg, viewBox 24×24: pointed tip top-left, round base bottom-right) ──
+  const RAW_LEAF_D = 'M3.10998 2.29988C3.53998 2.21988 13.58 0.549883 18.93 5.89988C19.64 6.60988 20.26 7.43988 20.78 8.36988C22.77 11.9399 22.29 16.0599 19.6 18.9999C18.93 19.7322 18.53 20.1599 17.21 20.8899C15.89 21.6199 14.43 21.9999 12.95 21.9999C11.47 21.9999 9.83998 21.5999 8.36998 20.7799C7.43998 20.2599 6.60998 19.6399 5.89998 18.9299C0.549979 13.5799 2.22998 3.53988 2.29998 3.10988C2.33439 2.90757 2.43082 2.72095 2.57593 2.57583C2.72104 2.43072 2.90766 2.33429 3.10998 2.29988Z';
+  // Normalise: map stem→(0,0) and tip→straight up, scaled to H tall, so the leaf drops
+  // into the same per-leaf <g translate/rotate> and unfurls from its stem end.
+  const LEAF_D = (function () {
+    const S = { x: 19.6, y: 19 }, T = { x: 2.4, y: 2.4 }, H = 20;   // round base / pointed tip in raw coords, target height
+    const dx = T.x - S.x, dy = T.y - S.y, sc = H / Math.hypot(dx, dy), R = Math.atan2(-dx, -dy);
+    const cs = Math.cos(R), sn = Math.sin(R);
+    const a = sc * cs, b = sc * sn, c = -sc * sn, d = sc * cs;    // sc·Rot(R) about the stem
+    const tf = (x, y) => [a * (x - S.x) + c * (y - S.y), b * (x - S.x) + d * (y - S.y)];
+    const tok = RAW_LEAF_D.match(/[a-zA-Z]|-?\d*\.?\d+/g);
+    let out = '', i = 0;
+    while (i < tok.length) {
+      const cmd = tok[i++];
+      if (cmd === 'Z' || cmd === 'z') { out += 'Z'; continue; }
+      const nums = [];
+      while (i < tok.length && !/[a-zA-Z]/.test(tok[i])) nums.push(parseFloat(tok[i++]));
+      let seg = cmd;
+      for (let k = 0; k < nums.length; k += 2) { const p = tf(nums[k], nums[k + 1]); seg += ` ${p[0].toFixed(2)} ${p[1].toFixed(2)}`; }
+      out += seg + ' ';
+    }
+    return out.trim();
+  })();
+  const NODES = [                              // bottom → top; a = [inner, outer] angles
+    { x: 24, y: 180, a: [54, 86] },
+    { x: 33, y: 152, a: [44, 76] },
+    { x: 40, y: 123, a: [34, 66] },
+    { x: 41, y: 93,  a: [24, 54] },
+    { x: 36, y: 64,  a: [14, 42] },
+  ];
+  const TIP = { x: 27, y: 37, a: 6 };
+  function buildBranch(svg) {
+    const leaves = [];
+    const add = (x, y, ang) => {
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('transform', `translate(${x} ${y}) rotate(${ang})`);
+      const p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', LEAF_D);
+      p.setAttribute('fill-rule', 'evenodd');
+      p.setAttribute('class', 'leaf');
+      g.appendChild(p); svg.appendChild(g);
+      leaves.push(p);
+    };
+    NODES.forEach(n => { add(n.x, n.y, n.a[0]); add(n.x, n.y, n.a[1]); }); // inner, outer
+    add(TIP.x, TIP.y, TIP.a);                                             // tip last
+    return leaves;
+  }
+  const leftLeaves  = buildBranch(document.querySelector('.wl'));
+  const rightLeaves = buildBranch(document.querySelector('.wr'));
+  const wl = document.querySelector('.wl'), wr = document.querySelector('.wr');
+  const LEAVES = leftLeaves.length;
+
+  /* ───────── timeline (ms within one 3000ms loop) ───────── */
+  const LEAF_START = 1950, LEAF_STAGGER = 52, LEAF_DUR = 120;
+  const CAP_START = 2100, CAP_STAGGER = 18, CAP_DUR = 250;
+
+  /* ───────── the single render(t) — pure function of loop time ───────── */
+  function render(t, now) {
+    /* ---- HERO ---- */
+    for (let i = 0; i < N; i++) {
+      const s = heroSpans[i];
+      const ch = heroLetters[i] === ' ' ? ' ' : heroLetters[i];
+      let text = ch, op = 1, blur = 0, color = 'rgb(20,20,20)';
+      if (t < 800) { /* HOLD */ }
+      else if (t < 1500) {                         // DISSOLVE OUT (per-char random)
+        const lo = clamp01((t - (800 + disDelay[i])) / 350);
+        const e = bezDissolve(lo);
+        op = 1 - e; blur = 3 * e;
+      } else if (t < 1900) { op = 0; }             // BLANK
+      else if (t < 2650) {                         // BUILD — scramble/decode resolve
+        const eased = easeInOutQuint(clamp01((t - 1900) / 750));
+        const resolved = eased * N >= i + 1;
+        const cp = clamp01((t - 1900) / 250);      // light→dark colour/opacity ramp
+        color = col(LIGHT, DARK, cp); op = lerp(0.5, 1, cp);
+        if (resolved) { text = ch; blur = 0; }
+        else { text = POOL[(Math.floor(now / 45) + i * 13) % POOL.length]; blur = 1.5; }
+      } /* else HOLD */
+      if (s.textContent !== text) s.textContent = text;
+      s.style.opacity = op; s.style.color = color; setBlur(s, blur);
+    }
+
+    /* ---- WREATH ---- */
+    let wc = 1, wb = 0;
+    if (t >= 1000 && t < 1450) { const e = bezDissolve((t - 1000) / 450); wc = 1 - e; wb = 2 * e; }
+    else if (t >= 1450 && t < 1950) { wc = 0; }
+    wl.style.opacity = wr.style.opacity = wc; setBlur(wl, wb); setBlur(wr, wb);
+
+    const wreathBuild = t >= 1950 && t < 2650;
+    for (let i = 0; i < LEAVES; i++) {
+      let op = 1, sc = 1, bl = 0;
+      if (wreathBuild) {
+        const lo = clamp01((t - (LEAF_START + i * LEAF_STAGGER)) / LEAF_DUR);
+        const e = bezLeaf(lo);
+        op = e; sc = 0.6 + 0.4 * e; bl = 2 * (1 - e);
+      }
+      const tf = `scale(${sc.toFixed(3)})`;
+      [leftLeaves[i], rightLeaves[i]].forEach(p => { p.style.opacity = op; p.style.transform = tf; setBlur(p, bl); });
+    }
+
+    /* ---- CAPTION ---- */
+    let cc = 1, cb = 0;
+    if (t >= 1000 && t < 1450) { const e = bezDissolve((t - 1000) / 450); cc = 1 - e; cb = 4 * e; }
+    else if (t >= 1450 && t < 2100) { cc = 0; }
+    caption.style.opacity = cc; setBlur(caption, cb);
+
+    for (let j = 0; j < capSpans.length; j++) {
+      let op = 1, bl = 0;
+      if (t >= 2100) {                             // BUILD — left→right blur wipe
+        const st = CAP_START + j * CAP_STAGGER;
+        if (t < st) { op = 0.15; bl = 6; }         // unrevealed = faint blurred smudge
+        else { const e = bezCaption(clamp01((t - st) / CAP_DUR)); op = lerp(0.15, 1, e); bl = 6 * (1 - e); }
+      }
+      capSpans[j].style.opacity = op; setBlur(capSpans[j], bl);
+    }
+  }
+
+  /* ───────── clock ───────── */
+  let SCRUB = null, startTs = null;
+  function frame(now) {
+    let t;
+    if (SCRUB != null) t = SCRUB;
+    else { if (startTs == null) startTs = now; t = (now - startTs) % LOOP; }
+    render(t, now);
+    requestAnimationFrame(frame);
+  }
+  // manual scrub hooks (for inspection): __scrub(ms) freezes a frame, __play() resumes
+  window.__scrub = ms => { SCRUB = ms; };
+  window.__play = () => { SCRUB = null; startTs = null; };
+
+  /* fix each hero char's width to its final glyph so scramble never shifts layout */
+  function lockWidths() {
+    heroSpans.forEach((s, i) => {
+      s.textContent = heroLetters[i] === ' ' ? ' ' : heroLetters[i];
+      s.style.width = 'auto';
+      const w = s.getBoundingClientRect().width;
+      s.style.width = w + 'px';
+    });
+  }
+
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  render(0, 0);  // show the finished lockup immediately (also the reduced-motion state)
+  if (!reduce) {
+    const go = () => { lockWidths(); requestAnimationFrame(frame); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+})();
+</script>
+</body>
+</html>
