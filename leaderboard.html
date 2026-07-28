@@ -91,7 +91,7 @@
      whole badge keeps the SAME internal proportions at any device width (it scales as a
      single unit instead of each element scaling on its own clamp). */
   #tab-rank .hero { text-align: center; }
-  .lockup { font-size: clamp(1.85rem, 6.2vw, 2.7rem); }
+  .lockup { font-size: clamp(1.85rem, 6.2vw, 2.7rem); margin-top: 10px; }
   .crest { display: flex; align-items: center; justify-content: center; gap: 0.34em; margin: 0.15em 0 0; }
   .crest .laurel { height: 1.32em; width: auto; flex: none; overflow: visible; color: var(--ink); }
   .crest .laurel.flip { scale: -1 1; }
@@ -152,6 +152,13 @@
   .sec-actions { display: flex; gap: 0.7rem; }
   .sec-actions .btn { flex: 1; }
   .sec-title { margin: 0 0 0.4rem; font-size: 0.95rem; font-weight: 900; color: var(--ink); }
+
+  /* 紀錄 header — smaller "Sessions" title with the rules link tucked beneath it */
+  #tab-log .hero h1 { font-size: 1.7rem; }
+  .rules-link { display: inline-block; margin-top: 0.35rem; background: none; border: none; padding: 0;
+    font: inherit; font-size: 0.9rem; font-weight: 700; color: var(--ink-soft);
+    text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .rules-link:hover { color: var(--ink); }
 
   /* ---------- buttons ---------- */
   .btn { background: var(--accent); color: #fff; border: none; border-radius: var(--pill); padding: 0.85rem 1.3rem; font: inherit; font-size: 0.95rem; font-weight: 800; box-shadow: var(--shadow-pop); transition: transform 0.12s ease; }
@@ -260,14 +267,35 @@
   .tabbar {
     position: fixed; left: 50%; transform: translateX(-50%);
     bottom: max(0.7rem, env(safe-area-inset-bottom)); z-index: 95;
-    width: min(440px, calc(100% - 1.4rem));
-    display: flex; padding: 0.35rem;
-    background: rgba(255, 255, 255, 0.82); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--line); border-radius: var(--pill);
-    box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    width: max-content;                 /* hug the 120px tabs, not full width */
+    display: flex; padding: 0.3rem;
+    /* Apple iOS-26 liquid glass — only a faint tint sits on the surface; the
+       real refraction comes from a generated SVG displacement map applied as
+       backdrop-filter in JS (see the glassifyTabbar script). CSS here is the
+       Safari/Firefox fallback: a light frosted blur. */
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(3px) saturate(1.8) brightness(1.06);
+    backdrop-filter: blur(3px) saturate(1.8) brightness(1.06);
+    border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--pill);
+    /* soft drop + bright specular rim = the wet edge of glass */
+    box-shadow:
+      0 10px 30px -10px rgba(0, 0, 0, 0.28),
+      0 2px 8px -4px rgba(0, 0, 0, 0.14),
+      inset 0 0 6px 0 rgba(255, 255, 255, 0.55),
+      inset 0 1px 1px rgba(255, 255, 255, 0.9),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.35);
   }
-  .tabbar button { flex: 1; border: none; background: none; padding: 0.62rem 0; font: inherit; font-size: 0.88rem; font-weight: 800; color: var(--ink-soft); border-radius: var(--pill); transition: background 0.15s, color 0.15s; }
-  .tabbar button.on { background: var(--ink); color: #fff; }
+  .tabbar button {
+    flex: none; width: 120px; border: none; background: none; padding: 0.62rem 0;
+    font: inherit; font-size: 0.88rem; font-weight: 800; color: var(--ink-soft);
+    border-radius: var(--pill); transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  }
+  /* active tab reads as a solid black lozenge floating on the glass */
+  .tabbar button.on {
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 4px 12px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
 </style>
 </head>
 <body>
@@ -299,16 +327,10 @@
     <header class="hero">
       <button class="hero-btn" id="fab" aria-label="新增場次">＋</button>
       <h1>Sessions</h1>
+      <button class="rules-link" id="open-rules">加分準則</button>
     </header>
 
     <div class="sec">
-      <div class="sec-actions">
-        <button class="btn" id="open-rules">加分準則</button>
-      </div>
-    </div>
-
-    <div class="sec">
-      <h3 class="sec-title">場次紀錄</h3>
       <ul class="records" id="records"></ul>
     </div>
   </section>
@@ -1259,6 +1281,67 @@ if (!history.state) history.replaceState({ tab: curTab(), stack: [] }, '');
 startCrest();                   // play the header build-in if 排名 is the landing tab
 setSync('ok');
 pull();
+
+/* ===============================================================
+   Apple iOS-26 liquid glass on the tab bar — ported from
+   github.com/nikdelvin/liquid-glass. A displacement map (an SVG
+   data-URL: grey = no shift, coloured edge gradients = shift) is fed
+   into backdrop-filter via feDisplacementMap, so the page genuinely
+   REFRACTS through the bar's rounded edges — the real glass lens,
+   not just a frosted blur. Chromium-only; Safari/Firefox keep the
+   CSS blur fallback. Re-drawn whenever the bar's size changes.
+   =============================================================== */
+(function glassifyTabbar() {
+  const supportsUrl = (() => {
+    const t = document.createElement('div');
+    t.style.cssText = 'backdrop-filter: url(#x)';
+    return /url/.test(t.style.backdropFilter || t.style.webkitBackdropFilter || '');
+  })();
+  if (!supportsUrl) return;
+
+  const map = ({ w, h, r, depth }) =>
+    'data:image/svg+xml;utf8,' + encodeURIComponent(
+      `<svg height="${h}" width="${w}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">` +
+      `<style>.mix{mix-blend-mode:screen}</style><defs>` +
+      `<linearGradient id="Y" x1="0" x2="0" y1="${Math.ceil(r / h * 15)}%" y2="${Math.floor(100 - r / h * 15)}%">` +
+      `<stop offset="0%" stop-color="#0F0"/><stop offset="100%" stop-color="#000"/></linearGradient>` +
+      `<linearGradient id="X" x1="${Math.ceil(r / w * 15)}%" x2="${Math.floor(100 - r / w * 15)}%" y1="0" y2="0">` +
+      `<stop offset="0%" stop-color="#F00"/><stop offset="100%" stop-color="#000"/></linearGradient></defs>` +
+      `<rect x="0" y="0" height="${h}" width="${w}" fill="#808080"/>` +
+      `<g filter="blur(2px)">` +
+      `<rect x="0" y="0" height="${h}" width="${w}" fill="#000080"/>` +
+      `<rect x="0" y="0" height="${h}" width="${w}" fill="url(#Y)" class="mix"/>` +
+      `<rect x="0" y="0" height="${h}" width="${w}" fill="url(#X)" class="mix"/>` +
+      `<rect x="${depth}" y="${depth}" height="${h - 2 * depth}" width="${w - 2 * depth}" fill="#808080" rx="${r}" ry="${r}" filter="blur(${depth}px)"/>` +
+      `</g></svg>`);
+
+  const filter = ({ w, h, r, depth, strength, cab }) =>
+    'data:image/svg+xml;utf8,' + encodeURIComponent(
+      `<svg height="${h}" width="${w}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg"><defs>` +
+      `<filter id="displace" color-interpolation-filters="sRGB">` +
+      `<feImage x="0" y="0" height="${h}" width="${w}" href="${map({ w, h, r, depth })}" result="d"/>` +
+      `<feDisplacementMap in="SourceGraphic" in2="d" scale="${strength + cab * 2}" xChannelSelector="R" yChannelSelector="G"/>` +
+      `<feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>` +
+      `<feDisplacementMap in="SourceGraphic" in2="d" scale="${strength + cab}" xChannelSelector="R" yChannelSelector="G"/>` +
+      `<feColorMatrix type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>` +
+      `<feDisplacementMap in="SourceGraphic" in2="d" scale="${strength}" xChannelSelector="R" yChannelSelector="G"/>` +
+      `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>` +
+      `<feBlend in="R" in2="G" mode="screen"/><feBlend in2="B" mode="screen"/>` +
+      `</filter></defs></svg>#displace`);
+
+  const bar = document.getElementById('tabbar');
+  function draw() {
+    const rect = bar.getBoundingClientRect();
+    const w = Math.round(rect.width), h = Math.round(rect.height);
+    if (!w || !h) return;
+    const url = filter({ w, h, r: h / 2, depth: 5, strength: 42, cab: 3 });
+    const fx = `blur(1px) url('${url}') saturate(1.8) brightness(1.06)`;
+    bar.style.backdropFilter = fx;
+    bar.style.webkitBackdropFilter = fx;
+  }
+  draw();
+  new ResizeObserver(draw).observe(bar);
+})();
 </script>
 </body>
 </html>
