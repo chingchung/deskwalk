@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>集體潛意識 v1 · deskwalk</title>
     <link rel="stylesheet" href="brand.css" />
+<link rel="stylesheet" href="proto-mono.css" />
     <style>
       :root {
         /* deskwalk light brand — white cards on warm paper.
@@ -18,7 +19,7 @@
         --ink-on-card-soft: #6E665A;
         --ink-on-card-faint: #A8A091;
         --ink-faint: #A49B8C;
-        --glow: rgba(240, 82, 46, 0.22);
+        --glow: rgba(26, 23, 18, 0.14);
         --warn: var(--bad);
         --serif: var(--sans);
       }
@@ -311,7 +312,7 @@
         transition: transform 0.06s, box-shadow 0.06s, background 0.2s, color 0.2s;
       }
       .btn-primary {
-        background: linear-gradient(180deg, #F5704E, var(--accent));
+        background: linear-gradient(180deg, #4A443B, var(--accent));
         color: #fff;
         border: none;
         -webkit-backdrop-filter: var(--glass-blur-sm);
@@ -494,7 +495,7 @@
           max-height: 100dvh;
           min-height: 0;
           padding:
-            max(0.65rem, env(safe-area-inset-top))
+            max(3rem, calc(env(safe-area-inset-top) + 2.6rem))
             max(1rem, env(safe-area-inset-right))
             calc(2.75rem + env(safe-area-inset-bottom))
             max(1rem, env(safe-area-inset-left));
@@ -663,7 +664,7 @@
       /* Very short screens (e.g. iPhone SE, landscape phone) */
       @media (max-width: 540px) and (max-height: 680px) {
         .stage {
-          padding-top: max(0.4rem, env(safe-area-inset-top));
+          padding-top: max(2.6rem, calc(env(safe-area-inset-top) + 2.3rem));
           gap: 0.2rem;
         }
 
@@ -736,6 +737,7 @@
     </style>
   </head>
   <body>
+    <a class="dw-mark" href="index.html">deskwalk</a>
 
     <!-- Ambient cosmic ornaments -->
     <div class="ornament ornament-tr" aria-hidden="true">
@@ -885,8 +887,6 @@
     </div>
 
     <footer class="footer-info">
-      <a href="index.html">deskwalk</a>
-      <span style="opacity:0.5;font-size:0.75rem;">集體潛意識v1 · v0.5 · 2026-05-15</span>
       <button class="reset" onclick="resetSession()">重置</button>
     </footer>
 

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Headliner · 頭條人物 · deskwalk</title>
 <link rel="stylesheet" href="brand.css" />
+<link rel="stylesheet" href="proto-mono.css" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { min-height: 100%; }
@@ -29,7 +30,7 @@
   #question { font-size: 32px; font-weight: 800; line-height: 1.4; text-align: center; word-break: break-word; color: var(--ink); max-width: 18ch; }
   #card-buttons { display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px; }
   .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 18px; font-size: 19px; font-weight: 900; border: none; border-radius: 14px; cursor: pointer; font-family: inherit; transition: transform .06s, box-shadow .06s; }
-  .btn-primary { background: linear-gradient(180deg, #F5704E, var(--accent)); color: #fff; -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--shadow-pop); }
+  .btn-primary { background: linear-gradient(180deg, #4A443B, var(--accent)); color: #fff; -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--shadow-pop); }
   .btn-primary:active { transform: translateY(3px); box-shadow: var(--shadow-press); }
   .btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); -webkit-backdrop-filter: var(--glass-blur-sm); backdrop-filter: var(--glass-blur-sm); box-shadow: var(--shadow); }
   .btn-secondary:active { transform: translateY(2px); }
@@ -61,7 +62,7 @@
   #results-buttons { display: flex; flex-direction: column; gap: 12px; padding: 8px 0 24px; }
   #empty-note { text-align: center; color: var(--ink-soft); padding: 40px 0; font-size: 14px; }
 
-  #error { color: #ff8080; padding: 12px; font-size: 14px; text-align: center; }
+  #error { color: #8A8175; padding: 12px; font-size: 14px; text-align: center; }
   #live-overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
   #canvas { display: none; }
 </style>
