@@ -311,7 +311,7 @@
         <h1>揭尾故</h1>
         <p class="sub">
           海龜湯 · Situation Puzzle · Yes-No Puzzle。<br />
-          Review 進行中 — 99 題收集，49 題已移除，35 題未睇。
+          Review 進行中 — 99 題收集，59 題已移除，25 題未睇。
         </p>
       </header>
 
@@ -338,12 +338,14 @@
       <section class="memo">
         <h2>Review 進度</h2>
         <ol>
-          <li><b>已移除 49 題。</b>預設隱藏，冇真係刪走——撳「已移除」pill 隨時揀返。</li>
+          <li><b>已移除 59 題。</b>預設隱藏，冇真係刪走——撳「已移除」pill 隨時揀返。</li>
           <li><b>待定 9 題</b>：A2 火車・A6 死喺房間正中央嘅男人・A9 少女被謀殺・B2 報紙・B3 冰粒・C3 滴水聲・C8 滿地木屑・C18 外賣・D1 酒吧</li>
           <li><b>要改 6 題</b>：A8 紅眼睛・B1 水草・C5 魔術師・C7 葬禮姊妹・C19 生日・F6 Time for Bed</li>
-          <li><b>未 review 35 題</b> — 個 list 停咗喺 F10 Cabin in the Woods。剩低：
-            A1・A5・B9・B13・B14・C1 海龜湯・C2 牛食草・C4 三兄弟・C13・C26・D2・E3、
-            F4・F11–F22（13 題）、G1–G10（10 題）。</li>
+          <li><b>未 review 25 題</b>：
+            A1 人聲・A5 只有公主逃走咗／B9 郵票・B13 半根火柴・B14 簽名／
+            C1 海龜湯・C2 牛食草・C4 三兄弟・C13 對面大樓・C26 夜半敲門／D2 行花園／
+            E3 電話響咗／F4 Poisoned Ice Cubes・F20 The Stranger・F21 The New Shoes／
+            G1–G10（10 題，全部未有湯底）。</li>
         </ol>
 
         <h2 style="margin-top:1.6rem">要你確認</h2>
@@ -356,9 +358,9 @@
 
         <h2 style="margin-top:1.6rem">撞題 · review 後嘅狀況</h2>
         <ol>
-          <li><b>已解決</b> — 感官復明（A3 刪，剩 A2）・船難食人（F2 刪，剩 C1）・矮人撳掣（F5 刪，剩 G10）・偷窺被鎖定（C22 刪，剩 C13）</li>
+          <li><b>已解決</b> — 感官復明（A3 刪，剩 A2）・船難食人（F2 刪，剩 C1）・矮人撳掣（F5 刪，剩 G10）・偷窺被鎖定（C22 刪，剩 C13）・降落傘（F14 刪，剩 G4）</li>
           <li><b>兩條都刪晒</b> — 夢遊（C12・E9）</li>
-          <li><b>仲未解決</b> — 冰溶咗仲有四條live：A6・B3（待定）＋ F11・F4（未 review）。燈塔兩條都在：B2 待定 ／ F6 要改。降落傘（F14・G4）同難產陌生人（F20・G8）四條都未 review。</li>
+          <li><b>仲未解決</b> — 冰溶咗剩三條：A6・B3（待定）＋ F4（未 review）。燈塔兩條都在：B2 待定 ／ F6 要改。難產陌生人（F20・G8）兩條都未 review。</li>
           <li><b>家宅入侵</b> — A7・C21 刪咗，剩 C3・C18 兩條，兩條都係待定。</li>
         </ol>
 
@@ -450,7 +452,9 @@
         E1:['out'], E2:['out'], E4:['out'], E5:['out'], E6:['out'], E7:['out'],
         E8:['out'], E9:['out'], E10:['out'],
         F1:['out'], F2:['out'], F3:['out'], F5:['out'], F6:['rework','修改'],
-        F7:['out'], F8:['out'], F9:['out'], F10:['out'],
+        F7:['out'], F8:['out'], F9:['out'], F10:['out'], F11:['out'], F12:['out'],
+        F13:['out'], F14:['out'], F15:['out'], F16:['out'], F17:['out'], F18:['out'],
+        F19:['out'], F22:['out'],
       };
       const STLABEL = { hold:'待定', rework:'要改', out:'已移除', new:'未 review' };
       const stOf = id => (ST[id] ? ST[id][0] : 'new');
