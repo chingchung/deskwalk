@@ -163,6 +163,31 @@
         color: var(--ink-soft);
         opacity: 0.6;
       }
+      .tag.dup {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+      }
+
+      /* difficulty meter */
+      .lv {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: -0.3rem 0 0.75rem;
+        font-size: 0.73rem;
+        color: var(--ink-soft);
+      }
+      .meter { display: inline-flex; gap: 2px; flex: 0 0 auto; }
+      .meter i {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--line);
+      }
+      .meter i.on { background: color-mix(in srgb, var(--accent) 70%, var(--line)); }
+
+      .acts { display: inline-flex; gap: 1rem; }
 
       .soup {
         margin: 0;
@@ -271,41 +296,55 @@
       <div class="rules">
         <b>玩法</b>：出題者講出「湯面」——故事嘅開頭同結果，中間刻意留白。其他玩家只可以問封閉式問題，
         出題者只可以答 <span class="ans">是</span><span class="ans">不是</span><span class="ans">無關</span>。
-        玩家砌返完整故事 =「湯底」，即為過關。<br /><br />
-        <b>機制上嘅空缺</b>：原玩法冇計分、冇回合限制、冇勝負判定，全靠出題者主觀判斷夠唔夠貼。
-        呢個就係我哋要補嘅位。
+        玩家砌返完整故事 =「湯底」，即為過關。
       </div>
 
       <div class="bar">
         <div class="pills" id="pills"></div>
         <div class="barfoot">
           <span id="count"></span>
-          <button class="toggle" id="toggleAll" type="button">全部展開</button>
+          <span class="acts">
+            <button class="toggle" id="sortBtn" type="button">難度排序</button>
+            <button class="toggle" id="toggleAll" type="button">全部展開</button>
+          </span>
         </div>
       </div>
 
       <div id="list"></div>
 
       <section class="memo">
-        <h2>落遊戲前要處理</h2>
+        <h2>已定</h2>
         <ol>
+          <li><b>內容照用，唔重寫。</b>恐怖類嘅口味問題留返包裝階段處理。</li>
+          <li><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</li>
           <li>
-            <b>暴力同性別失衡。</b>恐怖類 26 題入面，女性受害者佔壓倒性多數，斬手斬腳／碎屍係常見手法。
-            派對場景（尤其混合朋友圈）唔 work。要麼大幅重寫，要麼收窄成一個明確標示嘅「重口味」分類，預設唔開。
-          </li>
-          <li>
-            <b>重複結構。</b>「盲人／聾人治好後以為復發」出現三次；「以為係狗其實係人」兩次；「船難食人」兩次；
-            「燈塔」兩次。同一場出兩題同結構 = 第二題即刻被破。要建立<b>結構標籤</b>去避開撞題。
-          </li>
-          <li>
-            <b>出處不明。</b>全部係無名氏流傳版本，冇單一權利人，但商用前值得再確認。
-            安全做法係全部重寫成自己版本——反正第 1 點都要重寫。
-          </li>
-          <li>
-            <b>難度冇客觀標準。</b>各來源嘅「初階／中階／高階」標法唔一致。要自己定一套。
-            yesnogame 用「difficulty 1–10 ＋ 平均解題分鐘數」，數據驅動，值得參考。
+            <b>難度用 1–10 ＋ 預估解題分鐘。</b>G 組全部、F15、F22 用 yesnogame 實測數據；
+            其餘為估算，依推理跳躍次數、所需背景知識、湯面誤導程度定。可以按「難度排序」重排。
           </li>
         </ol>
+
+        <h2 style="margin-top:1.6rem">待決 · 撞題二揀一</h2>
+        <ol>
+          <li><b>冰溶咗上吊</b> — A6 死喺房間正中央嘅男人 ／ F11 The Hanged Man</li>
+          <li><b>冰粒落毒</b> — B3 冰粒 ／ F4 Poisoned Ice Cubes</li>
+          <li><b>船難食人</b> — C1 海龜湯 ／ F2 Albatross Sandwich</li>
+          <li><b>燈塔</b> — B2 報紙 ／ F6 Time for Bed</li>
+          <li><b>矮人撳唔到掣</b> — F5 The Man in the Elevator ／ G10 An Uncommon Man</li>
+          <li><b>降落傘冇開</b> — F14 Backpack ／ G4 Unopened Package</li>
+          <li><b>難產嘅陌生人</b> — F20 The Stranger ／ G8 A Stranger in the Car</li>
+          <li><b>感官復明後以為復發</b> — A2 火車 ／ A3 雨夜廣播</li>
+        </ol>
+
+        <h2 style="margin-top:1.6rem">同族 · 唔使刪，唔好同場</h2>
+        <ol>
+          <li><b>冰溶咗</b> — A6・F11・B3・F4・F8。三種死法，同一個 gimmick。</li>
+          <li><b>感官誤判</b> — A2・A3・B4 可樂・B12 眼鏡男・C8 滿地木屑</li>
+          <li><b>船難食人</b> — C1・F2・C19 生日・E6 斷手</li>
+          <li><b>偷窺者被兇手鎖定</b> — C13 對面大樓・C22 直播</li>
+          <li><b>夢遊症</b> — C12 綠衫・E9 絕望嘅兩個人</li>
+          <li><b>家宅入侵</b> — A7 買飲料・C3 滴水聲・C18 外賣・C21 指紋驗證失敗</li>
+        </ol>
+
         <p class="src">
           來源：
           <a href="https://manmandays.com/situation-puzzle/">漫漫日和</a> ·
@@ -329,9 +368,46 @@
         { k: 'hard',    label: '高難度' },
         { k: 'classic', label: '英文經典' },
         { k: 'open',    label: '未有湯底' },
+        { k: 'dup',     label: '撞題' },
       ];
 
       const LABEL = Object.fromEntries(CATS.map(c => [c.k, c.label]));
+
+      // 難度 1–10 ＋ 預估解題分鐘。G 組全部、F15、F22 用 yesnogame 實測數據，
+      // 其餘為估算（依推理跳躍次數、所需背景知識、湯面誤導程度）。
+      const META = {
+        A1:[1,3],  A2:[3,6],  A3:[3,6],  A4:[2,5],  A5:[3,6],  A6:[3,7],  A7:[2,5],  A8:[3,6],  A9:[2,4],
+        B1:[5,11], B2:[6,13], B3:[4,9],  B4:[6,13], B5:[6,14], B6:[4,9],  B7:[5,11], B8:[5,10],
+        B9:[5,10], B10:[7,15],B11:[6,12],B12:[5,11],B13:[6,13],B14:[4,8],
+        C1:[5,12], C2:[5,11], C3:[4,9],  C4:[6,13], C5:[5,11], C6:[6,13], C7:[5,10], C8:[5,11],
+        C9:[3,7],  C10:[5,11],C11:[6,13],C12:[7,15],C13:[4,9], C14:[7,15],C15:[6,13],C16:[6,13],
+        C17:[5,11],C18:[3,7], C19:[6,12],C20:[5,10],C21:[4,8], C22:[5,10],C23:[4,8], C24:[5,11],
+        C25:[5,10],C26:[4,9],
+        D1:[4,8],  D2:[3,6],  D3:[2,4],  D4:[2,4],  D5:[2,4],  D6:[2,4],  D7:[3,5],  D8:[4,8],
+        E1:[9,20], E2:[7,15], E3:[7,14], E4:[10,25],E5:[8,17], E6:[6,13], E7:[7,14], E8:[7,15],
+        E9:[7,14], E10:[6,12],
+        F1:[5,10], F2:[5,12], F3:[6,13], F4:[4,9],  F5:[5,11], F6:[6,13], F7:[8,17], F8:[4,8],
+        F9:[3,7],  F10:[4,8], F11:[3,7], F12:[3,6], F13:[6,12],F14:[2,5], F15:[7,14],F16:[6,12],
+        F17:[4,8], F18:[7,14],F19:[6,13],F20:[4,9], F21:[7,15],F22:[5,11],
+        G1:[5,9],  G2:[7,18], G3:[4,9],  G4:[4,9],  G5:[6,14], G6:[3,8],  G7:[5,9],  G8:[5,7],
+        G9:[3,4],  G10:[4,9],
+      };
+
+      // 同結構／同手法嘅題。同一場出兩題同組 = 第二題即刻被破。
+      const DUP = {
+        '冰溶咗':      ['A6','F11','B3','F4','F8'],
+        '感官誤判':    ['A2','A3','B4','B12','C8'],
+        '船難食人':    ['C1','F2','C19','E6'],
+        '燈塔':        ['B2','F6'],
+        '矮人撳掣':    ['F5','G10'],
+        '降落傘':      ['F14','G4'],
+        '難產陌生人':  ['F20','G8'],
+        '偷窺被鎖定':  ['C13','C22'],
+        '夢遊':        ['C12','E9'],
+        '家宅入侵':    ['A7','C3','C18','C21'],
+      };
+      const DUPOF = {};
+      Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
 
       const P = [
         // ---------------- 暖場 ----------------
@@ -657,12 +733,15 @@
 
       let active = 'all';
       let allOpen = false;
+      let byLevel = false;
 
       const esc = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
       const para = s => esc(s).split('\n').map(l => `<p>${l}</p>`).join('');
 
       CATS.forEach(c => {
-        const n = c.k === 'all' ? P.length : P.filter(p => p.c === c.k).length;
+        const n = c.k === 'all' ? P.length
+          : c.k === 'dup' ? P.filter(p => DUPOF[p.id]).length
+          : P.filter(p => p.c === c.k).length;
         const b = document.createElement('button');
         b.className = 'pill';
         b.type = 'button';
@@ -678,7 +757,10 @@
       });
 
       function render() {
-        const rows = active === 'all' ? P : P.filter(p => p.c === active);
+        let rows = active === 'all' ? P
+          : active === 'dup' ? P.filter(p => DUPOF[p.id])
+          : P.filter(p => p.c === active);
+        if (byLevel) rows = [...rows].sort((a, b) => META[a.id][0] - META[b.id][0]);
         countEl.textContent = `${rows.length} 題`;
 
         if (!rows.length) {
@@ -690,8 +772,13 @@
           <article class="card${allOpen ? ' open' : ''}${p.a ? '' : ' todo'}">
             <div class="head">
               <h2>${esc(p.t)}</h2>
+              ${DUPOF[p.id] ? `<span class="tag dup">撞 · ${DUPOF[p.id]}</span>` : ''}
               <span class="tag">${LABEL[p.c]}</span>
               <span class="id">${p.id}</span>
+            </div>
+            <div class="lv">
+              <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
+              難度 ${META[p.id][0]} · 約 ${META[p.id][1]} 分鐘
             </div>
             <div class="soup">${para(p.q)}</div>
             <button class="reveal" type="button">${p.a ? '揭湯底' : '睇備註'}</button>
@@ -711,6 +798,12 @@
       toggleEl.onclick = () => {
         allOpen = !allOpen;
         toggleEl.textContent = allOpen ? '全部收起' : '全部展開';
+        render();
+      };
+
+      document.querySelector('#sortBtn').onclick = (e) => {
+        byLevel = !byLevel;
+        e.target.textContent = byLevel ? '原順序' : '難度排序';
         render();
       };
 
