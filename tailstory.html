@@ -189,6 +189,28 @@
 
       .acts { display: inline-flex; gap: 1rem; }
 
+      .pills.stats { margin-top: 0.4rem; }
+
+      /* review status */
+      .tag.st {
+        background: transparent;
+        border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+        color: var(--accent-deep);
+      }
+      .card.st-out { opacity: 0.5; }
+      .card.st-out h2 { text-decoration: line-through; text-decoration-color: var(--line); }
+      .card.st-out .tag.st { border-color: var(--line); color: var(--ink-soft); }
+      .verdict {
+        margin: 0 0 0.75rem;
+        font-size: 0.82rem;
+        line-height: 1.7;
+        color: var(--accent-deep);
+        background: var(--accent-soft);
+        border-radius: var(--radius-sm);
+        padding: 0.45rem 0.7rem;
+      }
+      .card.st-out .verdict { background: none; color: var(--ink-soft); padding: 0; }
+
       .soup {
         margin: 0;
         font-size: 0.95rem;
@@ -289,7 +311,7 @@
         <h1>揭尾故</h1>
         <p class="sub">
           海龜湯 · Situation Puzzle · Yes-No Puzzle。<br />
-          網上收集嘅原始題庫，未做改編。素材階段，供翻揀同重寫。
+          Review 進行中 — 99 題收集，49 題已移除，35 題未睇。
         </p>
       </header>
 
@@ -301,6 +323,7 @@
 
       <div class="bar">
         <div class="pills" id="pills"></div>
+        <div class="pills stats" id="stats"></div>
         <div class="barfoot">
           <span id="count"></span>
           <span class="acts">
@@ -313,36 +336,37 @@
       <div id="list"></div>
 
       <section class="memo">
-        <h2>已定</h2>
+        <h2>Review 進度</h2>
         <ol>
-          <li><b>內容照用，唔重寫。</b>恐怖類嘅口味問題留返包裝階段處理。</li>
-          <li><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</li>
+          <li><b>已移除 49 題。</b>預設隱藏，冇真係刪走——撳「已移除」pill 隨時揀返。</li>
+          <li><b>待定 9 題</b>：A2 火車・A6 死喺房間正中央嘅男人・A9 少女被謀殺・B2 報紙・B3 冰粒・C3 滴水聲・C8 滿地木屑・C18 外賣・D1 酒吧</li>
+          <li><b>要改 6 題</b>：A8 紅眼睛・B1 水草・C5 魔術師・C7 葬禮姊妹・C19 生日・F6 Time for Bed</li>
+          <li><b>未 review 35 題</b> — 個 list 停咗喺 F10 Cabin in the Woods。剩低：
+            A1・A5・B9・B13・B14・C1 海龜湯・C2 牛食草・C4 三兄弟・C13・C26・D2・E3、
+            F4・F11–F22（13 題）、G1–G10（10 題）。</li>
+        </ol>
+
+        <h2 style="margin-top:1.6rem">要你確認</h2>
+        <ol>
           <li>
-            <b>難度用 1–10 ＋ 預估解題分鐘。</b>G 組全部、F15、F22 用 yesnogame 實測數據；
-            其餘為估算，依推理跳躍次數、所需背景知識、湯面誤導程度定。可以按「難度排序」重排。
+            <b>B3 冰粒</b> — 你只寫咗「不像揭尾故」，冇講 onhold 定 remove。
+            A9 少女被謀殺同一個理由你標咗 onhold，所以我暫時當 <b>待定</b>。要 remove 話我知。
           </li>
         </ol>
 
-        <h2 style="margin-top:1.6rem">待決 · 撞題二揀一</h2>
+        <h2 style="margin-top:1.6rem">撞題 · review 後嘅狀況</h2>
         <ol>
-          <li><b>冰溶咗上吊</b> — A6 死喺房間正中央嘅男人 ／ F11 The Hanged Man</li>
-          <li><b>冰粒落毒</b> — B3 冰粒 ／ F4 Poisoned Ice Cubes</li>
-          <li><b>船難食人</b> — C1 海龜湯 ／ F2 Albatross Sandwich</li>
-          <li><b>燈塔</b> — B2 報紙 ／ F6 Time for Bed</li>
-          <li><b>矮人撳唔到掣</b> — F5 The Man in the Elevator ／ G10 An Uncommon Man</li>
-          <li><b>降落傘冇開</b> — F14 Backpack ／ G4 Unopened Package</li>
-          <li><b>難產嘅陌生人</b> — F20 The Stranger ／ G8 A Stranger in the Car</li>
-          <li><b>感官復明後以為復發</b> — A2 火車 ／ A3 雨夜廣播</li>
+          <li><b>已解決</b> — 感官復明（A3 刪，剩 A2）・船難食人（F2 刪，剩 C1）・矮人撳掣（F5 刪，剩 G10）・偷窺被鎖定（C22 刪，剩 C13）</li>
+          <li><b>兩條都刪晒</b> — 夢遊（C12・E9）</li>
+          <li><b>仲未解決</b> — 冰溶咗仲有四條live：A6・B3（待定）＋ F11・F4（未 review）。燈塔兩條都在：B2 待定 ／ F6 要改。降落傘（F14・G4）同難產陌生人（F20・G8）四條都未 review。</li>
+          <li><b>家宅入侵</b> — A7・C21 刪咗，剩 C3・C18 兩條，兩條都係待定。</li>
         </ol>
 
-        <h2 style="margin-top:1.6rem">同族 · 唔使刪，唔好同場</h2>
+        <h2 style="margin-top:1.6rem">已定</h2>
         <ol>
-          <li><b>冰溶咗</b> — A6・F11・B3・F4・F8。三種死法，同一個 gimmick。</li>
-          <li><b>感官誤判</b> — A2・A3・B4 可樂・B12 眼鏡男・C8 滿地木屑</li>
-          <li><b>船難食人</b> — C1・F2・C19 生日・E6 斷手</li>
-          <li><b>偷窺者被兇手鎖定</b> — C13 對面大樓・C22 直播</li>
-          <li><b>夢遊症</b> — C12 綠衫・E9 絕望嘅兩個人</li>
-          <li><b>家宅入侵</b> — A7 買飲料・C3 滴水聲・C18 外賣・C21 指紋驗證失敗</li>
+          <li><b>內容照用，唔重寫</b>（「要改」嗰 6 題除外）。</li>
+          <li><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</li>
+          <li><b>難度 1–10 ＋ 預估分鐘。</b>G 組全部、F15、F22 用 yesnogame 實測數據；其餘估算。</li>
         </ol>
 
         <p class="src">
@@ -408,6 +432,28 @@
       };
       const DUPOF = {};
       Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
+
+      // Review 狀態。out = 已移除（預設隱藏，可還原）；hold = 待定；rework = 要改。
+      // 冇列出嘅 = 未 review。
+      const ST = {
+        A2:['hold'], A3:['out'], A4:['out'], A6:['hold'], A7:['out'],
+        A8:['rework','題目需更改，未有結局'], A9:['hold','唔似揭尾故'],
+        B1:['rework','需 craft 題目'], B2:['hold'], B3:['hold','唔似揭尾故'],
+        B4:['out'], B5:['out'], B6:['out'], B7:['out'], B8:['out'],
+        B10:['out'], B11:['out'], B12:['out'],
+        C3:['hold'], C5:['rework','需改題目'], C6:['out'],
+        C7:['rework','題目透露過多資訊'], C8:['hold'], C9:['out'], C10:['out'],
+        C11:['out'], C12:['out'], C14:['out'], C15:['out'], C16:['out'], C17:['out'],
+        C18:['hold','要修改'], C19:['rework','要修改'], C20:['out'], C21:['out'],
+        C22:['out'], C23:['out'], C24:['out'], C25:['out'],
+        D1:['hold'], D3:['out'], D4:['out'], D5:['out'], D6:['out'], D7:['out'], D8:['out'],
+        E1:['out'], E2:['out'], E4:['out'], E5:['out'], E6:['out'], E7:['out'],
+        E8:['out'], E9:['out'], E10:['out'],
+        F1:['out'], F2:['out'], F3:['out'], F5:['out'], F6:['rework','修改'],
+        F7:['out'], F8:['out'], F9:['out'], F10:['out'],
+      };
+      const STLABEL = { hold:'待定', rework:'要改', out:'已移除', new:'未 review' };
+      const stOf = id => (ST[id] ? ST[id][0] : 'new');
 
       const P = [
         // ---------------- 暖場 ----------------
@@ -734,6 +780,15 @@
       let active = 'all';
       let allOpen = false;
       let byLevel = false;
+      let stat = 'live';
+
+      const STATS = [
+        { k: 'live',   label: '未移除' },
+        { k: 'hold',   label: '待定' },
+        { k: 'rework', label: '要改' },
+        { k: 'new',    label: '未 review' },
+        { k: 'out',    label: '已移除' },
+      ];
 
       const esc = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
       const para = s => esc(s).split('\n').map(l => `<p>${l}</p>`).join('');
@@ -756,10 +811,30 @@
         pillsEl.appendChild(b);
       });
 
+      const statsEl = document.querySelector('#stats');
+      STATS.forEach(t => {
+        const n = t.k === 'live'
+          ? P.filter(p => stOf(p.id) !== 'out').length
+          : P.filter(p => stOf(p.id) === t.k).length;
+        const b = document.createElement('button');
+        b.className = 'pill';
+        b.type = 'button';
+        b.setAttribute('aria-pressed', String(t.k === 'live'));
+        b.innerHTML = `${t.label}<span class="n">${n}</span>`;
+        b.onclick = () => {
+          stat = t.k;
+          [...statsEl.children].forEach((el, i) =>
+            el.setAttribute('aria-pressed', String(STATS[i].k === stat)));
+          render();
+        };
+        statsEl.appendChild(b);
+      });
+
       function render() {
         let rows = active === 'all' ? P
           : active === 'dup' ? P.filter(p => DUPOF[p.id])
           : P.filter(p => p.c === active);
+        rows = rows.filter(p => stat === 'live' ? stOf(p.id) !== 'out' : stOf(p.id) === stat);
         if (byLevel) rows = [...rows].sort((a, b) => META[a.id][0] - META[b.id][0]);
         countEl.textContent = `${rows.length} 題`;
 
@@ -769,9 +844,10 @@
         }
 
         listEl.innerHTML = rows.map(p => `
-          <article class="card${allOpen ? ' open' : ''}${p.a ? '' : ' todo'}">
+          <article class="card st-${stOf(p.id)}${allOpen ? ' open' : ''}${p.a ? '' : ' todo'}">
             <div class="head">
               <h2>${esc(p.t)}</h2>
+              ${stOf(p.id) !== 'new' ? `<span class="tag st">${STLABEL[stOf(p.id)]}</span>` : ''}
               ${DUPOF[p.id] ? `<span class="tag dup">撞 · ${DUPOF[p.id]}</span>` : ''}
               <span class="tag">${LABEL[p.c]}</span>
               <span class="id">${p.id}</span>
@@ -780,6 +856,7 @@
               <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
               難度 ${META[p.id][0]} · 約 ${META[p.id][1]} 分鐘
             </div>
+            ${ST[p.id] && ST[p.id][1] ? `<p class="verdict">${esc(ST[p.id][1])}</p>` : ''}
             <div class="soup">${para(p.q)}</div>
             <button class="reveal" type="button">${p.a ? '揭湯底' : '睇備註'}</button>
             <div class="base">
