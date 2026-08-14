@@ -3,7 +3,9 @@
 > 海龜湯 / Situation Puzzle / Lateral Thinking Puzzle / Yes-No Puzzle。
 > 香港叫「揭尾故」，台灣叫「海龜湯」，歐美叫 situation puzzle（德系叫 Black Stories）。
 >
-> 呢份保留**全部 99 題收集紀錄**，包括已移除嗰批。實際可用嘅 18 題見 [tailstory.html](tailstory.html)。
+> 呢份保留**全部 99 題收集紀錄**（包括已移除嗰批），文字維持收集時嘅原貌，粵語行文。
+> 實際出街嘅 18 題見 [tailstory.html](tailstory.html)——**嗰邊已經全部改寫成書面語，以嗰邊為準**。
+> Prototype 現名 **Black Stories**（注意：呢個係 moses. Verlag 嘅註冊桌遊品牌，正式產品名要另改）。
 > 逐題狀態以 [tailstory.html](tailstory.html) 嘅 `ST` 表為準。
 > 機制討論放 [MECHANICS.md](MECHANICS.md)，包裝方向放 [CONCEPTS.md](CONCEPTS.md)。
 

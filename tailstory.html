@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>揭尾故 · 題庫 — deskwalk</title>
+    <title>Black Stories — deskwalk</title>
     <link rel="stylesheet" href="brand.css" />
     <style>
       body { background-image: none; }
@@ -20,45 +20,15 @@
         font-size: 0.85rem;
         color: var(--ink-soft);
         text-decoration: none;
-        margin-bottom: 1.75rem;
+        margin-bottom: 2rem;
       }
       .back:hover { color: var(--accent); }
 
       header h1 {
-        margin: 0 0 0.5rem;
-        font-size: 2rem;
+        margin: 0 0 2.25rem;
+        font-size: 2.4rem;
         font-weight: 600;
-        letter-spacing: 0.02em;
-      }
-      header .sub {
-        margin: 0 0 1.5rem;
-        color: var(--ink-soft);
-        font-size: 0.9rem;
-        line-height: 1.7;
-      }
-
-      .rules {
-        background: var(--card);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        box-shadow: inset 0 1px 0 var(--glass-rim);
-        padding: 1.1rem 1.3rem;
-        margin-bottom: 2rem;
-        font-size: 0.88rem;
-        line-height: 1.75;
-        color: var(--ink-soft);
-      }
-      .rules b { color: var(--ink); font-weight: 600; }
-      .rules .ans {
-        display: inline-block;
-        background: var(--accent-soft);
-        color: var(--accent-deep);
-        border-radius: var(--pill);
-        padding: 0.05rem 0.55rem;
-        font-size: 0.8rem;
-        margin: 0 0.1rem;
+        letter-spacing: 0.01em;
       }
 
       /* ---------- filter bar ---------- */
@@ -154,19 +124,10 @@
         flex: 0 0 auto;
         font-size: 0.72rem;
         color: var(--ink-soft);
-        background: var(--accent-soft);
-        border-radius: var(--pill);
-        padding: 0.14rem 0.55rem;
-      }
-      .tag.dup {
         background: transparent;
         border: 1px solid var(--line);
-      }
-      .id {
-        flex: 0 0 auto;
-        font-size: 0.72rem;
-        color: var(--ink-soft);
-        opacity: 0.6;
+        border-radius: var(--pill);
+        padding: 0.14rem 0.55rem;
       }
 
       /* difficulty meter */
@@ -237,35 +198,6 @@
         color: var(--ink-soft);
       }
       .note::before { content: "◆ "; color: var(--accent); opacity: 0.5; }
-
-      /* ---------- closing notes ---------- */
-      .memo {
-        margin-top: 2.75rem;
-        padding: 1.4rem 1.5rem;
-        background: var(--card);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        box-shadow: inset 0 1px 0 var(--glass-rim);
-      }
-      .memo h2 { margin: 0 0 0.9rem; font-size: 1rem; font-weight: 600; }
-      .memo p {
-        margin: 0 0 0.7rem;
-        font-size: 0.88rem;
-        line-height: 1.8;
-        color: var(--ink-soft);
-      }
-      .memo p b { color: var(--ink); font-weight: 600; }
-      .memo .src {
-        margin: 1.2rem 0 0;
-        padding-top: 1rem;
-        border-top: 1px solid var(--line);
-        font-size: 0.78rem;
-        line-height: 1.9;
-      }
-      .memo .src a { color: var(--ink-soft); }
-      .memo .src a:hover { color: var(--accent); }
     </style>
   </head>
   <body>
@@ -273,18 +205,8 @@
       <a class="back" href="index.html">← deskwalk</a>
 
       <header>
-        <h1>揭尾故</h1>
-        <p class="sub">
-          海龜湯 · Situation Puzzle · Yes-No Puzzle。<br />
-          收集 99 題，篩剩 18 題。
-        </p>
+        <h1>Black Stories</h1>
       </header>
-
-      <div class="rules">
-        <b>玩法</b>：出題者講出「湯面」——故事嘅開頭同結果，中間刻意留白。其他玩家只可以問封閉式問題，
-        出題者只可以答 <span class="ans">是</span><span class="ans">不是</span><span class="ans">無關</span>。
-        玩家砌返完整故事 =「湯底」，即為過關。
-      </div>
 
       <div class="bar">
         <div class="pills" id="pills"></div>
@@ -298,33 +220,6 @@
       </div>
 
       <div id="list"></div>
-
-      <section class="memo">
-        <h2>撞題</h2>
-        <p>
-          刪剩得一組同結構嘅題：<b>船難食人</b> — C1 海龜湯・C19 生日。同一場唔好兩題都出，
-          出咗其中一題，另一題即刻被破。
-        </p>
-
-        <h2 style="margin-top:1.6rem">已定</h2>
-        <p><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</p>
-        <p><b>難度 1–10 ＋ 預估分鐘。</b>部分用 yesnogame 實測數據，其餘估算。可按「難度排序」重排。</p>
-        <p>
-          完整 99 題收集紀錄（連已移除嗰 81 題）留喺
-          <a href="TAILSTORY-PUZZLES.md">TAILSTORY-PUZZLES.md</a>。
-        </p>
-
-        <p class="src">
-          來源：
-          <a href="https://manmandays.com/situation-puzzle/">漫漫日和</a> ·
-          <a href="https://www.sundaykiss.com/%E7%86%B1%E8%A9%B1/%E6%B5%B7%E9%BE%9C%E6%B9%AF-%E6%8F%AD%E5%B0%BE%E6%95%85-%E7%B2%BE%E9%81%B8%E9%A1%8C%E7%9B%AE-cplt2-1310219/">SundayKiss</a> ·
-          <a href="https://nosca395311.pixnet.net/blog/posts/17330712171">官官的日更成長思考</a> ·
-          <a href="https://poplady-mag.com/article/296035/%E6%B5%B7%E9%BE%9C%E6%B9%AF-%E6%8F%AD%E5%B0%BE%E6%95%85">PopLady</a> ·
-          <a href="https://puzzlewocky.com/brain-teasers/situation-puzzles/">Puzzlewocky</a> ·
-          <a href="https://yesnogame.net/en">yesnogame.net</a> ·
-          <a href="https://en.wikipedia.org/wiki/Situation_puzzle">Wikipedia</a>
-        </p>
-      </section>
     </main>
 
     <script>
@@ -336,7 +231,6 @@
         { k: 'funny',   label: '搞笑' },
         { k: 'hard',    label: '高難度' },
       ];
-      const LABEL = Object.fromEntries(CATS.map(c => [c.k, c.label]));
 
       // 難度 1–10 ＋ 預估解題分鐘。
       const META = {
@@ -347,7 +241,7 @@
         E3:[7,14],
       };
 
-      // 同結構／同手法，同一場唔好一齊出。
+      // 同結構、同手法，同一場不宜連續出。
       const DUP = { '船難食人': ['C1', 'C19'] };
       const DUPOF = {};
       Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
@@ -355,73 +249,73 @@
       const P = [
         // ---------------- 暖場 ----------------
         { id:'A1', c:'warm', t:'人聲',
-          q:'隔壁房間傳來好多人嘅聲音，時而騷動時而歡笑，但打開門一睇，只有一個人。',
-          a:'隔壁嗰個人喺度睇電視。' },
-        { id:'A5', c:'warm', t:'只有公主逃走咗',
-          q:'王子帶公主逃出鬼堡。魔鬼話：「白色代表天使，著白色連身裙嘅公主唔可以通過，必須死。」結果王子死咗，公主逃出。',
-          a:'公主殺咗王子，用血將白裙染紅。' },
-        { id:'G6', c:'warm', t:'綁喺櫈度',
-          q:'小明最錫佢嗰個人，將佢綁咗喺張櫈度。小明一啲都唔介意。',
-          a:'小明係個 BB，阿媽將佢綁喺 BB 餐椅度餵嘢食。',
-          n:'原文（Binded）冇公開湯底，呢個湯底係自己寫嘅。' },
+          q:'隔壁房間傳來許多人的聲音，時而喧鬧，時而歡笑。推門一看，裡面只有一個人。',
+          a:'那個人在看電視。' },
+        { id:'A5', c:'warm', t:'只有公主逃了出去',
+          q:'王子帶著公主逃出鬼堡。魔鬼攔住他們說：「白色代表天使，穿白色連衣裙的公主不能通過，必須死。」最後王子死了，公主逃了出去。',
+          a:'公主殺了王子，用他的血把白裙染成紅色。' },
+        { id:'G6', c:'warm', t:'綁在椅子上',
+          q:'最疼他的人把他綁在椅子上，他卻一點也不介意。',
+          a:'他是個嬰兒，母親把他綁在餐椅上餵飯。',
+          n:'原題（Binded）沒有公開答案，此湯底為自行撰寫。' },
         { id:'G10', c:'warm', t:'十樓',
-          q:'一個男人住十樓。每朝出門，佢搭𨋢落地下。夜晚返嚟，佢撳七樓。',
-          a:'佢好矮，撳唔到十樓個掣，最高只夠得到七樓，之後行樓梯上返。',
-          n:'原文尾巴有「然後行三層樓梯上去」，太提示，已經移入湯底。' },
+          q:'一個男人住在十樓。每天早上出門，他搭電梯下到地面；晚上回家，他按七樓。',
+          a:'他個子很矮，按不到十樓的按鈕，最高只能碰到七樓，其餘路程走樓梯。',
+          n:'原題結尾寫明「然後走三層樓梯上去」，提示過強，已移入湯底。' },
 
         // ---------------- 懸疑 ----------------
         { id:'B9', c:'mystery', t:'郵票',
-          q:'一名男人發現自己少貼咗一張郵票，之後就死咗。',
-          a:'佢寄咗個定時炸彈畀仇人。郵資不足被退回，炸彈照原定時間喺佢屋企爆炸。' },
+          q:'一個男人發現自己少貼了一張郵票，不久之後就死了。',
+          a:'他寄了一個定時炸彈給仇人。郵資不足被退回，炸彈按原定時間在他家中引爆。' },
         { id:'B13', c:'mystery', t:'半根火柴',
-          q:'有人喺沙漠中頭向下死咗，身邊散落住行李箱，手裡緊緊揸住半支火柴。',
-          a:'佢哋搭熱氣球途中故障要減重，抽籤決定邊個跳。佢抽中咗嗰半支，連行李一齊掟落嚟。' },
+          q:'一個人在沙漠中面朝下死去，身邊散落著行李，手裡緊握半根火柴。',
+          a:'他們搭乘熱氣球途中故障，必須減輕重量，於是抽籤決定誰跳下去。他抽中了那半根，連同行李一起被扔了下去。' },
         { id:'B14', c:'mystery', t:'簽名',
-          q:'大明星喺簽名會簽完名之後突然死亡。',
-          a:'粉絲為咗令個簽名升值——「最後一張簽名」——所以殺咗佢。' },
-        { id:'G8', c:'mystery', t:'車入面嘅陌生人',
-          q:'一對夫婦揸車途中冇晒油。丈夫落車去搵油。返到嚟，太太死咗，而車入面多咗一個陌生人。車門反鎖、車窗閂實、車身完好無缺。',
-          a:'太太有咗身孕。丈夫走開嗰陣佢分娩，難產死咗。嗰個「陌生人」係啱啱出世嘅嬰兒。' },
+          q:'一位大明星在簽名會上簽完名後，突然死亡。',
+          a:'粉絲為了讓簽名升值——因為那會是「最後一張簽名」——所以殺了他。' },
+        { id:'G8', c:'mystery', t:'車裡的陌生人',
+          q:'一對夫婦開車途中沒油了。丈夫下車去找油。回來時，妻子已經死了，車裡卻多了一個陌生人。車門反鎖、車窗緊閉、車身完好無損。',
+          a:'妻子懷有身孕。丈夫離開期間她臨盆，難產而死。那個「陌生人」是剛出生的嬰兒。' },
         { id:'F21', c:'mystery', t:'新鞋',
-          q:'一個女人朝早買咗對新鞋。夜晚返工，返到工做冇耐就死咗。',
-          a:'對高踭鞋令佢高咗少少。佢喺馬戲團做飛刀表演嘅活靶，飛刀手照住平時嘅高度掟，掟中咗佢。' },
+          q:'一個女人早上買了一雙新鞋。晚上上班，開工不久就死了。',
+          a:'高跟鞋讓她比平時高了一些。她在馬戲團擔任飛刀表演的活靶，飛刀手按照平時的高度出手，正中了她。' },
 
         // ---------------- 恐怖 ----------------
         { id:'C1', c:'horror', t:'海龜湯',
-          q:'一位船長行入餐廳，叫咗碗海龜湯。飲落覺得味道有啲奇怪，問店家係咩做嘅。店家話：「用海龜肉做嘅。」船長沉思咗一陣，痛哭起身，然後自殺。',
-          a:'佢以前出海遇上海難，喺海上漂流好耐冇糧食。船員為咗令船長活落去，將已死船員嘅肉割落嚟煮湯，呃佢話係海龜湯。多年後飲到真正嘅海龜湯，先知當年真相。',
-          n:'遊戲名嘅由來，本體題。' },
-        { id:'C2', c:'horror', t:'牛食草',
-          q:'你獨自住喺郊外，隔籬鄰居係一對養牛嘅夫婦。某晚深夜你被嘈吵聲嘈醒，跟住聽到摔嘢聲、斬嘢聲，同埋「牛食草」嘅聲，一陣之後仲聽到撞門聲。你冇理。第二日發現鄰居女主人慘死喺你屋企門口。',
-          a:'老公斬斷咗老婆四肢。冇手冇腳嘅老婆用口咬住地上啲草，一路爬到你門口求救，用頭撞門。你冇開門，佢失血過多死咗。',
-          n:'香港／台灣流傳度最高嘅一題。' },
+          q:'一位船長走進餐廳，點了一碗海龜湯。喝下去覺得味道有些奇怪，便問店家是用什麼做的。店家答：「用海龜肉。」船長沉思片刻，痛哭起來，隨後自殺。',
+          a:'他早年出海遇上海難，在海上漂流許久，糧食耗盡。船員為了讓船長活下去，割下已死船員的肉煮成湯，騙他說是海龜湯。多年後嚐到真正的海龜湯，他才知道當年的真相。',
+          n:'「海龜湯」這個名稱的由來，本體題。' },
+        { id:'C2', c:'horror', t:'牛吃草',
+          q:'你獨自住在郊外，鄰居是一對養牛的夫婦。某天深夜你被爭吵聲驚醒，接著聽到摔東西的聲音、砍劈的聲音，以及牛吃草的聲音；過了一會兒，還聽到撞門聲。你沒有理會。第二天，鄰居的女主人慘死在你家門口。',
+          a:'丈夫砍斷了妻子的四肢。沒有手腳的妻子用嘴咬著地上的草，一路爬到你家門口求救，用頭撞門。你沒有開門，她因失血過多而死。',
+          n:'香港、台灣流傳度最高的一題。' },
         { id:'C4', c:'horror', t:'三兄弟',
-          q:'以前有三兄弟，大哥同二哥係孖生，三兄弟感情好好，成日一齊瞓。大哥病死之後，三弟殺咗二哥。點解？',
-          a:'三弟有精神病，接受唔到大哥死。佢將二哥劏成左右兩半，一半放左邊一半放右邊，咁瞓落去就好似大哥仲喺度。' },
+          q:'從前有三兄弟，大哥和二哥是雙胞胎，三人感情極好，常常睡在一起。大哥病死之後，三弟殺了二哥。為什麼？',
+          a:'三弟患有精神疾病，無法接受大哥的死。他把二哥剖成左右兩半，一半放在左邊，一半放在右邊；這樣躺下去，就像大哥還在。' },
         { id:'C7', c:'horror', t:'葬禮姊妹',
-          q:'媽媽過身，姊妹兩個去出殯。一個月後，家姐都死咗。',
-          a:'妹妹喺葬禮上見到一個男仔，一見鍾情，但葬禮之後佢消失無蹤，點都搵唔返。妹妹想再辦一次葬禮，希望再見到嗰個人，所以殺咗家姐。',
-          n:'原版湯面講晒個男仔同一見鍾情，等於送答案。已收窄到淨係講兩次死亡。' },
+          q:'母親過世，姊妹兩人參加葬禮。一個月後，姊姊也死了。',
+          a:'妹妹在葬禮上見到一名男子，一見鍾情，但葬禮結束後對方消失無蹤，怎麼也找不到。妹妹想再辦一次葬禮，希望能再見到那個人，於是殺了姊姊。',
+          n:'原版湯面點明了男子與一見鍾情，等於直接給出答案。現已收窄到只交代兩次死亡。' },
         { id:'C13', c:'horror', t:'對面大樓',
-          q:'小明見到對面大樓有人被殺，兇手望住佢，用手指由下向上點。小明嚇死咗。',
-          a:'兇手喺度數樓層，確定小明住幾多樓，打算上嚟滅口。' },
+          q:'他看見對面大樓有人被殺。兇手望向他，用手指由下往上點。他當場被嚇死。',
+          a:'兇手在數樓層，確認他住在幾樓，準備上門滅口。' },
         { id:'C19', c:'horror', t:'生日',
-          q:'今日我生日，請晒所有好朋友嚟。吹完蠟燭，四圍響起掌聲。之後我將所有好朋友都殺晒。',
-          a:'我係盲人。以前喺野外被困，朋友話大家一齊斬咗隻手做糧食救我。生日嗰晚聽到掌聲——拍手要兩隻手，原來當年斬手嘅只有我一個。',
-          n:'加咗「掌聲」入湯面先有得推。冇呢句就冇線索。' },
+          q:'今天是我生日，我請了所有好朋友來。吹完蠟燭，四周響起掌聲。之後，我把所有好朋友都殺了。',
+          a:'我是盲人。從前在野外受困，朋友說大家一起砍下一隻手作為糧食救我。生日那晚聽見掌聲——鼓掌需要兩隻手，原來當年砍手的只有我一個。',
+          n:'「掌聲」是唯一線索，沒有這句就無從推理。' },
         { id:'C26', c:'horror', t:'夜半敲門',
-          q:'有人住喺山頂小屋，半夜聽到拍門聲，開門冇人，瞓返。又拍門，又冇人，如是者幾次。第二日山腳發現一具屍體，警察拉走咗山頂嗰個人。',
-          a:'有人身負重傷爬到門口，屋主每次開門都撞返佢落山，反覆幾次，最後氣絕。' },
+          q:'一個人住在山頂小屋。半夜聽見敲門聲，開門卻沒有人，便回去睡了。門又響，還是沒有人，如此反覆數次。第二天，山腳下發現一具屍體，警方帶走了山頂那個人。',
+          a:'有人身負重傷，爬到門口求救。屋主每次開門都把他撞下山坡，反覆數次，最後傷者氣絕。' },
 
         // ---------------- 搞笑 ----------------
-        { id:'D2', c:'funny', t:'行花園',
-          q:'呢日我喺一個好大好大嘅花園度行，突然我停咗喺一個位，然後就死咗，流咗好多好多血。',
-          a:'我係隻蚊，喺花園搵緊嘢吸。吸緊血嗰陣被人一巴拍死，肚裡啲血爆晒出嚟。' },
+        { id:'D2', c:'funny', t:'逛花園',
+          q:'那天我在一座很大很大的花園裡走著，突然停在某處，然後就死了，流了很多很多血。',
+          a:'我是一隻蚊子，在花園裡尋找目標。正在吸血時被一巴掌拍死，肚子裡的血全部濺了出來。' },
 
         // ---------------- 高難度 ----------------
-        { id:'E3', c:'hard', t:'電話響咗',
-          q:'絕望嘅女子決定跳樓。跳落去嗰一刻，電話響起，佢好後悔，但已經來唔切。',
-          a:'周圍嘅人全部變咗喪屍，佢以為自己係最後一個人類先絕望。電話響代表仲有人生還。' },
+        { id:'E3', c:'hard', t:'電話響了',
+          q:'絕望的女子決定跳樓。縱身而下的那一刻，電話響了。她後悔了，但已經來不及。',
+          a:'周圍的人全都變成了喪屍，她以為自己是最後一個人類，才決定尋死。電話響起，代表還有人活著。' },
       ];
 
       // ---------- render ----------
@@ -464,9 +358,7 @@
           <article class="card${allOpen ? ' open' : ''}">
             <div class="head">
               <h2>${esc(p.t)}</h2>
-              ${DUPOF[p.id] ? `<span class="tag dup">撞 · ${DUPOF[p.id]}</span>` : ''}
-              <span class="tag">${LABEL[p.c]}</span>
-              <span class="id">${p.id}</span>
+              ${DUPOF[p.id] ? `<span class="tag">撞 · ${DUPOF[p.id]}</span>` : ''}
             </div>
             <div class="lv">
               <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
