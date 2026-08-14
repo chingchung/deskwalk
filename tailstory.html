@@ -25,75 +25,16 @@
       .back:hover { color: var(--accent); }
 
       header h1 {
-        margin: 0 0 2.25rem;
+        margin: 0 0 0.4rem;
         font-size: 2.4rem;
         font-weight: 600;
         letter-spacing: 0.01em;
       }
-
-      /* ---------- filter bar ---------- */
-      .bar {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        margin: 0 -1.25rem 1.5rem;
-        padding: 0.75rem 1.25rem 0.7rem;
-        background: rgba(251, 250, 246, 0.72);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
-        border-bottom: 1px solid var(--line);
-      }
-      .pills {
-        display: flex;
-        gap: 0.4rem;
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 0.15rem;
-      }
-      .pills::-webkit-scrollbar { display: none; }
-      .pill {
-        flex: 0 0 auto;
-        border: 1px solid var(--line);
-        border-radius: var(--pill);
-        background: var(--card-strong);
-        color: var(--ink-soft);
-        font: inherit;
-        font-size: 0.82rem;
-        padding: 0.34rem 0.85rem;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
-      }
-      .pill:hover { color: var(--ink); }
-      .pill[aria-pressed="true"] {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #fff;
-      }
-      .pill .n { opacity: 0.55; margin-left: 0.3rem; font-size: 0.76rem; }
-
-      .barfoot {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 0.55rem;
+      header .count {
+        margin: 0 0 2.25rem;
         font-size: 0.78rem;
         color: var(--ink-soft);
       }
-      .acts { display: inline-flex; gap: 1rem; }
-      .toggle {
-        border: 0;
-        background: none;
-        font: inherit;
-        color: var(--ink-soft);
-        cursor: pointer;
-        padding: 0;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-        text-decoration-color: var(--line);
-      }
-      .toggle:hover { color: var(--accent); }
 
       /* ---------- puzzle card ---------- */
       .card {
@@ -108,26 +49,10 @@
         padding: 1.25rem 1.35rem 1.1rem;
         margin-bottom: 0.9rem;
       }
-      .head {
-        display: flex;
-        align-items: baseline;
-        gap: 0.6rem;
-        margin-bottom: 0.7rem;
-      }
-      .head h2 {
-        margin: 0;
+      .card h2 {
+        margin: 0 0 0.6rem;
         font-size: 1.02rem;
         font-weight: 600;
-        flex: 1;
-      }
-      .tag {
-        flex: 0 0 auto;
-        font-size: 0.72rem;
-        color: var(--ink-soft);
-        background: transparent;
-        border: 1px solid var(--line);
-        border-radius: var(--pill);
-        padding: 0.14rem 0.55rem;
       }
 
       /* difficulty meter */
@@ -135,7 +60,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin: -0.3rem 0 0.75rem;
+        margin: 0 0 0.75rem;
         font-size: 0.73rem;
         color: var(--ink-soft);
       }
@@ -206,33 +131,14 @@
 
       <header>
         <h1>Black Stories</h1>
+        <p class="count" id="count"></p>
       </header>
-
-      <div class="bar">
-        <div class="pills" id="pills"></div>
-        <div class="barfoot">
-          <span id="count"></span>
-          <span class="acts">
-            <button class="toggle" id="sortBtn" type="button">難度排序</button>
-            <button class="toggle" id="toggleAll" type="button">全部展開</button>
-          </span>
-        </div>
-      </div>
 
       <div id="list"></div>
     </main>
 
     <script>
-      const CATS = [
-        { k: 'all',     label: '全部' },
-        { k: 'warm',    label: '暖場' },
-        { k: 'mystery', label: '懸疑' },
-        { k: 'horror',  label: '恐怖' },
-        { k: 'funny',   label: '搞笑' },
-        { k: 'hard',    label: '高難度' },
-      ];
-
-      // 難度 1–10 ＋ 預估解題分鐘。
+      // 難度 1–10 ＋ 預估解題分鐘。列表依難度由淺至深排序。
       const META = {
         A1:[1,3], A5:[3,6], G6:[2,5], G10:[4,9],
         B9:[5,10], B13:[6,13], B14:[4,8], G8:[5,9], F21:[7,15],
@@ -241,157 +147,96 @@
         E3:[7,14],
       };
 
-      // 同結構、同手法，同一場不宜連續出。
-      const DUP = { '船難食人': ['C1', 'C19'] };
-      const DUPOF = {};
-      Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
-
       const P = [
-        // ---------------- 暖場 ----------------
-        { id:'A1', c:'warm', t:'人聲',
+        { id:'A1', t:'人聲',
           q:'隔壁房間傳來許多人的聲音，時而喧鬧，時而歡笑。推門一看，裡面只有一個人。',
           a:'那個人在看電視。' },
-        { id:'A5', c:'warm', t:'只有公主逃了出去',
+        { id:'A5', t:'只有公主逃了出去',
           q:'王子帶著公主逃出鬼堡。魔鬼攔住他們說：「白色代表天使，穿白色連衣裙的公主不能通過，必須死。」最後王子死了，公主逃了出去。',
           a:'公主殺了王子，用他的血把白裙染成紅色。' },
-        { id:'G6', c:'warm', t:'綁在椅子上',
+        { id:'G6', t:'綁在椅子上',
           q:'最疼他的人把他綁在椅子上，他卻一點也不介意。',
           a:'他是個嬰兒，母親把他綁在餐椅上餵飯。',
           n:'原題（Binded）沒有公開答案，此湯底為自行撰寫。' },
-        { id:'G10', c:'warm', t:'十樓',
+        { id:'G10', t:'十樓',
           q:'一個男人住在十樓。每天早上出門，他搭電梯下到地面；晚上回家，他按七樓。',
           a:'他個子很矮，按不到十樓的按鈕，最高只能碰到七樓，其餘路程走樓梯。',
           n:'原題結尾寫明「然後走三層樓梯上去」，提示過強，已移入湯底。' },
-
-        // ---------------- 懸疑 ----------------
-        { id:'B9', c:'mystery', t:'郵票',
+        { id:'B9', t:'郵票',
           q:'一個男人發現自己少貼了一張郵票，不久之後就死了。',
           a:'他寄了一個定時炸彈給仇人。郵資不足被退回，炸彈按原定時間在他家中引爆。' },
-        { id:'B13', c:'mystery', t:'半根火柴',
+        { id:'B13', t:'半根火柴',
           q:'一個人在沙漠中面朝下死去，身邊散落著行李，手裡緊握半根火柴。',
           a:'他們搭乘熱氣球途中故障，必須減輕重量，於是抽籤決定誰跳下去。他抽中了那半根，連同行李一起被扔了下去。' },
-        { id:'B14', c:'mystery', t:'簽名',
+        { id:'B14', t:'簽名',
           q:'一位大明星在簽名會上簽完名後，突然死亡。',
           a:'粉絲為了讓簽名升值——因為那會是「最後一張簽名」——所以殺了他。' },
-        { id:'G8', c:'mystery', t:'車裡的陌生人',
+        { id:'G8', t:'車裡的陌生人',
           q:'一對夫婦開車途中沒油了。丈夫下車去找油。回來時，妻子已經死了，車裡卻多了一個陌生人。車門反鎖、車窗緊閉、車身完好無損。',
           a:'妻子懷有身孕。丈夫離開期間她臨盆，難產而死。那個「陌生人」是剛出生的嬰兒。' },
-        { id:'F21', c:'mystery', t:'新鞋',
+        { id:'F21', t:'新鞋',
           q:'一個女人早上買了一雙新鞋。晚上上班，開工不久就死了。',
           a:'高跟鞋讓她比平時高了一些。她在馬戲團擔任飛刀表演的活靶，飛刀手按照平時的高度出手，正中了她。' },
-
-        // ---------------- 恐怖 ----------------
-        { id:'C1', c:'horror', t:'海龜湯',
+        { id:'C1', t:'海龜湯',
           q:'一位船長走進餐廳，點了一碗海龜湯。喝下去覺得味道有些奇怪，便問店家是用什麼做的。店家答：「用海龜肉。」船長沉思片刻，痛哭起來，隨後自殺。',
           a:'他早年出海遇上海難，在海上漂流許久，糧食耗盡。船員為了讓船長活下去，割下已死船員的肉煮成湯，騙他說是海龜湯。多年後嚐到真正的海龜湯，他才知道當年的真相。',
-          n:'「海龜湯」這個名稱的由來，本體題。' },
-        { id:'C2', c:'horror', t:'牛吃草',
+          n:'「海龜湯」這個名稱的由來，本體題。與〈生日〉同屬船難食人的結構，同一場不宜連續出。' },
+        { id:'C2', t:'牛吃草',
           q:'你獨自住在郊外，鄰居是一對養牛的夫婦。某天深夜你被爭吵聲驚醒，接著聽到摔東西的聲音、砍劈的聲音，以及牛吃草的聲音；過了一會兒，還聽到撞門聲。你沒有理會。第二天，鄰居的女主人慘死在你家門口。',
           a:'丈夫砍斷了妻子的四肢。沒有手腳的妻子用嘴咬著地上的草，一路爬到你家門口求救，用頭撞門。你沒有開門，她因失血過多而死。',
           n:'香港、台灣流傳度最高的一題。' },
-        { id:'C4', c:'horror', t:'三兄弟',
+        { id:'C4', t:'三兄弟',
           q:'從前有三兄弟，大哥和二哥是雙胞胎，三人感情極好，常常睡在一起。大哥病死之後，三弟殺了二哥。為什麼？',
           a:'三弟患有精神疾病，無法接受大哥的死。他把二哥剖成左右兩半，一半放在左邊，一半放在右邊；這樣躺下去，就像大哥還在。' },
-        { id:'C7', c:'horror', t:'葬禮姊妹',
+        { id:'C7', t:'葬禮姊妹',
           q:'母親過世，姊妹兩人參加葬禮。一個月後，姊姊也死了。',
           a:'妹妹在葬禮上見到一名男子，一見鍾情，但葬禮結束後對方消失無蹤，怎麼也找不到。妹妹想再辦一次葬禮，希望能再見到那個人，於是殺了姊姊。',
           n:'原版湯面點明了男子與一見鍾情，等於直接給出答案。現已收窄到只交代兩次死亡。' },
-        { id:'C13', c:'horror', t:'對面大樓',
+        { id:'C13', t:'對面大樓',
           q:'他看見對面大樓有人被殺。兇手望向他，用手指由下往上點。他當場被嚇死。',
           a:'兇手在數樓層，確認他住在幾樓，準備上門滅口。' },
-        { id:'C19', c:'horror', t:'生日',
+        { id:'C19', t:'生日',
           q:'今天是我生日，我請了所有好朋友來。吹完蠟燭，四周響起掌聲。之後，我把所有好朋友都殺了。',
           a:'我是盲人。從前在野外受困，朋友說大家一起砍下一隻手作為糧食救我。生日那晚聽見掌聲——鼓掌需要兩隻手，原來當年砍手的只有我一個。',
-          n:'「掌聲」是唯一線索，沒有這句就無從推理。' },
-        { id:'C26', c:'horror', t:'夜半敲門',
+          n:'「掌聲」是唯一線索，沒有這句就無從推理。與〈海龜湯〉同屬船難食人的結構，同一場不宜連續出。' },
+        { id:'C26', t:'夜半敲門',
           q:'一個人住在山頂小屋。半夜聽見敲門聲，開門卻沒有人，便回去睡了。門又響，還是沒有人，如此反覆數次。第二天，山腳下發現一具屍體，警方帶走了山頂那個人。',
           a:'有人身負重傷，爬到門口求救。屋主每次開門都把他撞下山坡，反覆數次，最後傷者氣絕。' },
-
-        // ---------------- 搞笑 ----------------
-        { id:'D2', c:'funny', t:'逛花園',
+        { id:'D2', t:'逛花園',
           q:'那天我在一座很大很大的花園裡走著，突然停在某處，然後就死了，流了很多很多血。',
           a:'我是一隻蚊子，在花園裡尋找目標。正在吸血時被一巴掌拍死，肚子裡的血全部濺了出來。' },
-
-        // ---------------- 高難度 ----------------
-        { id:'E3', c:'hard', t:'電話響了',
+        { id:'E3', t:'電話響了',
           q:'絕望的女子決定跳樓。縱身而下的那一刻，電話響了。她後悔了，但已經來不及。',
           a:'周圍的人全都變成了喪屍，她以為自己是最後一個人類，才決定尋死。電話響起，代表還有人活著。' },
-      ];
+      ].sort((a, b) => META[a.id][0] - META[b.id][0]);
 
       // ---------- render ----------
-      const listEl   = document.querySelector('#list');
-      const pillsEl  = document.querySelector('#pills');
-      const countEl  = document.querySelector('#count');
-      const toggleEl = document.querySelector('#toggleAll');
-
-      let active = 'all';
-      let allOpen = false;
-      let byLevel = false;
-
       const esc  = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
       const para = s => esc(s).split('\n').map(l => `<p>${l}</p>`).join('');
 
-      CATS.forEach(c => {
-        const n = c.k === 'all' ? P.length : P.filter(p => p.c === c.k).length;
-        if (!n) return;
-        const b = document.createElement('button');
-        b.className = 'pill';
-        b.type = 'button';
-        b.dataset.k = c.k;
-        b.setAttribute('aria-pressed', String(c.k === 'all'));
-        b.innerHTML = `${c.label}<span class="n">${n}</span>`;
-        b.onclick = () => {
-          active = c.k;
-          [...pillsEl.children].forEach(el =>
-            el.setAttribute('aria-pressed', String(el.dataset.k === active)));
-          render();
-        };
-        pillsEl.appendChild(b);
+      document.querySelector('#count').textContent = `${P.length} 題`;
+
+      const listEl = document.querySelector('#list');
+      listEl.innerHTML = P.map(p => `
+        <article class="card">
+          <h2>${esc(p.t)}</h2>
+          <div class="lv">
+            <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
+            難度 ${META[p.id][0]} · 約 ${META[p.id][1]} 分鐘
+          </div>
+          <div class="soup">${para(p.q)}</div>
+          <button class="reveal" type="button">揭湯底</button>
+          <div class="base">
+            <span class="lab">湯底</span>
+            ${para(p.a)}
+            ${p.n ? `<p class="note">${esc(p.n)}</p>` : ''}
+          </div>
+        </article>
+      `).join('');
+
+      listEl.querySelectorAll('.reveal').forEach(btn => {
+        btn.onclick = () => btn.closest('.card').classList.add('open');
       });
-
-      function render() {
-        let rows = active === 'all' ? P : P.filter(p => p.c === active);
-        if (byLevel) rows = [...rows].sort((a, b) => META[a.id][0] - META[b.id][0]);
-        countEl.textContent = `${rows.length} 題`;
-
-        listEl.innerHTML = rows.map(p => `
-          <article class="card${allOpen ? ' open' : ''}">
-            <div class="head">
-              <h2>${esc(p.t)}</h2>
-              ${DUPOF[p.id] ? `<span class="tag">撞 · ${DUPOF[p.id]}</span>` : ''}
-            </div>
-            <div class="lv">
-              <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
-              難度 ${META[p.id][0]} · 約 ${META[p.id][1]} 分鐘
-            </div>
-            <div class="soup">${para(p.q)}</div>
-            <button class="reveal" type="button">揭湯底</button>
-            <div class="base">
-              <span class="lab">湯底</span>
-              ${para(p.a)}
-              ${p.n ? `<p class="note">${esc(p.n)}</p>` : ''}
-            </div>
-          </article>
-        `).join('');
-
-        listEl.querySelectorAll('.reveal').forEach(btn => {
-          btn.onclick = () => btn.closest('.card').classList.add('open');
-        });
-      }
-
-      toggleEl.onclick = () => {
-        allOpen = !allOpen;
-        toggleEl.textContent = allOpen ? '全部收起' : '全部展開';
-        render();
-      };
-
-      document.querySelector('#sortBtn').onclick = (e) => {
-        byLevel = !byLevel;
-        e.target.textContent = byLevel ? '原順序' : '難度排序';
-        render();
-      };
-
-      render();
     </script>
   </body>
 </html>
