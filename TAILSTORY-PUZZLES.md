@@ -3,6 +3,10 @@
 > 海龜湯 / Situation Puzzle / Lateral Thinking Puzzle / Yes-No Puzzle。
 > 香港叫「揭尾故」，台灣叫「海龜湯」，歐美叫 situation puzzle（德系叫 Black Stories）。
 >
+> ⚠️ **呢份已經唔係 source of truth。** 出街題庫搬咗去 Google 試算表：
+> [Black Stories — 題庫](https://docs.google.com/spreadsheets/d/1WwguyEA3D8hoXvg0gc1KRe58bDq7n7I6JVjYGDdt9UA/edit)
+> ——加新題目喺嗰度加行就得，唔使掂 code。接駁方法見 [apps-script-blackstories.gs](apps-script-blackstories.gs)。
+>
 > 呢份保留**全部 99 題收集紀錄**（包括已移除嗰批），文字維持收集時嘅原貌，粵語行文。
 > 實際出街嘅 18 題見 [tailstory.html](tailstory.html)——**嗰邊已經全部改寫成書面語，以嗰邊為準**。
 > Prototype 現名 **Black Stories**（注意：呢個係 moses. Verlag 嘅註冊桌遊品牌，正式產品名要另改）。
@@ -34,7 +38,7 @@
 | F. 英文經典 | 22 |
 | G. 改寫後（原本冇湯底） | 10 |
 | **合計（收集）** | **99** |
-| **留低可用** | **18** |
+| **留低可用** | **18**（＋新增 N1，共 19） |
 
 ---
 
@@ -401,9 +405,17 @@
 
 ---
 
+## 新增題目（唔喺原本 99 題收集入面）
+
+**N1. 樹上的男子**（難度 8，約 18 分鐘）
+- 湯面：一名男子死在森林裡的一棵樹上。
+- 湯底：他當時正在附近的海裡潛水。不遠處發生大規模森林火災，消防飛機到海面汲水滅火，把潛水中的他一併吸進水箱，隨後連水一起空投到火場上空。他從高空墜落，摔死在樹上。
+
+---
+
 ## Review 狀態
 
-99 題全部揀完，**留低 18 題**。
+99 題全部揀完，留低 18 題，再加一條新題（N1 樹上的男子），**現時共 19 題**。
 
 呢份文件保留成個收集紀錄（連已移除嗰 81 題），
 但 [tailstory.html](tailstory.html) 已經只載住留低嗰 18 題——刪走嘅題唔再喺 prototype 入面。
