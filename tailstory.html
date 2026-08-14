@@ -276,6 +276,12 @@
         box-shadow: inset 0 1px 0 var(--glass-rim);
       }
       .memo h2 { margin: 0 0 0.9rem; font-size: 1rem; font-weight: 600; }
+      .memo .lead {
+        margin: -0.4rem 0 0.9rem;
+        font-size: 0.84rem;
+        line-height: 1.75;
+        color: var(--ink-soft);
+      }
       .memo ol { margin: 0; padding-left: 1.15rem; }
       .memo li {
         font-size: 0.88rem;
@@ -311,7 +317,7 @@
         <h1>揭尾故</h1>
         <p class="sub">
           海龜湯 · Situation Puzzle · Yes-No Puzzle。<br />
-          Review 進行中 — 99 題收集，59 題已移除，25 題未睇。
+          Review 篩剩嘅題。「待定」同「要改」嘅卡會標出嚟。
         </p>
       </header>
 
@@ -323,7 +329,6 @@
 
       <div class="bar">
         <div class="pills" id="pills"></div>
-        <div class="pills stats" id="stats"></div>
         <div class="barfoot">
           <span id="count"></span>
           <span class="acts">
@@ -336,39 +341,20 @@
       <div id="list"></div>
 
       <section class="memo">
-        <h2>Review 進度</h2>
+        <h2>撞題</h2>
+        <p class="lead">同結構／同手法。同一場出兩題同組，第二題即刻被破。刪剩一條嘅組已經唔再標。</p>
         <ol>
-          <li><b>已移除 59 題。</b>預設隱藏，冇真係刪走——撳「已移除」pill 隨時揀返。</li>
-          <li><b>待定 9 題</b>：A2 火車・A6 死喺房間正中央嘅男人・A9 少女被謀殺・B2 報紙・B3 冰粒・C3 滴水聲・C8 滿地木屑・C18 外賣・D1 酒吧</li>
-          <li><b>要改 6 題</b>：A8 紅眼睛・B1 水草・C5 魔術師・C7 葬禮姊妹・C19 生日・F6 Time for Bed</li>
-          <li><b>未 review 25 題</b>：
-            A1 人聲・A5 只有公主逃走咗／B9 郵票・B13 半根火柴・B14 簽名／
-            C1 海龜湯・C2 牛食草・C4 三兄弟・C13 對面大樓・C26 夜半敲門／D2 行花園／
-            E3 電話響咗／F4 Poisoned Ice Cubes・F20 The Stranger・F21 The New Shoes／
-            G1–G10（10 題，全部未有湯底）。</li>
-        </ol>
-
-        <h2 style="margin-top:1.6rem">要你確認</h2>
-        <ol>
-          <li>
-            <b>B3 冰粒</b> — 你只寫咗「不像揭尾故」，冇講 onhold 定 remove。
-            A9 少女被謀殺同一個理由你標咗 onhold，所以我暫時當 <b>待定</b>。要 remove 話我知。
-          </li>
-        </ol>
-
-        <h2 style="margin-top:1.6rem">撞題 · review 後嘅狀況</h2>
-        <ol>
-          <li><b>已解決</b> — 感官復明（A3 刪，剩 A2）・船難食人（F2 刪，剩 C1）・矮人撳掣（F5 刪，剩 G10）・偷窺被鎖定（C22 刪，剩 C13）・降落傘（F14 刪，剩 G4）</li>
-          <li><b>兩條都刪晒</b> — 夢遊（C12・E9）</li>
-          <li><b>仲未解決</b> — 冰溶咗剩三條：A6・B3（待定）＋ F4（未 review）。燈塔兩條都在：B2 待定 ／ F6 要改。難產陌生人（F20・G8）兩條都未 review。</li>
-          <li><b>家宅入侵</b> — A7・C21 刪咗，剩 C3・C18 兩條，兩條都係待定。</li>
+          <li><b>冰溶咗</b> — A6 死喺房間正中央嘅男人・B3 冰粒</li>
+          <li><b>感官誤判</b> — A2 火車・C8 滿地木屑</li>
+          <li><b>船難食人</b> — C1 海龜湯・C19 生日</li>
+          <li><b>燈塔</b> — B2 報紙・F6 Time for Bed</li>
+          <li><b>家宅入侵</b> — C3 滴水聲・C18 外賣</li>
         </ol>
 
         <h2 style="margin-top:1.6rem">已定</h2>
         <ol>
-          <li><b>內容照用，唔重寫</b>（「要改」嗰 6 題除外）。</li>
           <li><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</li>
-          <li><b>難度 1–10 ＋ 預估分鐘。</b>G 組全部、F15、F22 用 yesnogame 實測數據；其餘估算。</li>
+          <li><b>難度 1–10 ＋ 預估分鐘。</b>部分用 yesnogame 實測數據，其餘估算。可按「難度排序」重排。</li>
         </ol>
 
         <p class="src">
@@ -415,8 +401,9 @@
         F1:[5,10], F2:[5,12], F3:[6,13], F4:[4,9],  F5:[5,11], F6:[6,13], F7:[8,17], F8:[4,8],
         F9:[3,7],  F10:[4,8], F11:[3,7], F12:[3,6], F13:[6,12],F14:[2,5], F15:[7,14],F16:[6,12],
         F17:[4,8], F18:[7,14],F19:[6,13],F20:[4,9], F21:[7,15],F22:[5,11],
-        G1:[5,9],  G2:[7,18], G3:[4,9],  G4:[4,9],  G5:[6,14], G6:[3,8],  G7:[5,9],  G8:[5,7],
+        G1:[5,9],  G2:[7,18], G3:[4,9],  G4:[4,9],  G5:[6,14], G6:[2,5],  G7:[5,9],  G8:[5,9],
         G9:[3,4],  G10:[4,9],
+        // 改寫後：G6 簡化、G8 補湯底、G10 抽起提示
       };
 
       // 同結構／同手法嘅題。同一場出兩題同組 = 第二題即刻被破。
@@ -432,8 +419,8 @@
         '夢遊':        ['C12','E9'],
         '家宅入侵':    ['A7','C3','C18','C21'],
       };
+      // 只有仲有兩條或以上未移除，先算撞題——剩返一條就冇得撞。
       const DUPOF = {};
-      Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
 
       // Review 狀態。out = 已移除（預設隱藏，可還原）；hold = 待定；rework = 要改。
       // 冇列出嘅 = 未 review。
@@ -452,11 +439,15 @@
         E1:['out'], E2:['out'], E4:['out'], E5:['out'], E6:['out'], E7:['out'],
         E8:['out'], E9:['out'], E10:['out'],
         F1:['out'], F2:['out'], F3:['out'], F5:['out'], F6:['rework','修改'],
-        F7:['out'], F8:['out'], F9:['out'], F10:['out'], F11:['out'], F12:['out'],
-        F13:['out'], F14:['out'], F15:['out'], F16:['out'], F17:['out'], F18:['out'],
-        F19:['out'], F22:['out'],
+        F4:['out'], F7:['out'], F8:['out'], F9:['out'], F10:['out'], F11:['out'],
+        F12:['out'], F13:['out'], F14:['out'], F15:['out'], F16:['out'], F17:['out'],
+        F18:['out'], F19:['out'], F20:['out'], F22:['out'],
+        F21:['ok','已譯成中文'],
+        G1:['out'], G2:['out'], G3:['out'], G4:['out'], G5:['out'], G7:['out'], G9:['out'],
+        G6:['ok','已譯成中文，簡化'], G8:['ok','已譯成中文，補回湯底'],
+        G10:['ok','已譯成中文；「行三層樓梯」移入湯底'],
       };
-      const STLABEL = { hold:'待定', rework:'要改', out:'已移除', new:'未 review' };
+      const STLABEL = { hold:'待定', rework:'要改', out:'已移除', new:'', ok:'已改' };
       const stOf = id => (ST[id] ? ST[id][0] : 'new');
 
       const P = [
@@ -740,9 +731,9 @@
         { id:'F20', c:'classic', t:'The Stranger',
           q:'A man finds his wife dead and a stranger in the room.',
           a:'老婆難產死咗，個「陌生人」係啱啱出世嘅 BB。' },
-        { id:'F21', c:'classic', t:'The New Shoes',
-          q:'A woman buys new shoes in the morning, goes to work at night, and dies at work.',
-          a:'高踭鞋令佢高咗。佢喺馬戲團做飛刀表演嘅活靶，飛刀手估錯高度。' },
+        { id:'F21', c:'mystery', t:'新鞋',
+          q:'一個女人朝早買咗對新鞋。夜晚返工，返到工做冇耐就死咗。',
+          a:'對高踭鞋令佢高咗少少。佢喺馬戲團做飛刀表演嘅活靶，飛刀手照住平時嘅高度掟，掟中咗佢。' },
         { id:'F22', c:'classic', t:'Jack and Judy',
           q:'Jack and Judy were lying on the floor dead. There was a puddle of water and broken glass on the floor.',
           a:'佢哋係金魚，魚缸被貓撞跌咗。',
@@ -760,19 +751,20 @@
           n:'大機會同 Backpack 同源（降落傘），未證實。' },
         { id:'G5', c:'open', t:'Death: Delayed',
           q:'Helen never thought that her decision to travel by plane would save her life.', a:null },
-        { id:'G6', c:'open', t:'Binded',
-          q:"One of Michael's dearest loved ones binds him to a chair, but Michael doesn't mind.", a:null },
+        { id:'G6', c:'warm', t:'綁喺櫈度',
+          q:'小明最錫佢嗰個人，將佢綁咗喺張櫈度。小明一啲都唔介意。',
+          a:'小明係個 BB，阿媽將佢綁喺 BB 餐椅度餵嘢食。' },
         { id:'G7', c:'open', t:'Fatal Shot',
           q:'A hunter aimed his gun carefully and fired. Seconds later he realized his mistake. Minutes later he was dead.', a:null },
-        { id:'G8', c:'open', t:'A Stranger in the Car',
-          q:'A couple ran out of gas. The man went for help. On return he found his wife dead and a stranger in the locked, undamaged car with the windows closed.', a:null,
-          n:'同 The Stranger 同源機會大，未證實。' },
+        { id:'G8', c:'mystery', t:'車入面嘅陌生人',
+          q:'一對夫婦揸車途中冇晒油。丈夫落車去搵油。返到嚟，太太死咗，而車入面多咗一個陌生人。車門反鎖、車窗閂實、車身完好無缺。',
+          a:'太太有咗身孕。丈夫走開嗰陣佢分娩，難產死咗。嗰個「陌生人」係啱啱出世嘅嬰兒。' },
         { id:'G9', c:'open', t:'Sweet Dreams',
           q:'Matthew keeps reading a bedtime story to his son despite the blackout.', a:null,
           n:'經典答案：佢係盲人，讀緊點字。未經來源證實。' },
-        { id:'G10', c:'open', t:'An Uncommon Man',
-          q:'A man on the 10th floor takes the elevator down each morning. Coming back, he takes it to floor 7, then walks up 3 flights.', a:null,
-          n:'The Man in the Elevator 嘅變體。' },
+        { id:'G10', c:'warm', t:'十樓',
+          q:'一個男人住十樓。每朝出門，佢搭𨋢落地下。夜晚返嚟，佢撳七樓。',
+          a:'佢好矮，撳唔到十樓個掣，最高只夠得到七樓，之後行樓梯上返。' },
       ];
 
       // ---------- render ----------
@@ -784,61 +776,41 @@
       let active = 'all';
       let allOpen = false;
       let byLevel = false;
-      let stat = 'live';
 
-      const STATS = [
-        { k: 'live',   label: '未移除' },
-        { k: 'hold',   label: '待定' },
-        { k: 'rework', label: '要改' },
-        { k: 'new',    label: '未 review' },
-        { k: 'out',    label: '已移除' },
-      ];
+      // 已移除嘅題留喺 data 度（改返主意揀得返），但唔會出現喺頁面。
+      const LIVE = P.filter(p => stOf(p.id) !== 'out');
+      Object.entries(DUP).forEach(([g, ids]) => {
+        const alive = ids.filter(id => stOf(id) !== 'out');
+        if (alive.length > 1) alive.forEach(id => { DUPOF[id] = g; });
+      });
 
       const esc = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
       const para = s => esc(s).split('\n').map(l => `<p>${l}</p>`).join('');
 
       CATS.forEach(c => {
-        const n = c.k === 'all' ? P.length
-          : c.k === 'dup' ? P.filter(p => DUPOF[p.id]).length
-          : P.filter(p => p.c === c.k).length;
+        const n = c.k === 'all' ? LIVE.length
+          : c.k === 'dup' ? LIVE.filter(p => DUPOF[p.id]).length
+          : LIVE.filter(p => p.c === c.k).length;
+        if (!n) return;
         const b = document.createElement('button');
         b.className = 'pill';
         b.type = 'button';
         b.setAttribute('aria-pressed', String(c.k === 'all'));
         b.innerHTML = `${c.label}<span class="n">${n}</span>`;
+        b.dataset.k = c.k;
         b.onclick = () => {
           active = c.k;
-          [...pillsEl.children].forEach((el, i) =>
-            el.setAttribute('aria-pressed', String(CATS[i].k === active)));
+          [...pillsEl.children].forEach(el =>
+            el.setAttribute('aria-pressed', String(el.dataset.k === active)));
           render();
         };
         pillsEl.appendChild(b);
       });
 
-      const statsEl = document.querySelector('#stats');
-      STATS.forEach(t => {
-        const n = t.k === 'live'
-          ? P.filter(p => stOf(p.id) !== 'out').length
-          : P.filter(p => stOf(p.id) === t.k).length;
-        const b = document.createElement('button');
-        b.className = 'pill';
-        b.type = 'button';
-        b.setAttribute('aria-pressed', String(t.k === 'live'));
-        b.innerHTML = `${t.label}<span class="n">${n}</span>`;
-        b.onclick = () => {
-          stat = t.k;
-          [...statsEl.children].forEach((el, i) =>
-            el.setAttribute('aria-pressed', String(STATS[i].k === stat)));
-          render();
-        };
-        statsEl.appendChild(b);
-      });
-
       function render() {
-        let rows = active === 'all' ? P
-          : active === 'dup' ? P.filter(p => DUPOF[p.id])
-          : P.filter(p => p.c === active);
-        rows = rows.filter(p => stat === 'live' ? stOf(p.id) !== 'out' : stOf(p.id) === stat);
+        let rows = active === 'all' ? LIVE
+          : active === 'dup' ? LIVE.filter(p => DUPOF[p.id])
+          : LIVE.filter(p => p.c === active);
         if (byLevel) rows = [...rows].sort((a, b) => META[a.id][0] - META[b.id][0]);
         countEl.textContent = `${rows.length} 題`;
 

@@ -3,7 +3,7 @@
 > 海龜湯 / Situation Puzzle / Lateral Thinking Puzzle / Yes-No Puzzle。
 > 香港叫「揭尾故」，台灣叫「海龜湯」，歐美叫 situation puzzle（德系叫 Black Stories）。
 >
-> 呢份係**原始素材**，內容照用唔重寫。Review 進行中，狀態見文末〈Review 狀態〉。
+> 呢份保留**全部 99 題收集紀錄**，包括已移除嗰批。實際可用嘅 31 題見 [tailstory.html](tailstory.html)。
 > 逐題狀態以 [tailstory.html](tailstory.html) 嘅 `ST` 表為準。
 > 機制討論放 [MECHANICS.md](MECHANICS.md)，包裝方向放 [CONCEPTS.md](CONCEPTS.md)。
 
@@ -30,8 +30,9 @@
 | D. 搞笑 / 抽水 | 8 |
 | E. 高難度 / 多層推理 | 10 |
 | F. 英文經典 | 22 |
-| G. 有湯面、未搵到湯底 | 10 |
-| **合計** | **99** |
+| G. 改寫後（原本冇湯底） | 10 |
+| **合計（收集）** | **99** |
+| **留低可用** | **31** |
 
 ---
 
@@ -339,107 +340,108 @@
 
 ## F. 英文經典（Situation Puzzles / Black Stories）
 
-多數係英美流傳版本，部分同上面中文題同源。
+多數係英美流傳版本，部分同上面中文題同源。編號同 [tailstory.html](tailstory.html) 一致。
+呢組經 review 之後只留低 F6（要改）同 F21（已譯成中文，見下一節），其餘全部移除。
 
 | # | Puzzle | Solution |
 |---|---|---|
-| F1 | **The Man in the Mask** — A man is running home. Another man is chasing him. At home, a man wearing a mask is waiting. | They're playing baseball. The masked man is the catcher. |
+| F1 | **The Man in the Mask** — A man is running home. Another man is chasing him. At home, a man wearing a mask is waiting. | 佢哋打緊棒球。戴面罩嗰個係捕手。 |
 | F2 | **Albatross Sandwich** — A man orders an albatross sandwich, takes one bite, and kills himself. | 同 C1 海龜湯。佢係盲人，船難後有人用死者嘅肉呃佢話係信天翁。 |
-| F3 | **Paper on the Cactus** — A man walks up to a cactus, looks at a piece of paper pinned there, and kills himself. | Lost in the desert, he pinned a blank paper to test if he was walking in circles. Finding it again confirms it. |
+| F3 | **Paper on the Cactus** — A man walks up to a cactus, looks at a piece of paper pinned there, and kills himself. | 佢喺沙漠迷路，之前釘咗張白紙落去測試自己係咪兜圈。再見返張紙＝證實咗。 |
 | F4 | **Poisoned Ice Cubes** — Guests at a party all die except one man. | 同 B3。毒喺冰粒度，飲得快嗰個冇事。 |
 | F5 | **The Man in the Elevator** — 佢住 17 樓。落雨嗰日撳到 17；有人同佢一齊撳到 17；晴天又單獨一人就撳 11 樓行樓梯上。 | 佢好矮，淨係撳到 11。落雨有遮可以撳高啲，有人就叫人幫手撳。 |
 | F6 | **Time for Bed** — A man brushes his teeth, turns out the light, goes to bed. Next morning he looks out the window and kills himself. | 同 B2。佢係燈塔看守員。 |
 | F7 | **The Radio** — A man turns on the car radio, listens a few seconds, then kills himself. | 佢係電台 DJ，播住一隻長碟去殺老婆做不在場證明。發現隻碟跳針咗，alibi 冇晒。 |
-| F8 | **Push That Car** — 同 D8 Monopoly。 | — |
-| F9 | **Pool of Water** — A man is found dead in an empty room with a pool of water nearby. | 被冰柱刺死。 |
-| F10 | **Headlights Off** — Two cars drive toward each other with headlights off, no moon, no stars, both black — yet they brake in time. | 日頭嚟嘅，陰天所以見唔到太陽。 |
-| F11 | **Cabin in the Woods** — A man is found dead in a cabin in the woods. | 係飛機 cabin，墜毀喺樹林。 |
-| F12 | **The Hanged Man** — Hanged in an empty room, nothing to climb on. | 同 A6。踩住冰。 |
-| F13 | **"This Man Is My Son"** — The surgeon refuses to operate, saying the patient is their son — but the surgeon is not the father. | 個外科醫生係佢阿媽。（呢題本身係一個性別偏見測試） |
-| F14 | **The Kiss** — A man kisses his daughter, then regrets it. | 佢係 King Midas，掂到咩都變金。 |
-| F15 | **Backpack** — A man lies face down dead in a field, wearing a backpack. | 降落傘冇開到。 |
-| F16 | **Little Susie** — Susie's parents told her never to open the basement door. Why? | 佢一世人住喺地牢，父母唔想佢知道外面有世界。 |
-| F17 | **Friend on a Plane** — A man greets his friend boarding the plane and is immediately arrested. | 佢講咗 "Hi, Jack!"（hijack）。 |
-| F18 | **The Yacht** — Several corpses float in the water near a yacht. | 全船人落水游水，冇人放低條梯，全部浸死。 |
-| F19 | **Photo with Grandfather** — A woman is photographed with her grandfather; they've never met and neither knows the relation. | 佢係醫科生，同教學用嘅骸骨影相——嗰副骸骨係佢爺爺捐嘅。 |
-| F20 | **The Drawing** — A woman finishes a drawing, then kills herself. | 佢畫緊家族樹，畫完發現自己係亂倫嘅產物。 |
-| F21 | **The Stranger** — A man finds his wife dead and a stranger in the room. | 老婆難產死咗，個「陌生人」係啱啱出世嘅 BB。 |
-| F22 | **The New Shoes** — A woman buys new shoes in the morning, goes to work at night, and dies at work. | 高踭鞋令佢高咗。佢喺馬戲團做飛刀表演嘅活靶。 |
+| F8 | **Pool of Water** — A man is found dead in an empty room with a pool of water nearby. | 被冰柱刺死，冰溶咗剩返攤水。 |
+| F9 | **Headlights Off** — Two cars drive toward each other with headlights off, no moon, no stars, both black — yet they brake in time. | 日頭嚟嘅，陰天所以見唔到太陽同星。 |
+| F10 | **Cabin in the Woods** — A man is found dead in a cabin in the woods. | 係飛機 cabin，墜毀喺樹林。 |
+| F11 | **The Hanged Man** — Hanged in an empty room, nothing to climb on. | 同 A6。踩住一嚿冰，冰溶晒。 |
+| F12 | **This Man Is My Son** — The surgeon refuses to operate, saying the patient is their son — but the surgeon is not the father. | 個外科醫生係佢阿媽。（呢題本身係一個性別偏見測試多過推理題） |
+| F13 | **The Kiss** — A man kisses his daughter, then regrets it. | 佢係 King Midas，掂到咩都變金。 |
+| F14 | **Backpack** — A man lies face down dead in a field, wearing a backpack. | 降落傘冇開到。 |
+| F15 | **Little Susie** — Susie's parents told her never to open the basement door. Why? | 佢一世人住喺地牢，父母唔想佢知道外面有個世界。 |
+| F16 | **Friend on a Plane** — A man greets his friend boarding the plane and is immediately arrested. | 佢講咗 "Hi, Jack!"（hijack）。 |
+| F17 | **The Yacht** — Several corpses float in the water near a yacht. | 全船人落水游水，冇人放低條梯，全部浸死。 |
+| F18 | **Photo with Grandfather** — A woman is photographed with her grandfather; they've never met and neither knows the relation. | 佢係醫科生，同教學用嘅骸骨影相——嗰副骸骨係佢爺爺捐嘅。 |
+| F19 | **The Drawing** — A woman finishes a drawing, then kills herself. | 佢畫緊家族樹，畫完發現自己係亂倫嘅產物。 |
+| F20 | **The Stranger** — A man finds his wife dead and a stranger in the room. | 老婆難產死咗，個「陌生人」係啱啱出世嘅 BB。 |
+| F21 | **新鞋**（原 The New Shoes） | 已譯成中文，見下一節。 |
+| F22 | **Jack and Judy** — Jack and Judy were lying on the floor dead. There was a puddle of water and broken glass on the floor. | 佢哋係金魚，魚缸被貓撞跌咗。（經典版本叫 Jack & Jill） |
+
+> 註：**Push That Car**（Monopoly）唔喺呢組，佢係 D8 推車。
 
 ---
 
-## G. 有湯面、未搵到湯底
+## G. 改寫後（原本得湯面、冇湯底）
 
-由 [yesnogame.net](https://yesnogame.net/en)（233 題目錄）抽出，該站列表頁唔顯示答案。留低做**改編素材**——湯面本身好，我哋可以自己寫湯底。
+呢批原本由 [yesnogame.net](https://yesnogame.net/en) 抽返嚟，只有湯面冇答案。
+留低嗰三條已經譯成中文並補回湯底，其餘七條（G1・G2・G3・G4・G5・G7・G9）移除咗。
 
-1. **A Ballroom** — A couple enters a grand ballroom only to find the occupants are dead. No crime has been committed. The couple is not concerned.
-2. **A Weird Bus Stop** — On a beautiful road there's a fully operational bus stop. However, no public transport stops there.
-3. **Try Hard** — A salesman tries too hard to get a sale and as a result ends up dying.
-4. **Unopened Package** — A man is found dead in a field. Lying next to him is an unopened package.（大機會係降落傘，同 F15 同源）
-5. **Death: Delayed** — Helen never thought that her decision to travel by plane would save her life.
-6. **Jack and Judy Are Dead** — Jack and Judy were lying on the floor dead. There was a puddle of water and broken glass.（經典版本 Jack & Jill 係金魚，魚缸被貓撞爛）
-7. **Binded** — One of Michael's dearest loved ones binds him to a chair, but Michael doesn't mind.
-8. **Fatal Shot** — A hunter aimed his gun carefully and fired. Seconds later he realized his mistake. Minutes later he was dead.
-9. **A Stranger in the Car** — A couple ran out of gas. The man went for help. On return he found his wife dead and a stranger in the locked, undamaged car with windows closed.（同 F21 同源機會大）
-10. **Sweet Dreams** — Matthew keeps reading a bedtime story to his son despite the blackout.（經典答案：佢係盲人，讀緊點字）
+**G6. 綁喺櫈度**（原 Binded）
+- 湯面：小明最錫佢嗰個人，將佢綁咗喺張櫈度。小明一啲都唔介意。
+- 湯底：小明係個 BB，阿媽將佢綁喺 BB 餐椅度餵嘢食。
+- 備註：原文冇公開湯底，呢個係自己寫嘅簡單版。
 
-> 括號入面嘅推測係我按經典版本推嘅，**未經來源證實**，唔好當定案。
+**G8. 車入面嘅陌生人**（原 A Stranger in the Car）
+- 湯面：一對夫婦揸車途中冇晒油。丈夫落車去搵油。返到嚟，太太死咗，而車入面多咗一個陌生人。車門反鎖、車窗閂實、車身完好無缺。
+- 湯底：太太有咗身孕。丈夫走開嗰陣佢分娩，難產死咗。嗰個「陌生人」係啱啱出世嘅嬰兒。
+
+**G10. 十樓**（原 An Uncommon Man）
+- 湯面：一個男人住十樓。每朝出門，佢搭𨋢落地下。夜晚返嚟，佢撳七樓。
+- 湯底：佢好矮，撳唔到十樓個掣，最高只夠得到七樓，之後行樓梯上返。
+- 備註：原文湯面尾巴有「然後行三層樓梯上去」，太提示，已經移入湯底。
+
+**F21. 新鞋**（原 The New Shoes）
+- 湯面：一個女人朝早買咗對新鞋。夜晚返工，返到工做冇耐就死咗。
+- 湯底：對高踭鞋令佢高咗少少。佢喺馬戲團做飛刀表演嘅活靶，飛刀手照住平時嘅高度掟，掟中咗佢。
 
 ---
 
 ## Review 狀態
 
-99 題已 review 74 題。已移除嗰批喺 [tailstory.html](tailstory.html) 預設隱藏，冇真係刪走，撳「已移除」pill 揀得返。
+99 題揀完 87 題，**留低 31 題**。已移除嗰批仍然存喺 [tailstory.html](tailstory.html) 嘅 `ST` 表
+（改返主意揀得返），但唔會出現喺頁面。頁面亦唔顯示狀態統計。
 
-| 狀態 | 數 | 題 |
-|---|---|---|
-| 已移除 | 59 | A3・A4・A7／B4・B5・B6・B7・B8・B10・B11・B12／C6・C9・C10・C11・C12・C14・C15・C16・C17・C20・C21・C22・C23・C24・C25／D3・D4・D5・D6・D7・D8／E1・E2・E4・E5・E6・E7・E8・E9・E10／F1・F2・F3・F5・F7・F8・F9・F10・F11・F12・F13・F14・F15・F16・F17・F18・F19・F22 |
-| 待定 | 9 | A2 火車・A6 死喺房間正中央嘅男人・A9 少女被謀殺・B2 報紙・B3 冰粒・C3 滴水聲・C8 滿地木屑・C18 外賣・D1 酒吧 |
-| 要改 | 6 | A8 紅眼睛・B1 水草・C5 魔術師・C7 葬禮姊妹・C19 生日・F6 Time for Bed |
-| 未 review | 25 | A1・A5／B9・B13・B14／C1・C2・C4・C13・C26／D2／E3／F4・F20・F21／G1–G10 |
-
-### 要改嘅具體理由
-
-| 題 | 理由 |
+| 狀態 | 數 |
 |---|---|
-| A8 紅眼睛 | 題目需更改，未有結局 |
-| B1 水草 | 需 craft 題目 |
-| C5 魔術師 | 需改題目 |
-| C7 葬禮姊妹 | 題目透露過多資訊 |
-| C18 外賣 | 待定，要修改 |
-| C19 生日 | 要修改 |
-| F6 Time for Bed | 修改 |
+| 留低（可用） | 31 |
+| 已移除 | 68 |
 
-### 要確認
+留低嗰 31 題入面：**待定 9・要改 6・已改 4・未 review 12**。
 
-**B3 冰粒** — 只寫咗「不像揭尾故」，冇講 onhold 定 remove。A9 少女被謀殺同一個理由標咗 onhold，
-所以暫時當**待定**處理。要 remove 嘅話講聲。
+| 分項 | 題 |
+|---|---|
+| 待定 | A2 火車・A6 死喺房間正中央嘅男人・A9 少女被謀殺・B2 報紙・B3 冰粒・C3 滴水聲・C8 滿地木屑・C18 外賣・D1 酒吧 |
+| 要改 | A8 紅眼睛（未有結局）・B1 水草（需 craft）・C5 魔術師・C7 葬禮姊妹（透露過多）・C19 生日・F6 Time for Bed |
+| 已改 | F21 新鞋・G6 綁喺櫈度・G8 車入面嘅陌生人・G10 十樓 |
+| 未 review | A1 人聲・A5 只有公主逃走咗・B9 郵票・B13 半根火柴・B14 簽名・C1 海龜湯・C2 牛食草・C4 三兄弟・C13 對面大樓・C26 夜半敲門・D2 行花園・E3 電話響咗 |
+
+**B3 冰粒** 仍待確認：verdict 只寫咗「不像揭尾故」，冇講 onhold 定 remove，暫按待定處理。
 
 ---
 
-## 撞題 · review 後嘅狀況
+## 撞題
 
-| 撞乜 | 狀況 |
+刪剩一條嘅組自動解散。仲要處理嘅得返五組：
+
+| 撞乜 | 剩返 |
 |---|---|
-| 感官復明 | ✅ 解決 — A3 刪，剩 A2 |
-| 船難食人 | ✅ 解決 — F2 刪，剩 C1（未 review） |
-| 降落傘 | ✅ 解決 — F14 刪，剩 G4（未 review） |
-| 矮人撳掣 | ✅ 解決 — F5 刪，剩 G10（未 review） |
-| 偷窺被鎖定 | ✅ 解決 — C22 刪，剩 C13（未 review） |
-| 夢遊 | 兩條都刪咗（C12・E9） |
-| 冰溶咗 | ⚠️ 未解決 — 剩三條：A6・B3（待定）＋ F4（未 review） |
-| 燈塔 | ⚠️ 未解決 — B2 待定 ／ F6 要改，兩條都仲在 |
-| 難產陌生人 | ⚠️ F20・G8 都未 review |
-| 家宅入侵 | A7・C21 刪咗，剩 C3・C18，兩條都待定 |
+| 冰溶咗 | A6 死喺房間正中央嘅男人・B3 冰粒 |
+| 感官誤判 | A2 火車・C8 滿地木屑 |
+| 船難食人 | C1 海龜湯・C19 生日 |
+| 燈塔 | B2 報紙・F6 Time for Bed |
+| 家宅入侵 | C3 滴水聲・C18 外賣 |
+
+已解散：感官復明・矮人撳掣・降落傘・難產陌生人・偷窺被鎖定・夢遊。
 
 ---
 
 ## 已定
 
-1. **內容照用，唔重寫**（「要改」嗰 6 題除外）。
+1. **內容照用，唔重寫**（個別點名要改嘅除外）。
 2. **唔計分。** 原玩法冇勝負判定，維持原樣。
-3. **難度用 1–10 ＋ 預估解題分鐘。** G 組全部、F15、F22 用 yesnogame 實測數據；其餘為估算。
-   > 難度數值同 review 狀態都只存放喺 [tailstory.html](tailstory.html)（`META` / `ST` 表），
+3. **難度用 1–10 ＋ 預估解題分鐘。** 部分用 yesnogame 實測數據，其餘為估算。
+   > 難度數值同 review 狀態只存放喺 [tailstory.html](tailstory.html)（`META` / `ST` 表），
    > 唔喺呢份文件重複，避免兩邊各改一半。
 
 ---
