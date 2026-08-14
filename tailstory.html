@@ -111,6 +111,7 @@
         font-size: 0.78rem;
         color: var(--ink-soft);
       }
+      .acts { display: inline-flex; gap: 1rem; }
       .toggle {
         border: 0;
         background: none;
@@ -157,16 +158,15 @@
         border-radius: var(--pill);
         padding: 0.14rem 0.55rem;
       }
+      .tag.dup {
+        background: transparent;
+        border: 1px solid var(--line);
+      }
       .id {
         flex: 0 0 auto;
         font-size: 0.72rem;
         color: var(--ink-soft);
         opacity: 0.6;
-      }
-      .tag.dup {
-        background: transparent;
-        border: 1px solid var(--line);
-        color: var(--ink-soft);
       }
 
       /* difficulty meter */
@@ -186,30 +186,6 @@
         background: var(--line);
       }
       .meter i.on { background: color-mix(in srgb, var(--accent) 70%, var(--line)); }
-
-      .acts { display: inline-flex; gap: 1rem; }
-
-      .pills.stats { margin-top: 0.4rem; }
-
-      /* review status */
-      .tag.st {
-        background: transparent;
-        border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
-        color: var(--accent-deep);
-      }
-      .card.st-out { opacity: 0.5; }
-      .card.st-out h2 { text-decoration: line-through; text-decoration-color: var(--line); }
-      .card.st-out .tag.st { border-color: var(--line); color: var(--ink-soft); }
-      .verdict {
-        margin: 0 0 0.75rem;
-        font-size: 0.82rem;
-        line-height: 1.7;
-        color: var(--accent-deep);
-        background: var(--accent-soft);
-        border-radius: var(--radius-sm);
-        padding: 0.45rem 0.7rem;
-      }
-      .card.st-out .verdict { background: none; color: var(--ink-soft); padding: 0; }
 
       .soup {
         margin: 0;
@@ -262,8 +238,6 @@
       }
       .note::before { content: "◆ "; color: var(--accent); opacity: 0.5; }
 
-      .card.todo .base p { color: var(--ink-soft); font-style: italic; }
-
       /* ---------- closing notes ---------- */
       .memo {
         margin-top: 2.75rem;
@@ -276,37 +250,22 @@
         box-shadow: inset 0 1px 0 var(--glass-rim);
       }
       .memo h2 { margin: 0 0 0.9rem; font-size: 1rem; font-weight: 600; }
-      .memo .lead {
-        margin: -0.4rem 0 0.9rem;
-        font-size: 0.84rem;
-        line-height: 1.75;
-        color: var(--ink-soft);
-      }
-      .memo ol { margin: 0; padding-left: 1.15rem; }
-      .memo li {
+      .memo p {
+        margin: 0 0 0.7rem;
         font-size: 0.88rem;
         line-height: 1.8;
         color: var(--ink-soft);
-        margin-bottom: 0.7rem;
       }
-      .memo li b { color: var(--ink); font-weight: 600; }
+      .memo p b { color: var(--ink); font-weight: 600; }
       .memo .src {
         margin: 1.2rem 0 0;
         padding-top: 1rem;
         border-top: 1px solid var(--line);
         font-size: 0.78rem;
         line-height: 1.9;
-        color: var(--ink-soft);
       }
       .memo .src a { color: var(--ink-soft); }
       .memo .src a:hover { color: var(--accent); }
-
-      .empty {
-        text-align: center;
-        color: var(--ink-soft);
-        font-size: 0.88rem;
-        padding: 3rem 0;
-      }
     </style>
   </head>
   <body>
@@ -317,7 +276,7 @@
         <h1>揭尾故</h1>
         <p class="sub">
           海龜湯 · Situation Puzzle · Yes-No Puzzle。<br />
-          Review 篩剩嘅題。「待定」同「要改」嘅卡會標出嚟。
+          收集 99 題，篩剩 18 題。
         </p>
       </header>
 
@@ -342,20 +301,18 @@
 
       <section class="memo">
         <h2>撞題</h2>
-        <p class="lead">同結構／同手法。同一場出兩題同組，第二題即刻被破。刪剩一條嘅組已經唔再標。</p>
-        <ol>
-          <li><b>冰溶咗</b> — A6 死喺房間正中央嘅男人・B3 冰粒</li>
-          <li><b>感官誤判</b> — A2 火車・C8 滿地木屑</li>
-          <li><b>船難食人</b> — C1 海龜湯・C19 生日</li>
-          <li><b>燈塔</b> — B2 報紙・F6 Time for Bed</li>
-          <li><b>家宅入侵</b> — C3 滴水聲・C18 外賣</li>
-        </ol>
+        <p>
+          刪剩得一組同結構嘅題：<b>船難食人</b> — C1 海龜湯・C19 生日。同一場唔好兩題都出，
+          出咗其中一題，另一題即刻被破。
+        </p>
 
         <h2 style="margin-top:1.6rem">已定</h2>
-        <ol>
-          <li><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</li>
-          <li><b>難度 1–10 ＋ 預估分鐘。</b>部分用 yesnogame 實測數據，其餘估算。可按「難度排序」重排。</li>
-        </ol>
+        <p><b>唔計分。</b>原玩法冇勝負判定，維持原樣。</p>
+        <p><b>難度 1–10 ＋ 預估分鐘。</b>部分用 yesnogame 實測數據，其餘估算。可按「難度排序」重排。</p>
+        <p>
+          完整 99 題收集紀錄（連已移除嗰 81 題）留喺
+          <a href="TAILSTORY-PUZZLES.md">TAILSTORY-PUZZLES.md</a>。
+        </p>
 
         <p class="src">
           來源：
@@ -378,152 +335,56 @@
         { k: 'horror',  label: '恐怖' },
         { k: 'funny',   label: '搞笑' },
         { k: 'hard',    label: '高難度' },
-        { k: 'classic', label: '英文經典' },
-        { k: 'open',    label: '未有湯底' },
-        { k: 'dup',     label: '撞題' },
       ];
-
       const LABEL = Object.fromEntries(CATS.map(c => [c.k, c.label]));
 
-      // 難度 1–10 ＋ 預估解題分鐘。G 組全部、F15、F22 用 yesnogame 實測數據，
-      // 其餘為估算（依推理跳躍次數、所需背景知識、湯面誤導程度）。
+      // 難度 1–10 ＋ 預估解題分鐘。
       const META = {
-        A1:[1,3],  A2:[3,6],  A3:[3,6],  A4:[2,5],  A5:[3,6],  A6:[3,7],  A7:[2,5],  A8:[3,6],  A9:[2,4],
-        B1:[5,11], B2:[6,13], B3:[4,9],  B4:[6,13], B5:[6,14], B6:[4,9],  B7:[5,11], B8:[5,10],
-        B9:[5,10], B10:[7,15],B11:[6,12],B12:[5,11],B13:[6,13],B14:[4,8],
-        C1:[5,12], C2:[5,11], C3:[4,9],  C4:[6,13], C5:[5,11], C6:[6,13], C7:[5,10], C8:[5,11],
-        C9:[3,7],  C10:[5,11],C11:[6,13],C12:[7,15],C13:[4,9], C14:[7,15],C15:[6,13],C16:[6,13],
-        C17:[5,11],C18:[3,7], C19:[6,12],C20:[5,10],C21:[4,8], C22:[5,10],C23:[4,8], C24:[5,11],
-        C25:[5,10],C26:[4,9],
-        D1:[4,8],  D2:[3,6],  D3:[2,4],  D4:[2,4],  D5:[2,4],  D6:[2,4],  D7:[3,5],  D8:[4,8],
-        E1:[9,20], E2:[7,15], E3:[7,14], E4:[10,25],E5:[8,17], E6:[6,13], E7:[7,14], E8:[7,15],
-        E9:[7,14], E10:[6,12],
-        F1:[5,10], F2:[5,12], F3:[6,13], F4:[4,9],  F5:[5,11], F6:[6,13], F7:[8,17], F8:[4,8],
-        F9:[3,7],  F10:[4,8], F11:[3,7], F12:[3,6], F13:[6,12],F14:[2,5], F15:[7,14],F16:[6,12],
-        F17:[4,8], F18:[7,14],F19:[6,13],F20:[4,9], F21:[7,15],F22:[5,11],
-        G1:[5,9],  G2:[7,18], G3:[4,9],  G4:[4,9],  G5:[6,14], G6:[2,5],  G7:[5,9],  G8:[5,9],
-        G9:[3,4],  G10:[4,9],
-        // 改寫後：G6 簡化、G8 補湯底、G10 抽起提示
+        A1:[1,3], A5:[3,6], G6:[2,5], G10:[4,9],
+        B9:[5,10], B13:[6,13], B14:[4,8], G8:[5,9], F21:[7,15],
+        C1:[5,12], C2:[5,11], C4:[6,13], C7:[7,15], C13:[4,9], C19:[6,12], C26:[4,9],
+        D2:[3,6],
+        E3:[7,14],
       };
 
-      // 同結構／同手法嘅題。同一場出兩題同組 = 第二題即刻被破。
-      const DUP = {
-        '冰溶咗':      ['A6','F11','B3','F4','F8'],
-        '感官誤判':    ['A2','A3','B4','B12','C8'],
-        '船難食人':    ['C1','F2','C19','E6'],
-        '燈塔':        ['B2','F6'],
-        '矮人撳掣':    ['F5','G10'],
-        '降落傘':      ['F14','G4'],
-        '難產陌生人':  ['F20','G8'],
-        '偷窺被鎖定':  ['C13','C22'],
-        '夢遊':        ['C12','E9'],
-        '家宅入侵':    ['A7','C3','C18','C21'],
-      };
-      // 只有仲有兩條或以上未移除，先算撞題——剩返一條就冇得撞。
+      // 同結構／同手法，同一場唔好一齊出。
+      const DUP = { '船難食人': ['C1', 'C19'] };
       const DUPOF = {};
-
-      // Review 狀態。out = 已移除（預設隱藏，可還原）；hold = 待定；rework = 要改。
-      // 冇列出嘅 = 未 review。
-      const ST = {
-        A2:['hold'], A3:['out'], A4:['out'], A6:['hold'], A7:['out'],
-        A8:['rework','題目需更改，未有結局'], A9:['hold','唔似揭尾故'],
-        B1:['rework','需 craft 題目'], B2:['hold'], B3:['hold','唔似揭尾故'],
-        B4:['out'], B5:['out'], B6:['out'], B7:['out'], B8:['out'],
-        B10:['out'], B11:['out'], B12:['out'],
-        C3:['hold'], C5:['rework','需改題目'], C6:['out'],
-        C7:['rework','題目透露過多資訊'], C8:['hold'], C9:['out'], C10:['out'],
-        C11:['out'], C12:['out'], C14:['out'], C15:['out'], C16:['out'], C17:['out'],
-        C18:['hold','要修改'], C19:['rework','要修改'], C20:['out'], C21:['out'],
-        C22:['out'], C23:['out'], C24:['out'], C25:['out'],
-        D1:['hold'], D3:['out'], D4:['out'], D5:['out'], D6:['out'], D7:['out'], D8:['out'],
-        E1:['out'], E2:['out'], E4:['out'], E5:['out'], E6:['out'], E7:['out'],
-        E8:['out'], E9:['out'], E10:['out'],
-        F1:['out'], F2:['out'], F3:['out'], F5:['out'], F6:['rework','修改'],
-        F4:['out'], F7:['out'], F8:['out'], F9:['out'], F10:['out'], F11:['out'],
-        F12:['out'], F13:['out'], F14:['out'], F15:['out'], F16:['out'], F17:['out'],
-        F18:['out'], F19:['out'], F20:['out'], F22:['out'],
-        F21:['ok','已譯成中文'],
-        G1:['out'], G2:['out'], G3:['out'], G4:['out'], G5:['out'], G7:['out'], G9:['out'],
-        G6:['ok','已譯成中文，簡化'], G8:['ok','已譯成中文，補回湯底'],
-        G10:['ok','已譯成中文；「行三層樓梯」移入湯底'],
-      };
-      const STLABEL = { hold:'待定', rework:'要改', out:'已移除', new:'', ok:'已改' };
-      const stOf = id => (ST[id] ? ST[id][0] : 'new');
+      Object.entries(DUP).forEach(([g, ids]) => ids.forEach(id => { DUPOF[id] = g; }));
 
       const P = [
         // ---------------- 暖場 ----------------
         { id:'A1', c:'warm', t:'人聲',
           q:'隔壁房間傳來好多人嘅聲音，時而騷動時而歡笑，但打開門一睇，只有一個人。',
           a:'隔壁嗰個人喺度睇電視。' },
-        { id:'A2', c:'warm', t:'火車',
-          q:'一個男人搭火車去隔壁鎮睇病，睇完病都好晒。回程一樣搭火車，途中經過隧道，佢跳車自殺。',
-          a:'佢原本係盲人，做手術重見光明。火車入隧道時四周漆黑，佢以為自己又盲返，絕望之下跳車。' },
-        { id:'A3', c:'warm', t:'雨夜廣播',
-          q:'滂沱大雨嘅夜晚，男子揸車聽廣播。行雷閃電之後，廣播中斷咗幾秒，佢隨即跳車自殺。',
-          a:'佢原本係聾人，啱啱醫好。廣播中斷嗰刻，佢以為自己又聾返，絕望自殺。',
-          n:'同「火車」係同一結構嘅變體，兩題唔好同一場出。' },
-        { id:'A4', c:'warm', t:'睡美人',
-          q:'公主被詛咒長眠不醒，王子一吻將佢喚醒。但公主醒返之後，將王子殺咗。',
-          a:'公主瞓咗好耐已經老咗，王子仲後生。公主驚被拋棄，索性先落手。' },
         { id:'A5', c:'warm', t:'只有公主逃走咗',
           q:'王子帶公主逃出鬼堡。魔鬼話：「白色代表天使，著白色連身裙嘅公主唔可以通過，必須死。」結果王子死咗，公主逃出。',
           a:'公主殺咗王子，用血將白裙染紅。' },
-        { id:'A6', c:'warm', t:'死喺房間正中央嘅男人',
-          q:'男子吊喺半空套住繩索已經死亡，周圍冇任何嘢可以踩，四面牆都掂唔到，房門反鎖。',
-          a:'佢踩住一大嚿冰上吊，冰溶咗就冇晒痕跡。' },
-        { id:'A7', c:'warm', t:'買飲料',
-          q:'小美同朋友傾偈到凌晨兩點。朋友喺床底下攞嘢嗰陣，突然堅持要小美陪佢出去買飲料，仲強調一定要飲到某種飲料。',
-          a:'朋友喺床底下見到有個陌生人，佢做咗個割喉嘅動作。朋友為咗保命，藉故帶小美離開房間。' },
-        { id:'A8', c:'warm', t:'紅眼睛',
-          q:'女子租嘅屋有個洞，每次望入去都見到一片紅色，佢以為隔壁係間全紅色嘅房。有日佢忍唔住問房東，隔壁住咩人。',
-          a:'房東話隔壁住咗個有紅眼症嘅人。佢望過去嗰陣，鄰居同時望返佢——嗰片紅色係鄰居隻眼。' },
-        { id:'A9', c:'warm', t:'少女被謀殺',
-          q:'開學第一日，少女被謀殺。警方問四位老師朝早八點做緊乜。A：揸緊車返學，遲到咗。B：喺度改英文卷。C：睇報紙。D：喺辦公室同太太傾偈。警方即刻拉人。',
-          a:'兇手係 B。開學第一日邊有卷改。' },
+        { id:'G6', c:'warm', t:'綁喺櫈度',
+          q:'小明最錫佢嗰個人，將佢綁咗喺張櫈度。小明一啲都唔介意。',
+          a:'小明係個 BB，阿媽將佢綁喺 BB 餐椅度餵嘢食。',
+          n:'原文（Binded）冇公開湯底，呢個湯底係自己寫嘅。' },
+        { id:'G10', c:'warm', t:'十樓',
+          q:'一個男人住十樓。每朝出門，佢搭𨋢落地下。夜晚返嚟，佢撳七樓。',
+          a:'佢好矮，撳唔到十樓個掣，最高只夠得到七樓，之後行樓梯上返。',
+          n:'原文尾巴有「然後行三層樓梯上去」，太提示，已經移入湯底。' },
 
         // ---------------- 懸疑 ----------------
-        { id:'B1', c:'mystery', t:'水草',
-          q:'男仔同女友喺湖邊散步，女友跌咗落湖。男仔跳落水搵，搵唔到。幾年後佢重返舊地，見到個老人喺度釣魚，釣上嚟啲魚身上一條水草都冇。男仔問點解，老人答：「呢條河從來冇生過水草。」男仔聽完跳落河自殺。',
-          a:'當年佢喺水底摸到一撮嘢，以為係水草放咗手——嗰啲其實係女友嘅頭髮。差一步就救到。' },
-        { id:'B2', c:'mystery', t:'報紙',
-          q:'天氣晴朗，一名男子企喺一座好高嘅建築物下面睇報紙。睇到一條新聞之後，佢突然衝上頂層，開著盞燈，然後跳落嚟自殺。',
-          a:'佢係燈塔看守員。報紙報導有船因為燈塔冇及時著燈而出事。佢上去著返盞燈，然後畏罪自殺。' },
-        { id:'B3', c:'mystery', t:'冰粒',
-          q:'兩個閨蜜入酒吧，侍應端上兩杯一模一樣嘅飲品。一個飲完冇事，另一個半個鐘後倒地身亡。',
-          a:'毒落咗喺冰粒入面。飲得快嗰個冰未溶，飲得慢嗰個冰溶晒，中毒身亡。' },
-        { id:'B4', c:'mystery', t:'可樂嘅味道',
-          q:'女病人骨折康復出院，屋企擺酒慶祝。哥哥話可樂味有啲怪，父母都話唔對路，但病人飲完話完全正常。當晚病人死喺浴缸。',
-          a:'佢喺醫院治療期間失去咗部分嗅覺同味覺。所以佢一樣聞唔到熱水爐漏煤氣，煤氣中毒死亡。' },
-        { id:'B5', c:'mystery', t:'MSN 頭像',
-          q:'有前科嘅男人啱啱由警局返到屋企（因證據不足釋放）。開 MSN 見到網友個頭像係一套污糟嘅黑色西裝，佢即刻衝出去買咗套白色西裝。',
-          a:'佢係職業殺手，網友係中間人。黑西裝頭像＝有新任務。佢每次做嘢都著白西裝（易見血跡），做完即棄，所以每次都要買過。' },
-        { id:'B6', c:'mystery', t:'廁所',
-          q:'醉漢急尿入公園廁所，見到有人攞住地拖打緊掃。對方問：「你睇唔到我打緊掃咩？」第二日佢睇新聞先恍然大悟。',
-          a:'新聞報導一宗姦殺案。攞住「地拖」嗰個就係兇手，佢拖緊嘅係死者屍體。' },
-        { id:'B7', c:'mystery', t:'迷路嘅男孩',
-          q:'男人揸車去機場，喺三岔口見到個男仔蹲喺地下喊。落車問完帶佢搵屋企，揸咗好耐，男仔話見到自己屋企就跳落車。男人發現趕唔切班機，好沮喪，跟住突然標冷汗，之後又欣慰咁笑。',
-          a:'廣播傳嚟嗰班機失事。而佢十年前救過一個出車禍嘅男仔——嗰個男仔嘅靈魂返嚟報恩。' },
-        { id:'B8', c:'mystery', t:'地下酒吧嘅秘密',
-          q:'地下五層嘅酒吧，後生仔焦急咁等緊女友，一路盯住天花板嘅鐘。突然佢攞電話出嚟，狠狠掟落地，喊住大叫救命。',
-          a:'天花板嗰個唔係鐘，係定時炸彈嘅倒數。地下五層冇訊號，通知唔到女友，最後五秒崩潰。' },
         { id:'B9', c:'mystery', t:'郵票',
           q:'一名男人發現自己少貼咗一張郵票，之後就死咗。',
           a:'佢寄咗個定時炸彈畀仇人。郵資不足被退回，炸彈照原定時間喺佢屋企爆炸。' },
-        { id:'B10', c:'mystery', t:'幽會',
-          q:'女人因為老公不斷出軌，決定食藥自殺，留咗遺書畀初戀。初戀飛車趕到，女人未死，兩人纏綿。第二日警察話佢老公死咗，死喺同情婦幽會嘅過程中。',
-          a:'兩支藥樽調換咗。女人食咗嘅係老公收埋嘅春藥，老公同情婦嗰陣攞出嚟嗰支先係毒藥。' },
-        { id:'B11', c:'mystery', t:'消失嘅女孩',
-          q:'女子過馬路時貨車撞埋嚟，一個小女孩衝出嚟推開佢，貨車撞到小女孩引發爆炸。清理現場時發現小女孩神秘失蹤，身世不明。',
-          a:'小女孩係佢將來嘅女兒，返返嚟過去改變命運，爆炸之後返返未來。' },
-        { id:'B12', c:'mystery', t:'眼鏡男',
-          q:'警察喺野外發現一個昏迷嘅人，神情抑鬱嘅眼鏡男，瞓喺一把倒咗喺地下嘅爬梯上面，袋入面有安眠藥樽。',
-          a:'佢重度抑鬱想臥軌自殺。高度近視加攰到眼花，見到「路軌」就瞓低食安眠藥等火車——其實佢瞓緊喺一把倒咗嘅梯上面。' },
         { id:'B13', c:'mystery', t:'半根火柴',
           q:'有人喺沙漠中頭向下死咗，身邊散落住行李箱，手裡緊緊揸住半支火柴。',
           a:'佢哋搭熱氣球途中故障要減重，抽籤決定邊個跳。佢抽中咗嗰半支，連行李一齊掟落嚟。' },
         { id:'B14', c:'mystery', t:'簽名',
           q:'大明星喺簽名會簽完名之後突然死亡。',
           a:'粉絲為咗令個簽名升值——「最後一張簽名」——所以殺咗佢。' },
+        { id:'G8', c:'mystery', t:'車入面嘅陌生人',
+          q:'一對夫婦揸車途中冇晒油。丈夫落車去搵油。返到嚟，太太死咗，而車入面多咗一個陌生人。車門反鎖、車窗閂實、車身完好無缺。',
+          a:'太太有咗身孕。丈夫走開嗰陣佢分娩，難產死咗。嗰個「陌生人」係啱啱出世嘅嬰兒。' },
+        { id:'F21', c:'mystery', t:'新鞋',
+          q:'一個女人朝早買咗對新鞋。夜晚返工，返到工做冇耐就死咗。',
+          a:'對高踭鞋令佢高咗少少。佢喺馬戲團做飛刀表演嘅活靶，飛刀手照住平時嘅高度掟，掟中咗佢。' },
 
         // ---------------- 恐怖 ----------------
         { id:'C1', c:'horror', t:'海龜湯',
@@ -534,270 +395,57 @@
           q:'你獨自住喺郊外，隔籬鄰居係一對養牛嘅夫婦。某晚深夜你被嘈吵聲嘈醒，跟住聽到摔嘢聲、斬嘢聲，同埋「牛食草」嘅聲，一陣之後仲聽到撞門聲。你冇理。第二日發現鄰居女主人慘死喺你屋企門口。',
           a:'老公斬斷咗老婆四肢。冇手冇腳嘅老婆用口咬住地上啲草，一路爬到你門口求救，用頭撞門。你冇開門，佢失血過多死咗。',
           n:'香港／台灣流傳度最高嘅一題。' },
-        { id:'C3', c:'horror', t:'滴水聲 / 瞎子同狗',
-          q:'【版本一】女仔獨自喺屋企瞓，得一隻狗陪。半夜聽到天花板有滴水聲，佢伸手落床邊畀狗舐咗一啖先安心瞓返。第二日發現隻狗被吊死喺天花板，法醫話係半夜死嘅。\n【版本二】盲人獨居養狗，每晚習慣伸手出床邊畀隻狗舐。有朝早鄰居嚟拍門：「你點解畀隻狗喺樓梯間過咗成晚？」盲人諗咗一陣就狂嘔。',
-          a:'舐佢手嗰個唔係狗，係兇手／賊。滴水聲係狗血。' },
         { id:'C4', c:'horror', t:'三兄弟',
           q:'以前有三兄弟，大哥同二哥係孖生，三兄弟感情好好，成日一齊瞓。大哥病死之後，三弟殺咗二哥。點解？',
           a:'三弟有精神病，接受唔到大哥死。佢將二哥劏成左右兩半，一半放左邊一半放右邊，咁瞓落去就好似大哥仲喺度。' },
-        { id:'C5', c:'horror', t:'魔術師',
-          q:'小明好崇拜爸爸。有日小明將媽媽殺咗，同爸爸講咗一句話，爸爸就自殺。',
-          a:'爸爸係魔術師，表演過將人切開再駁返。小明以為係真嘅，趁爸爸唔喺屋企攞媽媽練習，真係切碎咗佢。爸爸返到屋企，小明話：「你變返媽媽出嚟啦。」' },
-        { id:'C6', c:'horror', t:'鎖匙',
-          q:'保險推銷員收工後見到路邊有個小女孩喊，行埋去發現佢頸上掛住一串鎖匙，於是上前安慰。第二日警方發現小女孩赤裸死喺街邊。',
-          a:'推銷員為咗做生意殺咗個女仔，剝光佢衫證明係他殺，仲攞走串鎖匙。父母驚有人有鎖匙入屋，就會買保險。' },
         { id:'C7', c:'horror', t:'葬禮姊妹',
-          q:'媽媽過身，姊妹兩個去出殯。妹妹喺葬禮上見到一個男仔，一見鍾情。葬禮之後男仔消失無蹤，點都搵唔返。一個月後，妹妹殺咗家姐。',
-          a:'妹妹想再辦一次葬禮，希望再見到嗰個男仔。' },
-        { id:'C8', c:'horror', t:'滿地木屑',
-          q:'窮困小鎮住住兩個高度相近嘅侏儒，其中一個係盲人。馬戲團請侏儒，越矮錄取機會越高。第二日發現盲侏儒陳屍屋企，身邊散落一地木屑。',
-          a:'另一個侏儒半夜將佢屋企所有傢俬腳鋸短。盲侏儒朝早摸乜都變矮咗，以為自己長高咗，絕望自殺。' },
-        { id:'C9', c:'horror', t:'死於心臟病',
-          q:'花匠同女友傾緊一單碎屍案。女友話想睇下佢後花園啲花，花匠話啲花未開好。傍晚女友偷偷入咗花園，睇完之後突發心臟病死亡。',
-          a:'花匠一直用人體內臟淋花。' },
-        { id:'C10', c:'horror', t:'媽媽嘅手',
-          q:'小明每晚要揸住媽媽隻手先瞓得著。有人發現成家人都死晒：爸爸被斬成肉醬、媽媽死咗、小明都死咗，手裡抱住一條血淋淋嘅手臂。',
-          a:'歹徒入屋殺人。襲擊小明時，小明以為係媽媽隻手，死揸唔放。歹徒斬咗自己隻手臂先走得甩，小明活活嚇死。' },
-        { id:'C11', c:'horror', t:'胖子',
-          q:'胖子去新朋友屋企聚會，全程淨係食嘢唔理人。上到冬瓜炒肉嗰陣佢漲到唔得，去咗廁所。當晚聚會有人被謀殺。',
-          a:'胖子個花名叫「冬瓜」。佢喺廁所聽到隔籬個女人講「冬瓜真係垃圾」，以為講緊佢，於是殺咗佢。' },
-        { id:'C12', c:'horror', t:'綠衫',
-          q:'退伍老兵夜晚起身去廁所，發現老伴唔喺床，枕頭跌咗喺地板。入到廁所見到廁板上有件好細嘅綠色衫，當場嚇死。',
-          a:'老兵有夢遊症，服役時試過夢遊用枕頭焗死戰友再肢解，得返件綠色軍裝。嗰日老伴喺廁所織緊件綠色小軍裝畀個仔，唔記得咗喺度。老兵以為自己又殺咗屋企人。' },
+          q:'媽媽過身，姊妹兩個去出殯。一個月後，家姐都死咗。',
+          a:'妹妹喺葬禮上見到一個男仔，一見鍾情，但葬禮之後佢消失無蹤，點都搵唔返。妹妹想再辦一次葬禮，希望再見到嗰個人，所以殺咗家姐。',
+          n:'原版湯面講晒個男仔同一見鍾情，等於送答案。已收窄到淨係講兩次死亡。' },
         { id:'C13', c:'horror', t:'對面大樓',
           q:'小明見到對面大樓有人被殺，兇手望住佢，用手指由下向上點。小明嚇死咗。',
           a:'兇手喺度數樓層，確定小明住幾多樓，打算上嚟滅口。' },
-        { id:'C14', c:'horror', t:'4 月 6 日',
-          q:'賭鬼嘅遺孀執到個仔本舊日記，寫住：「4 月 6 日，爸爸身上生咗好多蝨，我趁佢瞓著捉咗幾隻，好好玩。」女人睇完精神失常。',
-          a:'老公同人賭邊個身上蝨多，賭注係全副身家同條命。4 月 7 日佢爭一隻蝨輸咗，賠上性命。個仔嗰個天真舉動間接害死老豆。' },
-        { id:'C15', c:'horror', t:'紅色蝴蝶結',
-          q:'老師幫女學生綁咗個紅色蝴蝶結。結果一個男仔被女仔嘅爸爸殺死，定性為情殺。',
-          a:'女仔媽媽同嗰個男仔有外遇，約定用「女兒綁紅蝴蝶結」做暗號，代表今晚可以嚟搵佢。老師唔知情綁咗，男仔照嚟，被爸爸撞破。' },
-        { id:'C16', c:'horror', t:'海員同醫生',
-          q:'海員同一個做醫學實驗嘅女實驗員結婚。婚後冇耐，女實驗員精神失常。',
-          a:'海員經歷過海難，被困海上時飲尿、食船艙老鼠求生。有日老婆潛入實驗室，見到佢眼露凶光、口叼住半隻血淋淋嘅活老鼠。' },
-        { id:'C17', c:'horror', t:'蛋糕',
-          q:'媽媽問小明係咪偷食咗蛋糕，小明話冇。媽媽話：「阿姨見到㗎喎。」小明瞬間毛骨悚然。',
-          a:'媽媽殺咗同佢關係唔好嘅阿姨，個頭收埋喺雪櫃用蛋糕遮住。小明半夜偷食蛋糕見過個頭，以為係椰子。媽媽特登咁講，就係要小明知道佢見到嘅唔係椰子。' },
-        { id:'C18', c:'horror', t:'外賣',
-          q:'「你好，你嘅外賣到咗，麻煩開門攞一攞。」「你放門口就得喇。」過咗一陣：「你好，你嘅外賣到咗，麻煩開門攞一攞。」「我唔係話咗……」',
-          a:'獨居者被賊盯上。第一次係假外賣員想呃佢開門，第二次先係真外賣員——把聲唔同，先發現真相。' },
         { id:'C19', c:'horror', t:'生日',
-          q:'今日我生日，請晒所有好朋友嚟。吹完蠟燭之後，我將所有好朋友都殺晒。',
-          a:'我係盲人。以前喺野外被困，同朋友「商議」斬手做糧食。生日吹蠟燭嗰陣聽到啲掌聲——原來當年斬手嘅只有我一個。' },
-        { id:'C20', c:'horror', t:'紅綠燈',
-          q:'綠燈停，紅燈行。「紅燈，紅燈。」我死喺下一個路口。',
-          a:'女人上的士發現司機手上有血，訛稱自己色盲。司機綠燈時開車，女人叫「紅燈」——暴露咗佢分到顏色，即係之前講大話。' },
-        { id:'C21', c:'horror', t:'指紋驗證失敗',
-          q:'「滴！指紋驗證失敗」「滴！指紋驗證失敗」……九次之後，「嗒！指紋驗證成功」。我離死亡唔遠。',
-          a:'老公被殺，兇手斬咗佢十隻手指逐隻試門鎖。第十隻試中。' },
-        { id:'C22', c:'horror', t:'直播',
-          q:'我瞓喺床上睇直播，碌到一個漆黑嘅直播間。直播間越嚟越光，我睇到天花板，然後我死咗。',
-          a:'直播間入面正在殺人。主播開燈逐格照亮——能夠見到天花板，代表主播已經確認咗觀眾嘅位置。' },
-        { id:'C23', c:'horror', t:'室友',
-          q:'清晨我被室友嘅尖叫聲嘈醒，擘大眼之後，我講唔出聲。',
-          a:'室友成日鍾意嚇人。今次佢吊咗喺風扇上面跟住扇葉轉，件衫寫住：「今次，嚇到你哋喇啩！」' },
-        { id:'C24', c:'horror', t:'電梯',
-          q:'媽媽喺後面催我「返學遲到喇」，一路講一路推我入電梯。門閂上之後我覺得唔對路，一回頭，先發現我再返唔到學。',
-          a:'我入咗電梯掛住睇電話，冇撳樓層。媽媽為咗保護我推我入電梯，自己被殺人犯殺咗。電梯冇郁，兇手再開門嗰陣，我見到佢同媽媽具屍體。' },
-        { id:'C25', c:'horror', t:'全家福',
-          q:'小明準備出門口嗰陣，無意中抬頭望咗眼全家福，嗰一刻佢知道自己完咗。',
-          a:'殺人魔入屋殺晒佢全家，小明匿喺床下底逃過一劫。佢望全家福嗰刻意識到——兇手都望過，知道仲爭一個人未死，而家仲喺屋企等緊。' },
+          q:'今日我生日，請晒所有好朋友嚟。吹完蠟燭，四圍響起掌聲。之後我將所有好朋友都殺晒。',
+          a:'我係盲人。以前喺野外被困，朋友話大家一齊斬咗隻手做糧食救我。生日嗰晚聽到掌聲——拍手要兩隻手，原來當年斬手嘅只有我一個。',
+          n:'加咗「掌聲」入湯面先有得推。冇呢句就冇線索。' },
         { id:'C26', c:'horror', t:'夜半敲門',
           q:'有人住喺山頂小屋，半夜聽到拍門聲，開門冇人，瞓返。又拍門，又冇人，如是者幾次。第二日山腳發現一具屍體，警察拉走咗山頂嗰個人。',
           a:'有人身負重傷爬到門口，屋主每次開門都撞返佢落山，反覆幾次，最後氣絕。' },
 
         // ---------------- 搞笑 ----------------
-        { id:'D1', c:'funny', t:'酒吧',
-          q:'一個男人行入酒吧，同酒保要杯水。酒保攞支槍出嚟指住佢。男人講咗句「多謝你」就走咗。',
-          a:'男人打緊思噎想飲水，酒保攞槍嚇佢，嚇到佢唔打得，所以多謝。',
-          n:'英文經典 The Man in the Bar。' },
         { id:'D2', c:'funny', t:'行花園',
           q:'呢日我喺一個好大好大嘅花園度行，突然我停咗喺一個位，然後就死咗，流咗好多好多血。',
           a:'我係隻蚊，喺花園搵緊嘢吸。吸緊血嗰陣被人一巴拍死，肚裡啲血爆晒出嚟。' },
-        { id:'D3', c:'funny', t:'塞滿',
-          q:'我猛力咁塞，全部塞晒入去，直到將你塞到滿為止。',
-          a:'放假要帶嘅書太多，全部塞晒入書包。' },
-        { id:'D4', c:'funny', t:'玩電話',
-          q:'你玩緊電話，偶然望咗眼窗外，見到一張面，你知道自己完咗。',
-          a:'自修堂望到班主任張面喺窗外。' },
-        { id:'D5', c:'funny', t:'無畏之躍',
-          q:'男人由懸崖跌落去，目擊者見到反而露出一絲微笑。',
-          a:'男人係跳傘運動員，目擊者係攝影師，喺度影緊高空跳傘紀錄片。' },
-        { id:'D6', c:'funny', t:'笑',
-          q:'我手刃四人，卻企喺原地歡笑。',
-          a:'打機贏咗，連續淘汰四個隊友。' },
-        { id:'D7', c:'funny', t:'不該問嘅問題',
-          q:'老王去飛髮，剪完問飛髮佬：「你覺得今次剪成點？」飛髮佬愣咗一愣，答咗一句，令老王當場沉默。',
-          a:'飛髮佬話：「我剪嘅係你啲頭髮，唔係你張面呀。」' },
-        { id:'D8', c:'funny', t:'推車',
-          q:'一個男人推住架車，一路推到一間酒店門口，畀咗筆錢個酒店老闆，然後推架車走。',
-          a:'佢哋玩緊 Monopoly。佢隻棋係架車，行到對方有酒店嗰格。',
-          n:'英文經典 Push That Car。' },
 
         // ---------------- 高難度 ----------------
-        { id:'E1', c:'hard', t:'混血兒',
-          q:'細路嘅爸爸係英國醫生，媽媽係教英文嘅日本人。佢好自豪自己係混血兒。有日佢揭媽媽本講義，見到張好耐之前嘅便條紙畫住個英國國旗但冇填色，佢即刻返屋企刺殺爸爸。',
-          a:'媽媽係紅綠色盲，所以填唔到色。色盲屬伴 X 隱性遺傳，媽媽色盲嘅話個仔一定色盲——但佢唔係，證明佢唔係媽媽親生。' },
-        { id:'E2', c:'hard', t:'懦弱嘅男人',
-          q:'情侶喺獨木舟遇到鯊魚，男人將女人推落海。鯊魚繞過咗女人，反而撲向男人咬死佢。商船救起女人，船長望住海水喊。女人問點解，聽完之後跳海自殺。',
-          a:'船長話：「嗰個男人用小刀割開自己手腕，一路割一路將血流落海引開鯊魚。佢咁愛你。」' },
         { id:'E3', c:'hard', t:'電話響咗',
           q:'絕望嘅女子決定跳樓。跳落去嗰一刻，電話響起，佢好後悔，但已經來唔切。',
           a:'周圍嘅人全部變咗喪屍，佢以為自己係最後一個人類先絕望。電話響代表仲有人生還。' },
-        { id:'E4', c:'hard', t:'七點十二分',
-          q:'極度怕搭飛機嘅男子落機，睇手錶顯示七點十二分，然後喊住自殺。',
-          a:'佢係羅馬人，用羅馬數字錶。VII XII 望落似「✓ ✗」確認符號。佢去嘅地方係希臘（Hellas，似 Hell）。落機時天色突然漆黑，佢以為自己去咗地獄入口。',
-          n:'流傳版本多、邏輯偏牽強，適合歸入「爭議題」。' },
-        { id:'E5', c:'hard', t:'半張相片',
-          q:'女仔同男仔拍拖好耐，係男仔先追佢。生日時男仔送咗個舊八音盒。有日女仔整爛咗個盒，發現裡面夾住半張舊相，模糊咁見到一隻狗嘅影。女仔即刻嚇死。',
-          a:'【版本 A】女仔隻愛犬死咗，佢將狗屍、八音盒同合照一齊埋咗落地下。男仔掘返出嚟送畀佢，佢認得件嘢。\n【版本 B】相入面係隻狗嘅主人。女仔以為嗰個人已經死（可能死於佢手），而家先發現狗主人就係現任男友——佢整咗容，接近佢係為咗報仇。',
-          n:'兩個來源畀咗兩個唔同湯底，兩個都成立。' },
-        { id:'E6', c:'hard', t:'斷手',
-          q:'一名男子用刀斬斷咗好多人隻手，包括佢識嘅人。',
-          a:'船難，救生艇已達載人上限。遇溺者不斷游埋嚟捉住艇邊，佢為咗唔畀艇翻，必須斬斷佢哋隻手。' },
-        { id:'E7', c:'hard', t:'床上嘅窿',
-          q:'雙腿癱瘓嘅病人入院治療，出院前一晚自殺。護士執房發現床單上有好多窿。',
-          a:'醫生話佢隻腳好返可以出院。佢興奮到瞓唔著，捏下隻腳——冇感覺。越捏越大力，仲係冇感覺。攞生果刀㓤落去，都係冇感覺。其實佢一直㓤緊被單拱起嗰忽。' },
-        { id:'E8', c:'hard', t:'過山車',
-          q:'情侶去主題公園，女仔想玩過山車，男仔怕唔敢。女仔玩完仲想玩，硬拉男仔一齊，結果得佢一個落到嚟。',
-          a:'女仔矮，男仔高。第二次玩嗰陣，隧道裡面一條鋼線割甩咗男仔個頭。條鋼線係女仔第一次玩嗰陣裝落去。' },
-        { id:'E9', c:'hard', t:'絕望嘅兩個人',
-          q:'戰爭中殺人無數嘅兩個軍官被困荒野，被恐懼逼到癲。其中一個先死，生還嗰個埋葬咗戰友，精神崩潰。第二日朝早，佢發現死咗嘅戰友坐喺佢隔籬，用絕望嘅眼神望住佢。',
-          a:'生還嗰個有夢遊症，夜晚夢遊將同伴具屍體掘返出嚟。' },
-        { id:'E10', c:'hard', t:'足球',
-          q:'男仔去舖頭買新足球。老闆娘話賣晒，之後又話後面仲有最後一個。等咗三十分鐘先賣畀佢。當晚佢睇新聞嚇到成身冷汗。',
-          a:'新聞報導個舖頭老闆被殺，個頭唔見咗。' },
-
-        // ---------------- 英文經典 ----------------
-        { id:'F1', c:'classic', t:'The Man in the Mask',
-          q:'A man is running home. Another man is chasing him. At home, a man wearing a mask is waiting.',
-          a:'佢哋打緊棒球。戴面罩嗰個係捕手，跑緊嗰個唔敢衝返 home base。' },
-        { id:'F2', c:'classic', t:'Albatross Sandwich',
-          q:'A man orders an albatross sandwich, takes one bite, and kills himself.',
-          a:'同「海龜湯」同源。佢係盲人，船難後有人用死者嘅肉呃佢話係信天翁。' },
-        { id:'F3', c:'classic', t:'Paper on the Cactus',
-          q:'A man walks up to a cactus, looks at a piece of paper pinned there, and kills himself.',
-          a:'佢喺沙漠迷路，之前釘咗張白紙落去測試自己係咪兜圈。再見返張紙＝證實咗。' },
-        { id:'F4', c:'classic', t:'Poisoned Ice Cubes',
-          q:'Guests at a party all die except one man.',
-          a:'毒喺冰粒度。飲得快嗰個冰未溶，所以冇事。' },
-        { id:'F5', c:'classic', t:'The Man in the Elevator',
-          q:'佢住 17 樓。落雨嗰日撳到 17；有人同佢一齊都撳到 17；晴天又單獨一人就撳 11 樓，行樓梯上返。',
-          a:'佢好矮，淨係撳到 11。落雨有遮可以撳高啲，有人喺度就叫人幫手撳。' },
-        { id:'F6', c:'classic', t:'Time for Bed',
-          q:'A man brushes his teeth, turns out the light, goes to bed. Next morning he looks out the window and kills himself.',
-          a:'同「報紙」同源。佢係燈塔看守員，熄咗盞燈。' },
-        { id:'F7', c:'classic', t:'The Radio',
-          q:'A man turns on the car radio, listens a few seconds, then kills himself.',
-          a:'佢係電台 DJ，播住一隻長碟去殺老婆做不在場證明。發現隻碟跳針咗，alibi 冇晒。' },
-        { id:'F8', c:'classic', t:'Pool of Water',
-          q:'A man is found dead in an empty room with a pool of water nearby.',
-          a:'被冰柱刺死，冰溶咗剩返攤水。' },
-        { id:'F9', c:'classic', t:'Headlights Off',
-          q:'Two cars drive toward each other with headlights off — no moon, no stars, both painted black — yet both brake in time.',
-          a:'日頭嚟嘅，陰天所以見唔到太陽同星。' },
-        { id:'F10', c:'classic', t:'Cabin in the Woods',
-          q:'A man is found dead in a cabin in the woods.',
-          a:'係飛機 cabin，墜毀喺樹林。' },
-        { id:'F11', c:'classic', t:'The Hanged Man',
-          q:'Hanged in an empty room, nothing to climb on.',
-          a:'踩住一嚿冰，冰溶晒。' },
-        { id:'F12', c:'classic', t:'This Man Is My Son',
-          q:'The surgeon refuses to operate, saying the patient is their son — but the surgeon is not the father.',
-          a:'個外科醫生係佢阿媽。',
-          n:'呢題本身係一個性別偏見測試多過推理題。' },
-        { id:'F13', c:'classic', t:'The Kiss',
-          q:'A man kisses his daughter, then regrets it.',
-          a:'佢係 King Midas，掂到咩都變金。' },
-        { id:'F14', c:'classic', t:'Backpack',
-          q:'A man lies face down dead in a field, wearing a backpack.',
-          a:'降落傘冇開到。' },
-        { id:'F15', c:'classic', t:'Little Susie',
-          q:"Susie's parents told her never to open the basement door. Why?",
-          a:'佢一世人住喺地牢，父母唔想佢知道外面有個世界。' },
-        { id:'F16', c:'classic', t:'Friend on a Plane',
-          q:'A man greets his friend boarding the plane and is immediately arrested.',
-          a:'佢講咗 "Hi, Jack!"（hijack）。' },
-        { id:'F17', c:'classic', t:'The Yacht',
-          q:'Several corpses float in the water near a yacht.',
-          a:'全船人落水游水，冇人放低條梯，全部浸死。' },
-        { id:'F18', c:'classic', t:'Photo with Grandfather',
-          q:"A woman is photographed with her grandfather; they've never met and neither knows the relation.",
-          a:'佢係醫科生，同教學用嘅骸骨影相——嗰副骸骨係佢爺爺捐嘅。' },
-        { id:'F19', c:'classic', t:'The Drawing',
-          q:'A woman finishes a drawing, then kills herself.',
-          a:'佢畫緊家族樹，畫完發現自己係亂倫嘅產物。' },
-        { id:'F20', c:'classic', t:'The Stranger',
-          q:'A man finds his wife dead and a stranger in the room.',
-          a:'老婆難產死咗，個「陌生人」係啱啱出世嘅 BB。' },
-        { id:'F21', c:'mystery', t:'新鞋',
-          q:'一個女人朝早買咗對新鞋。夜晚返工，返到工做冇耐就死咗。',
-          a:'對高踭鞋令佢高咗少少。佢喺馬戲團做飛刀表演嘅活靶，飛刀手照住平時嘅高度掟，掟中咗佢。' },
-        { id:'F22', c:'classic', t:'Jack and Judy',
-          q:'Jack and Judy were lying on the floor dead. There was a puddle of water and broken glass on the floor.',
-          a:'佢哋係金魚，魚缸被貓撞跌咗。',
-          n:'經典版本叫 Jack & Jill。' },
-
-        // ---------------- 未有湯底 ----------------
-        { id:'G1', c:'open', t:'A Ballroom',
-          q:'A couple enters a grand ballroom only to find the occupants are dead. No crime has been committed. The couple is not concerned.', a:null },
-        { id:'G2', c:'open', t:'A Weird Bus Stop',
-          q:"On a beautiful road there's a fully operational bus stop. However, no public transport stops there.", a:null },
-        { id:'G3', c:'open', t:'Try Hard',
-          q:'A salesman tries too hard to get a sale and as a result ends up dying.', a:null },
-        { id:'G4', c:'open', t:'Unopened Package',
-          q:'A man is found dead in a field. Lying next to him is an unopened package.', a:null,
-          n:'大機會同 Backpack 同源（降落傘），未證實。' },
-        { id:'G5', c:'open', t:'Death: Delayed',
-          q:'Helen never thought that her decision to travel by plane would save her life.', a:null },
-        { id:'G6', c:'warm', t:'綁喺櫈度',
-          q:'小明最錫佢嗰個人，將佢綁咗喺張櫈度。小明一啲都唔介意。',
-          a:'小明係個 BB，阿媽將佢綁喺 BB 餐椅度餵嘢食。' },
-        { id:'G7', c:'open', t:'Fatal Shot',
-          q:'A hunter aimed his gun carefully and fired. Seconds later he realized his mistake. Minutes later he was dead.', a:null },
-        { id:'G8', c:'mystery', t:'車入面嘅陌生人',
-          q:'一對夫婦揸車途中冇晒油。丈夫落車去搵油。返到嚟，太太死咗，而車入面多咗一個陌生人。車門反鎖、車窗閂實、車身完好無缺。',
-          a:'太太有咗身孕。丈夫走開嗰陣佢分娩，難產死咗。嗰個「陌生人」係啱啱出世嘅嬰兒。' },
-        { id:'G9', c:'open', t:'Sweet Dreams',
-          q:'Matthew keeps reading a bedtime story to his son despite the blackout.', a:null,
-          n:'經典答案：佢係盲人，讀緊點字。未經來源證實。' },
-        { id:'G10', c:'warm', t:'十樓',
-          q:'一個男人住十樓。每朝出門，佢搭𨋢落地下。夜晚返嚟，佢撳七樓。',
-          a:'佢好矮，撳唔到十樓個掣，最高只夠得到七樓，之後行樓梯上返。' },
       ];
 
       // ---------- render ----------
-      const listEl  = document.querySelector('#list');
-      const pillsEl = document.querySelector('#pills');
-      const countEl = document.querySelector('#count');
+      const listEl   = document.querySelector('#list');
+      const pillsEl  = document.querySelector('#pills');
+      const countEl  = document.querySelector('#count');
       const toggleEl = document.querySelector('#toggleAll');
 
       let active = 'all';
       let allOpen = false;
       let byLevel = false;
 
-      // 已移除嘅題留喺 data 度（改返主意揀得返），但唔會出現喺頁面。
-      const LIVE = P.filter(p => stOf(p.id) !== 'out');
-      Object.entries(DUP).forEach(([g, ids]) => {
-        const alive = ids.filter(id => stOf(id) !== 'out');
-        if (alive.length > 1) alive.forEach(id => { DUPOF[id] = g; });
-      });
-
-      const esc = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
+      const esc  = s => s.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
       const para = s => esc(s).split('\n').map(l => `<p>${l}</p>`).join('');
 
       CATS.forEach(c => {
-        const n = c.k === 'all' ? LIVE.length
-          : c.k === 'dup' ? LIVE.filter(p => DUPOF[p.id]).length
-          : LIVE.filter(p => p.c === c.k).length;
+        const n = c.k === 'all' ? P.length : P.filter(p => p.c === c.k).length;
         if (!n) return;
         const b = document.createElement('button');
         b.className = 'pill';
         b.type = 'button';
+        b.dataset.k = c.k;
         b.setAttribute('aria-pressed', String(c.k === 'all'));
         b.innerHTML = `${c.label}<span class="n">${n}</span>`;
-        b.dataset.k = c.k;
         b.onclick = () => {
           active = c.k;
           [...pillsEl.children].forEach(el =>
@@ -808,22 +456,14 @@
       });
 
       function render() {
-        let rows = active === 'all' ? LIVE
-          : active === 'dup' ? LIVE.filter(p => DUPOF[p.id])
-          : LIVE.filter(p => p.c === active);
+        let rows = active === 'all' ? P : P.filter(p => p.c === active);
         if (byLevel) rows = [...rows].sort((a, b) => META[a.id][0] - META[b.id][0]);
         countEl.textContent = `${rows.length} 題`;
 
-        if (!rows.length) {
-          listEl.innerHTML = '<p class="empty">冇題目。</p>';
-          return;
-        }
-
         listEl.innerHTML = rows.map(p => `
-          <article class="card st-${stOf(p.id)}${allOpen ? ' open' : ''}${p.a ? '' : ' todo'}">
+          <article class="card${allOpen ? ' open' : ''}">
             <div class="head">
               <h2>${esc(p.t)}</h2>
-              ${stOf(p.id) !== 'new' ? `<span class="tag st">${STLABEL[stOf(p.id)]}</span>` : ''}
               ${DUPOF[p.id] ? `<span class="tag dup">撞 · ${DUPOF[p.id]}</span>` : ''}
               <span class="tag">${LABEL[p.c]}</span>
               <span class="id">${p.id}</span>
@@ -832,12 +472,11 @@
               <span class="meter">${Array.from({length:10},(_,i)=>`<i${i < META[p.id][0] ? ' class="on"' : ''}></i>`).join('')}</span>
               難度 ${META[p.id][0]} · 約 ${META[p.id][1]} 分鐘
             </div>
-            ${ST[p.id] && ST[p.id][1] ? `<p class="verdict">${esc(ST[p.id][1])}</p>` : ''}
             <div class="soup">${para(p.q)}</div>
-            <button class="reveal" type="button">${p.a ? '揭湯底' : '睇備註'}</button>
+            <button class="reveal" type="button">揭湯底</button>
             <div class="base">
-              <span class="lab">${p.a ? '湯底' : '待補'}</span>
-              ${p.a ? para(p.a) : '<p>呢題嘅湯底未搵到來源。湯面本身好，可以自己寫個湯底。</p>'}
+              <span class="lab">湯底</span>
+              ${para(p.a)}
               ${p.n ? `<p class="note">${esc(p.n)}</p>` : ''}
             </div>
           </article>
