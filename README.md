@@ -20,7 +20,7 @@
 
 ## 原型 Demo
 
-`index.html` 為首頁，列出各原型（1234、Roast King、Headliner、集體潛意識 v1/v2）。在瀏覽器打開即可。
+`index.html` 為首頁，列出各原型（1234、Headliner、集體潛意識 v1/v2）。在瀏覽器打開即可。
 
 ### 品牌與視覺系統
 
