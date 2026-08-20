@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="proto-mono.css" />
     <style>
       :root {
+        --card-solid: #FFFFFF;
         --card-edge: #F1ECE0;
         --ink-on-card: #1F1B14;
         --ink-on-card-faint: #A8A091;
@@ -56,9 +57,7 @@
       .card {
         position: absolute;
         inset: 0;
-        background: var(--card);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
+        background: var(--card-solid);
         border: 1px solid var(--line);
         border-radius: 22px;
         box-shadow: var(--shadow);
@@ -75,8 +74,6 @@
         /* 面頂張卡嘅「面」由 flipper 兩塊 face 負責，卡殼透明 */
         background: transparent;
         border-color: transparent;
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
         transform:
           translate3d(var(--dx), var(--dy), 0)
           rotate(calc(-1.4deg + var(--tilt)));
@@ -112,14 +109,33 @@
         outline-offset: 4px;
       }
 
-      /* 翻卡：正面題目，背面答案 */
+      /* 翻卡：正面題目，背面答案。
+         用 keyframes 而唔係 transition，等卡喺翻嘅中途
+         提起、放大少少，落返底先安定 —— 似真手翻卡。 */
       .flipper {
         position: absolute;
         inset: 0;
         transform-style: preserve-3d;
-        transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+        transform: rotateY(0);
       }
-      .flipper.flipped { transform: rotateY(180deg); }
+      .flipper.flipped {
+        transform: rotateY(180deg);
+        animation: flipToBack 0.62s cubic-bezier(0.32, 0.4, 0.18, 1) both;
+      }
+      .flipper.flipback {
+        transform: rotateY(0);
+        animation: flipToFront 0.62s cubic-bezier(0.32, 0.4, 0.18, 1) both;
+      }
+      @keyframes flipToBack {
+        0%   { transform: rotateY(0) translateY(0) scale(1); }
+        45%  { transform: rotateY(88deg) translateY(-16px) scale(1.05); }
+        100% { transform: rotateY(180deg) translateY(0) scale(1); }
+      }
+      @keyframes flipToFront {
+        0%   { transform: rotateY(180deg) translateY(0) scale(1); }
+        45%  { transform: rotateY(92deg) translateY(-16px) scale(1.05); }
+        100% { transform: rotateY(0) translateY(0) scale(1); }
+      }
       .face {
         position: absolute;
         inset: 0;
@@ -130,15 +146,25 @@
         gap: 0.7rem;
         padding: 1.5rem 2rem;
         text-align: center;
-        background: var(--card);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
+        background: var(--card-solid);
         border: 1px solid var(--line);
         border-radius: 22px;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
       }
       .face.back { transform: rotateY(180deg); }
+      /* 答案面：頂部細字重覆題目 */
+      .back-q {
+        position: absolute;
+        top: 1.15rem;
+        left: 1.6rem;
+        right: 1.6rem;
+        font-family: var(--serif);
+        font-size: 0.78rem;
+        color: var(--ink-on-card-faint);
+        line-height: 1.45;
+        margin: 0;
+      }
 
       .cat {
         font-size: 0.68rem;
@@ -180,30 +206,6 @@
         margin: 0;
         max-width: 30ch;
         line-height: 1.55;
-      }
-
-      /* ── 動作 ──────────────────────────────── */
-      .actions {
-        display: flex;
-        justify-content: center;
-      }
-      .btn {
-        font-family: inherit;
-        font-size: 0.95rem;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        padding: 0.9rem 1.9rem;
-        border-radius: var(--radius-sm);
-        cursor: pointer;
-        background: linear-gradient(180deg, #4A443B, var(--accent));
-        color: #fff;
-        border: none;
-        box-shadow: var(--shadow-pop);
-        transition: transform 0.06s, box-shadow 0.06s;
-      }
-      .btn:active {
-        transform: translateY(3px);
-        box-shadow: var(--shadow-press);
       }
 
       /* ── 頁腳 ──────────────────────────────── */
@@ -252,8 +254,7 @@
             calc(2.75rem + env(safe-area-inset-bottom))
             max(1rem, env(safe-area-inset-left));
           display: grid;
-          grid-template-rows: minmax(0, 1fr) auto;
-          gap: 0.5rem;
+          grid-template-rows: minmax(0, 1fr);
           overflow: hidden;
         }
 
@@ -265,13 +266,14 @@
         }
 
         .deck {
-          --deck-max-h: min(46dvh, 17rem, calc(100dvh - 11rem));
+          --deck-max-h: min(50dvh, 18rem, calc(100dvh - 8.5rem));
           width: min(92vw, 26rem, calc(var(--deck-max-h) * 7 / 5));
           height: auto;
           max-height: var(--deck-max-h);
         }
 
         .face { padding: 1rem 1.2rem; gap: 0.55rem; }
+        .back-q { top: 0.85rem; left: 1.1rem; right: 1.1rem; font-size: 0.72rem; }
 
         .question {
           font-size: clamp(1rem, 4.4vw, 1.22rem);
@@ -279,13 +281,6 @@
         }
         .num { font-size: clamp(1.8rem, 8vw, 2.3rem); }
         .note { font-size: 0.74rem; max-width: 100%; }
-
-        .btn {
-          font-size: 0.82rem;
-          padding: 0.72rem 1.5rem;
-          letter-spacing: 0.1em;
-          min-height: 2.75rem;
-        }
 
         .footer-info {
           bottom: max(0.5rem, env(safe-area-inset-bottom));
@@ -305,7 +300,8 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .card, .flipper { transition-duration: 0.01ms; }
+        .card { transition-duration: 0.01ms; }
+        .flipper.flipped, .flipper.flipback { animation-duration: 0.01ms; }
       }
     </style>
   </head>
@@ -319,10 +315,6 @@
           <div class="card" data-pos="1" aria-hidden="true"></div>
           <div class="card" data-pos="2" aria-hidden="true"></div>
         </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn" id="nextBtn" type="button">下一題</button>
       </div>
     </main>
 
@@ -417,6 +409,7 @@
                 <p class="question">${pick.q}</p>
               </div>
               <div class="face back" aria-hidden="true">
+                <p class="back-q">${pick.q}</p>
                 <p class="num">${pick.a}${pick.u ? ` <small>${pick.u}</small>` : ""}</p>
                 ${pick.note ? `<p class="note">${pick.note}</p>` : ""}
               </div>
@@ -447,14 +440,19 @@
         order[1].innerHTML = faceHTML(onDeck);
       }
 
+      let flipLock = false;   // 翻到一半唔好再翻，動畫會跳格
       function flip() {
-        if (busy) return;
+        if (busy || flipLock) return;
         const flipper = order[0].querySelector(".flipper");
         if (!flipper) return;
-        const flipped = flipper.classList.toggle("flipped");
+        const toBack = !flipper.classList.contains("flipped");
+        flipper.classList.toggle("flipped", toBack);
+        flipper.classList.toggle("flipback", !toBack);
         const back = flipper.querySelector(".face.back");
-        if (back) back.setAttribute("aria-hidden", String(!flipped));
-        order[0].setAttribute("aria-label", flipped ? "返回題目" : "翻卡睇答案");
+        if (back) back.setAttribute("aria-hidden", String(!toBack));
+        order[0].setAttribute("aria-label", toBack ? "返回題目" : "翻卡睇答案");
+        flipLock = true;
+        setTimeout(() => { flipLock = false; }, 480);
       }
 
       // 抽下一題：面頂那張飛走，下面牌堆嗰張（已經寫好題目）升上嚟。
@@ -563,7 +561,6 @@
         else if (e.key === "ArrowRight") { e.preventDefault(); next(); }
       });
 
-      document.getElementById("nextBtn").addEventListener("click", () => next());
       document.getElementById("shuffleBtn").addEventListener("click", () => {
         refill();
         deal();
