@@ -84,6 +84,30 @@
       }
       .meter i.on { background: color-mix(in srgb, var(--accent) 70%, var(--line)); }
 
+      /* ---------- loading skeleton ---------- */
+      .card[aria-hidden="true"] { pointer-events: none; cursor: default; }
+      .skel-line {
+        height: 0.95rem;
+        border-radius: 0.5rem;
+        background: linear-gradient(
+          90deg,
+          var(--line) 25%,
+          color-mix(in srgb, var(--line) 40%, transparent) 50%,
+          var(--line) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s ease infinite;
+      }
+      .skel-line.title { width: 42%; margin-bottom: 0.75rem; }
+      .skel-line.sub   { width: 62%; height: 0.7rem; }
+      @keyframes shimmer {
+        from { background-position: 200% 0; }
+        to   { background-position: -200% 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .skel-line { animation: none; }
+      }
+
       /* ---------- detail (dark) ---------- */
       .detail {
         --d-bg:   #14120E;
@@ -313,6 +337,17 @@
       let at = -1;        // 開緊邊題
       let page = 0;       // 0 = 湯面, 1 = 湯底
 
+      /* ---------- loading placeholder ---------- */
+      function renderSkeleton() {
+        document.querySelector('#count').textContent = '載入中…';
+        document.querySelector('#list').innerHTML = Array.from({ length: 6 }, () => `
+          <div class="card" aria-hidden="true">
+            <div class="skel-line title"></div>
+            <div class="skel-line sub"></div>
+          </div>
+        `).join('');
+      }
+
       /* ---------- list ---------- */
       function renderList() {
         document.querySelector('#count').textContent = `${PUZZLES.length} 題`;
@@ -397,6 +432,7 @@
       });
 
       /* ---------- go ---------- */
+      renderSkeleton();
       load().then(list => {
         PUZZLES = [...list].sort((a, b) => lv(a.level) - lv(b.level) || mins(a.minutes) - mins(b.minutes));
         renderList();
