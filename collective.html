@@ -2,25 +2,16 @@
 <html lang="zh-Hant">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>集體潛意識 v1 · deskwalk</title>
     <link rel="stylesheet" href="brand.css" />
-<link rel="stylesheet" href="proto-mono.css" />
+    <link rel="stylesheet" href="proto-mono.css" />
     <style>
       :root {
-        /* deskwalk light brand — white cards on warm paper.
-           --card / --ink / --ink-soft / --line / --accent / --sans
-           are inherited from brand.css; only the collective-specific
-           tokens are remapped here. */
-        --bg: var(--paper);
-        --bg-deep: var(--paper);
         --card-edge: #F1ECE0;
         --ink-on-card: #1F1B14;
-        --ink-on-card-soft: #6E665A;
         --ink-on-card-faint: #A8A091;
         --ink-faint: #A49B8C;
-        --glow: rgba(26, 23, 18, 0.14);
-        --warn: var(--bad);
         --serif: var(--sans);
       }
       html, body { height: 100%; }
@@ -29,141 +20,46 @@
         font-size: 16px;
         letter-spacing: 0.01em;
         overflow-x: hidden;
-        position: relative;
         min-height: 100vh;
       }
-      /* warm paper grid + liquid-glass ambient glow come from brand.css (body::before) */
-      /* Ambient corner ornaments */
-      .ornament { display: none; }
-      .ornament svg { display: block; width: 100%; height: 100%; }
-      .ornament-tr { top: 1.5rem; right: 1.25rem; width: 4.5rem; height: 4.5rem; }
-      .ornament-bl { bottom: 4rem; left: 1.25rem; width: 5.5rem; height: 5.5rem; }
-      @media (max-width: 480px) {
-        .ornament-tr { width: 3rem; height: 3rem; opacity: 0.1; }
-        .ornament-bl { width: 3.5rem; height: 3.5rem; opacity: 0.1; }
-      }
-
-      /* Small inline glyphs */
-      .glyph-inline {
-        display: inline-block;
-        vertical-align: middle;
-        color: var(--ink-faint);
-      }
-      .bubble-mark {
-        margin: 1.2rem auto 0;
-        opacity: 0.45;
-        color: var(--ink-soft);
-      }
-      .bubble-mark svg { width: 26px; height: 14px; }
-
-      /* Star field removed for the light paper theme */
-      body::after { display: none; }
 
       .stage {
         max-width: 560px;
         margin: 0 auto;
-        padding: 3rem 1.75rem 6rem;
+        padding: 3.25rem 1.75rem 7rem;
         display: flex;
         flex-direction: column;
-        align-items: stretch;
         min-height: 100vh;
       }
 
-      /* HEADER — counter + progress */
-      .head {
+      /* ── 題型篩選 ───────────────────────────── */
+      .pills {
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 4rem;
-        gap: 2rem;
+        gap: 0.4rem;
+        justify-content: center;
+        margin-bottom: 2.5rem;
       }
-      .counter {
-        display: flex;
-        align-items: baseline;
-        gap: 0.65rem;
+      .pill {
+        border: 1px solid var(--line);
+        border-radius: var(--pill);
+        background: var(--card-strong);
+        color: var(--ink-soft);
+        font: inherit;
+        font-size: 0.82rem;
+        padding: 0.34rem 0.9rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
       }
-      .counter .num {
-        font-family: var(--serif);
-        font-size: 2.75rem;
-        font-weight: 400;
-        line-height: 1;
-        color: var(--ink);
-        font-variant-numeric: lining-nums tabular-nums;
-        transition: color 0.6s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .counter .num.pop {
-        color: var(--accent);
-        transform: scale(1.08);
-      }
-      .counter .num.drop {
-        color: var(--warn);
-        transform: translateY(2px) scale(0.96);
-      }
-      .counter .num-label {
-        font-size: 0.74rem;
-        letter-spacing: 0.22em;
-        text-transform: uppercase;
-        color: var(--ink-faint);
-        font-weight: 400;
-      }
-      .progress {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.7rem;
-      }
-      .journey {
-        display: flex;
-        gap: 0.85rem;
-        align-items: center;
-      }
-      .leg {
-        display: flex;
-        gap: 0.45rem;
-      }
-      .leg + .leg::before {
-        content: "";
-        align-self: center;
-        width: 0.55rem;
-        height: 1px;
-        background: var(--line);
-        margin-right: 0.3rem;
-        margin-left: -0.3rem;
-      }
-      .dot {
-        width: 0.7rem;
-        height: 0.7rem;
-        border-radius: 999px;
-        border: 1.5px solid var(--line);
-        background: transparent;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      /* L3 dots are slightly larger — the climax leg */
-      .leg[data-level="3"] .dot {
-        width: 0.78rem;
-        height: 0.78rem;
-      }
-      .dot.win {
-        background: var(--ink);
+      .pill:hover { color: var(--ink); }
+      .pill[aria-pressed="true"] {
+        background: var(--accent);
         border-color: var(--accent);
+        color: #fff;
       }
-      .dot.current {
-        border-color: var(--accent);
-        animation: dotPulse 1.8s ease-in-out infinite;
-      }
-      @keyframes dotPulse {
-        0%, 100% { box-shadow: 0 0 0 0 var(--glow); transform: scale(1); }
-        50%      { box-shadow: 0 0 0 5px transparent; transform: scale(1.18); }
-      }
-      .threshold {
-        font-size: 0.78rem;
-        color: var(--ink-faint);
-        font-style: italic;
-        font-family: var(--serif);
-        text-align: right;
-      }
+      .pill .n { opacity: 0.5; margin-left: 0.3rem; font-size: 0.76rem; }
 
-      /* QUESTION — speech bubble */
+      /* ── 卡組 ──────────────────────────────── */
       .question-block {
         flex: 1;
         display: flex;
@@ -171,11 +67,9 @@
         justify-content: center;
         align-items: center;
         text-align: center;
-        gap: 1.5rem;
-        padding: 1rem 0 2rem;
-        transition: opacity 0.4s ease;
+        gap: 1.25rem;
+        padding-bottom: 1.5rem;
       }
-      .question-block.dim { opacity: 0.25; }
       .eyebrow {
         font-size: 0.74rem;
         letter-spacing: 0.3em;
@@ -183,10 +77,13 @@
         color: var(--ink-faint);
         margin: 0;
       }
-      /* DECK — stacked cards with the active one on top */
       .deck {
+        /* 卡片跟著視窗高度縮，整頁不用捲動 */
+        --deck-max-h: min(50vh, 26rem);
         position: relative;
-        width: min(22rem, 86vw);
+        width: min(22rem, 86vw, calc(var(--deck-max-h) * 5 / 7));
+        height: auto;
+        max-height: var(--deck-max-h);
         aspect-ratio: 5 / 7;
         margin: 0 auto;
       }
@@ -199,42 +96,60 @@
         border: 1px solid var(--line);
         border-radius: 22px;
         box-shadow: var(--shadow);
+        transition:
+          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.45s ease;
       }
-      /* Static stack cards behind active — suggest a deck */
-      .card.stack-2 {
-        transform: translate(10px, 8px) rotate(2.4deg);
-        background: var(--card-edge);
-        opacity: 0.78;
-        z-index: 1;
+      /* 牌堆位置：0 = 面頂，1、2 疊喺下面等上場 */
+      .card[data-pos="0"] {
+        --dx: 0px;
+        --dy: 0px;
+        --tilt: 0deg;
+        z-index: 3;
+        transform:
+          translate3d(var(--dx), var(--dy), 0)
+          rotate(calc(-2deg + var(--tilt)));
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
-      .card.stack-1 {
-        transform: translate(5px, 4px) rotate(-1deg);
-        background: var(--card);
-        opacity: 0.92;
+      .card[data-pos="1"] {
+        transform: translate(5px, 4px) rotate(-1deg) scale(0.985);
+        opacity: 0.94;
         z-index: 2;
       }
-      .card.active {
-        transform: rotate(-2deg);
-        z-index: 3;
+      .card[data-pos="2"] {
+        transform: translate(10px, 8px) rotate(2.4deg) scale(0.97);
+        background: var(--card-edge);
+        opacity: 0.8;
+        z-index: 1;
+      }
+      /* 抽走那張：沿掃出方向飛離牌堆，transform 由 JS 設定 */
+      .card.gone {
+        opacity: 0;
+        z-index: 4;
+        background: var(--card);
+        /* 遲少少先淡出，卡片要見到真係飛離牌堆 */
+        transition:
+          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.26s ease 0.22s;
+      }
+      /* 拖拉時卡片要即時跟手，不能有過場 */
+      .card.dragging { transition: none; cursor: grabbing; }
+      .card.no-anim { transition: none; }
+      .card[data-pos="0"]:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+      }
+      .face {
+        position: absolute;
+        inset: 0;
         display: flex;
         flex-direction: column;
         padding: 1.4rem 1.6rem 1.8rem;
-        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-                    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
       }
-      /* Flying off the deck */
-      .card.active.exit {
-        transform: translateY(-220px) rotate(-12deg) scale(1.02);
-        opacity: 0;
-        transition-duration: 0.5s;
-      }
-      /* Sliding back from the stack */
-      .card.active.enter {
-        transform: translateY(38px) rotate(-5deg) scale(0.96);
-        opacity: 0;
-        transition-duration: 0s;
-      }
-
       .card-symbol {
         flex: 1;
         display: grid;
@@ -258,49 +173,41 @@
       .question {
         font-family: var(--serif);
         font-weight: 400;
-        font-size: clamp(1.05rem, 3.4vw, 1.3rem);
-        line-height: 1.55;
+        font-size: clamp(1.35rem, 5vw, 1.7rem);
+        line-height: 1.5;
         color: var(--ink-on-card);
-        margin: 0;
-        text-align: center;
-        max-width: 22ch;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto;
+        max-width: 14ch;
       }
-      .question .count {
-        font-weight: 600;
-        color: var(--ink-on-card);
-        padding: 0 0.1em;
-        font-size: 1.2em;
+      /* 填空題的空格 — 柔和的凹槽，不用粗線 */
+      .question .blank {
+        display: inline-block;
+        width: 1.9em;
+        height: 1.1em;
+        margin: 0 0.14em;
+        vertical-align: -0.16em;
+        border-radius: 8px;
+        background: rgba(31, 27, 20, 0.07);
       }
+      .face.blank-face .question {
+        letter-spacing: 0.04em;
+        font-size: clamp(1.6rem, 6vw, 2rem);
+      }
+      .question.placeholder { color: var(--ink-on-card-faint); }
+
       .hint {
         font-family: var(--serif);
         font-size: 0.85rem;
         color: var(--ink-soft);
-        margin: 1.2rem 0 0;
+        margin: 0;
         letter-spacing: 0.04em;
-        text-align: center;
-      }
-      .placeholder {
-        font-family: var(--serif);
-        color: var(--ink-on-card-faint);
       }
 
-      /* ACTIONS */
+      /* ── 動作 ──────────────────────────────── */
       .actions {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1.25rem;
-        margin-top: 2rem;
-      }
-      .verdict {
-        display: none;
-        gap: 0.5rem;
-        flex-wrap: wrap;
         justify-content: center;
       }
-      .verdict.show { display: flex; }
       .btn {
         font-family: inherit;
         font-size: 0.95rem;
@@ -309,184 +216,50 @@
         padding: 0.9rem 1.9rem;
         border-radius: var(--radius-sm);
         cursor: pointer;
-        transition: transform 0.06s, box-shadow 0.06s, background 0.2s, color 0.2s;
-      }
-      .btn-primary {
         background: linear-gradient(180deg, #4A443B, var(--accent));
         color: #fff;
         border: none;
-        -webkit-backdrop-filter: var(--glass-blur-sm);
-        backdrop-filter: var(--glass-blur-sm);
         box-shadow: var(--shadow-pop);
+        transition: transform 0.06s, box-shadow 0.06s;
       }
-      .btn-primary:active {
+      .btn:active {
         transform: translateY(3px);
         box-shadow: var(--shadow-press);
       }
-      .btn-ghost {
-        background: var(--card);
-        color: var(--ink);
-        border: 1px solid var(--line);
-        -webkit-backdrop-filter: var(--glass-blur-sm);
-        backdrop-filter: var(--glass-blur-sm);
-        box-shadow: var(--shadow);
-      }
-      .btn-ghost:active { transform: translateY(2px); }
 
-      /* OVERLAYS */
-      .overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 100;
-        background: rgba(251, 250, 246, 0.7);
-        -webkit-backdrop-filter: blur(26px) saturate(1.5);
-        backdrop-filter: blur(26px) saturate(1.5);
-        display: grid;
-        place-items: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-      .overlay.show { opacity: 1; pointer-events: auto; }
-      .overlay-inner {
-        text-align: center;
-        max-width: 28rem;
-        padding: 2rem;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
-                    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
-      }
-      .overlay.show .overlay-inner { opacity: 1; transform: translateY(0); }
-      .overlay-eyebrow {
-        font-size: 0.74rem;
-        letter-spacing: 0.32em;
-        text-transform: uppercase;
-        color: var(--ink-faint);
-        margin: 0 0 1.5rem;
-      }
-      .overlay-title {
-        font-family: var(--serif);
-        font-weight: 400;
-        font-size: 2.5rem;
-        line-height: 1.2;
-        margin: 0 0 0.5rem;
-        color: var(--ink);
-      }
-      .overlay-title .roman {
-        font-weight: 600;
-        color: var(--ink);
-      }
-      .overlay-sub {
-        font-family: var(--serif);
-        font-size: 1rem;
-        color: var(--ink-soft);
-        margin: 0;
-        letter-spacing: 0.04em;
-      }
-      .overlay-glyph {
-        margin: 0 auto 1.5rem;
-        width: 4rem;
-        height: 4rem;
-        color: var(--ink);
-        opacity: 0.75;
-      }
-      .finale-mandala {
-        width: 5rem;
-        height: 5rem;
-        animation: mandalaSpin 60s linear infinite;
-      }
-      @keyframes mandalaSpin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-
-      /* FINALE */
-      .finale-count {
-        font-family: var(--serif);
-        font-size: 5rem;
-        font-weight: 400;
-        color: var(--ink);
-        margin: 1.25rem 0 0.5rem;
-        line-height: 1;
-      }
-      .finale-caption {
-        font-family: var(--serif);
-        font-size: 1rem;
-        color: var(--ink-soft);
-        margin: 0 0 2rem;
-        letter-spacing: 0.04em;
-      }
-      .finale-stars {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin: 1rem 0 2.5rem;
-        max-width: 22rem;
-      }
-      .finale-stars svg {
-        width: 1.4rem;
-        height: 1.4rem;
-        color: var(--ink);
-        opacity: 0;
-        animation: starFadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      }
-      @keyframes starFadeIn {
-        from { opacity: 0; transform: scale(0.6) rotate(-12deg); }
-        to   { opacity: 0.85; transform: scale(1) rotate(0); }
-      }
-
-      /* FOOTER */
+      /* ── 頁腳 ──────────────────────────────── */
       .footer-info {
         position: fixed;
         bottom: 1.25rem;
         left: 0;
         right: 0;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: 1.5rem;
         font-size: 0.72rem;
         letter-spacing: 0.2em;
         text-transform: uppercase;
         color: var(--ink-faint);
         pointer-events: none;
       }
-      .footer-info a {
-        color: inherit;
-        text-decoration: none;
-        pointer-events: auto;
-        border-bottom: 1px solid transparent;
-        padding-bottom: 1px;
-        transition: border-color 0.2s;
-      }
-      .footer-info a:hover { border-color: var(--ink-soft); color: var(--ink-soft); }
       .reset {
         background: none;
         border: none;
         color: inherit;
         font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
         cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
         pointer-events: auto;
-        margin-left: 1.5rem;
+        padding: 0;
       }
       .reset:hover { color: var(--ink-soft); }
 
-      /* L3 (climax) — slightly heavier emphasis, no color shift */
-      .stage[data-level="3"] .question {
-        font-size: clamp(1.5rem, 4.5vw, 1.85rem);
-      }
-
-      /* ── Mobile: fit header + card + actions above the fold ── */
+      /* ── 手機：卡片 + 按鈕一屏內 ────────────── */
       @media (max-width: 540px) {
-        html {
-          -webkit-text-size-adjust: 100%;
-          text-size-adjust: 100%;
-        }
-
-        body {
-          min-height: 100dvh;
-        }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { min-height: 100dvh; }
 
         .stage {
           max-width: none;
@@ -501,116 +274,42 @@
             max(1rem, env(safe-area-inset-left));
           display: grid;
           grid-template-rows: auto minmax(0, 1fr) auto;
-          gap: 0.35rem;
+          gap: 0.5rem;
           overflow: hidden;
         }
 
-        .head {
-          margin-bottom: 0;
-          gap: 0.75rem;
-          align-items: center;
-        }
-
-        .counter .num {
-          font-size: 2rem;
-        }
-
-        .counter .num-label {
-          font-size: 0.65rem;
-          letter-spacing: 0.16em;
-        }
-
-        .progress {
-          gap: 0.35rem;
-        }
-
-        .journey {
-          gap: 0.5rem;
-        }
-
-        .leg {
-          gap: 0.35rem;
-        }
-
-        .dot {
-          width: 0.55rem;
-          height: 0.55rem;
-        }
-
-        .leg[data-level="3"] .dot {
-          width: 0.62rem;
-          height: 0.62rem;
-        }
-
-        .threshold {
-          font-size: 0.68rem;
-          max-width: 9.5rem;
-          line-height: 1.25;
-        }
+        .pills { margin-bottom: 0; }
+        .pill { font-size: 0.78rem; padding: 0.3rem 0.75rem; }
 
         .question-block {
           flex: none;
           min-height: 0;
-          justify-content: center;
-          gap: 0.5rem;
-          padding: 0;
+          gap: 0.6rem;
+          padding-bottom: 0;
           overflow: hidden;
         }
 
-        .eyebrow {
-          font-size: 0.65rem;
-          letter-spacing: 0.22em;
-          flex-shrink: 0;
-        }
+        .eyebrow { font-size: 0.65rem; letter-spacing: 0.22em; flex-shrink: 0; }
 
         .deck {
-          --deck-max-h: min(36dvh, 15.5rem, calc(100dvh - 13.5rem));
-          width: min(72vw, 16.5rem, calc(var(--deck-max-h) * 5 / 7));
+          --deck-max-h: min(42dvh, 17rem, calc(100dvh - 13rem));
+          width: min(74vw, 17rem, calc(var(--deck-max-h) * 5 / 7));
           height: auto;
-          aspect-ratio: 5 / 7;
           max-height: var(--deck-max-h);
-          flex-shrink: 1;
         }
 
-        .card.active {
-          padding: 0.85rem 1rem 1rem;
-        }
-
-        .card-symbol svg {
-          width: 58%;
-          max-width: 7.5rem;
-        }
-
-        .card-divider {
-          margin: 0.2rem auto 0.45rem;
-        }
+        .face { padding: 0.85rem 1rem 1rem; }
+        .card-symbol svg { width: 58%; max-width: 7.5rem; }
+        .card-divider { margin: 0.2rem auto 0.45rem; }
 
         .question {
-          font-size: clamp(0.95rem, 3.8vw, 1.15rem);
-          line-height: 1.45;
+          font-size: clamp(1.15rem, 5.2vw, 1.45rem);
+          line-height: 1.4;
           max-width: 100%;
-          max-height: 5.5em;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-          overscroll-behavior: contain;
         }
+        .face.blank-face .question { font-size: clamp(1.35rem, 6.4vw, 1.7rem); }
 
-        .stage[data-level="3"] .question {
-          font-size: clamp(1.05rem, 4.2vw, 1.35rem);
-          max-height: 4.5em;
-        }
-
-        .hint {
-          font-size: 0.78rem;
-          margin: 0.15rem 0 0;
-          flex-shrink: 0;
-        }
-
-        .actions {
-          margin-top: 0;
-          gap: 0.65rem;
-          flex-shrink: 0;
-        }
+        .hint { font-size: 0.78rem; flex-shrink: 0; }
 
         .btn {
           font-size: 0.82rem;
@@ -619,388 +318,296 @@
           min-height: 2.75rem;
         }
 
-        .verdict {
-          gap: 0.45rem;
-          width: 100%;
-        }
-
-        .verdict .btn {
-          flex: 1 1 auto;
-          min-width: 0;
-          padding-left: 1rem;
-          padding-right: 1rem;
-        }
-
         .footer-info {
           bottom: max(0.5rem, env(safe-area-inset-bottom));
           font-size: 0.62rem;
           letter-spacing: 0.14em;
-        }
-
-        .reset {
-          margin-left: 0.85rem;
-        }
-
-        .overlay-inner {
-          padding: 1.25rem;
-          max-width: 92vw;
-        }
-
-        .overlay-title {
-          font-size: 2rem;
-        }
-
-        .overlay-glyph {
-          width: 3.25rem;
-          height: 3.25rem;
-          margin-bottom: 1rem;
-        }
-
-        .finale-count {
-          font-size: 3.5rem;
+          gap: 1rem;
         }
       }
 
-      /* Very short screens (e.g. iPhone SE, landscape phone) */
       @media (max-width: 540px) and (max-height: 680px) {
-        .stage {
-          padding-top: max(2.6rem, calc(env(safe-area-inset-top) + 2.3rem));
-          gap: 0.2rem;
-        }
-
-        .counter .num {
-          font-size: 1.65rem;
-        }
-
+        .stage { padding-top: max(2.6rem, calc(env(safe-area-inset-top) + 2.3rem)); gap: 0.3rem; }
         .deck {
-          --deck-max-h: min(32dvh, 13rem, calc(100dvh - 11.5rem));
-          width: min(64vw, 14rem, calc(var(--deck-max-h) * 5 / 7));
-          max-height: var(--deck-max-h);
+          --deck-max-h: min(36dvh, 14rem, calc(100dvh - 11.5rem));
+          width: min(66vw, 14.5rem, calc(var(--deck-max-h) * 5 / 7));
         }
-
-        .eyebrow {
-          display: none;
-        }
-
-        .hint {
-          font-size: 0.72rem;
-        }
-
-        .card.active {
-          padding: 0.65rem 0.85rem 0.75rem;
-        }
-
-        .card-symbol svg {
-          width: 50%;
-        }
+        .eyebrow { display: none; }
+        .hint { font-size: 0.72rem; }
+        .face { padding: 0.65rem 0.85rem 0.75rem; }
+        .card-symbol svg { width: 50%; }
       }
 
-      @media (max-width: 540px) and (orientation: landscape) {
-        .stage {
-          grid-template-columns: minmax(0, 1fr) auto;
-          grid-template-rows: auto 1fr;
-          grid-template-areas:
-            "head head"
-            "card actions";
-          column-gap: 0.75rem;
-          align-content: stretch;
-        }
-
-        .head {
-          grid-area: head;
-        }
-
-        .question-block {
-          grid-area: card;
-          align-items: flex-start;
-        }
-
-        .deck {
-          --deck-max-h: min(52dvh, 12rem, calc(100dvh - 5rem));
-          width: min(38vw, 11rem, calc(var(--deck-max-h) * 5 / 7));
-          max-height: var(--deck-max-h);
-          margin: 0;
-        }
-
-        .eyebrow,
-        .hint {
-          display: none;
-        }
-
-        .actions {
-          grid-area: actions;
-          justify-content: center;
-          align-self: center;
-          margin-top: 0;
-        }
+      @media (prefers-reduced-motion: reduce) {
+        .card { transition-duration: 0.01ms; }
       }
     </style>
   </head>
   <body>
     <a class="dw-mark" href="index.html">deskwalk</a>
 
-    <!-- Ambient cosmic ornaments -->
-    <div class="ornament ornament-tr" aria-hidden="true">
-      <!-- Concentric ripples — energy field -->
-      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="32" cy="32" r="4" fill="currentColor" stroke="none" />
-        <path d="M20 32 Q20 22 32 22 Q44 22 44 32" />
-        <path d="M14 36 Q14 18 32 18 Q50 18 50 36" />
-        <path d="M8 40 Q8 14 32 14 Q56 14 56 40" />
-      </svg>
-    </div>
+    <main class="stage">
+      <div class="pills" id="pills"></div>
 
-    <div class="ornament ornament-bl" aria-hidden="true">
-      <!-- Pair of lopsided stars with faces — twin spirits -->
-      <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <!-- top star -->
-        <path d="M54 6 L58 24 L74 24 L60 32 L64 50 L52 38 L40 44 L46 30 L36 20 L50 20 Z" />
-        <circle cx="56" cy="26" r="0.8" fill="currentColor" stroke="none" />
-        <circle cx="51" cy="28" r="0.8" fill="currentColor" stroke="none" />
-        <path d="M51 32 Q54 34 57 32" />
-        <!-- bottom star -->
-        <path d="M22 36 L26 50 L40 50 L28 58 L32 74 L20 64 L8 72 L14 58 L4 50 L18 50 Z" />
-        <circle cx="22" cy="54" r="0.8" fill="currentColor" stroke="none" />
-        <circle cx="18" cy="56" r="0.8" fill="currentColor" stroke="none" />
-        <path d="M18 60 Q21 62 24 60" />
-      </svg>
-    </div>
-
-    <div class="stage" id="stage" data-level="1">
-
-      <header class="head">
-        <div class="counter">
-          <span class="num" id="totalCount">0</span>
-          <span class="num-label">
-            <svg class="glyph-inline" width="9" height="9" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M8 0 L9.5 5.5 L15 7 L9.5 8.5 L8 14 L6.5 8.5 L1 7 L6.5 5.5 Z" />
-            </svg>
-            共感
-          </span>
-        </div>
-        <div class="progress">
-          <div class="journey" id="journey">
-            <div class="leg" data-level="1">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="leg" data-level="2">
-              <span class="dot"></span><span class="dot"></span>
-            </div>
-            <div class="leg" data-level="3">
-              <span class="dot"></span>
+      <div class="question-block">
+        <p class="eyebrow" id="kindLabel">集體潛意識</p>
+        <div class="deck" id="deck">
+          <div class="card" data-pos="0" role="button" tabindex="0" aria-label="下一題">
+            <div class="face">
+              <div class="card-symbol" aria-hidden="true"></div>
+              <div class="card-divider" aria-hidden="true"></div>
+              <p class="question placeholder">輕按或掃卡片</p>
             </div>
           </div>
-          <span class="threshold" id="thresholdText">第一階段 · 第 1 / 3 題</span>
+          <div class="card" data-pos="1" aria-hidden="true"></div>
+          <div class="card" data-pos="2" aria-hidden="true"></div>
         </div>
-      </header>
-
-      <div class="question-block" id="qBlock">
-        <p class="eyebrow" id="phaseLabel">第一階段 · 暖身</p>
-        <div class="deck">
-          <div class="card stack-2" aria-hidden="true"></div>
-          <div class="card stack-1" aria-hidden="true"></div>
-          <div class="card active" id="bubble">
-            <div class="card-symbol" id="cardSymbol" aria-hidden="true"></div>
-            <div class="card-divider" aria-hidden="true"></div>
-            <p class="question placeholder" id="question">準備好了嗎</p>
-          </div>
-        </div>
-        <p class="hint" id="hint">按下方開始</p>
+        <p class="hint" id="hint">全員各自寫答案，一樣就是集體潛意識</p>
       </div>
 
       <div class="actions">
-        <div class="verdict" id="verdict">
-          <button class="btn btn-primary" onclick="record(true)">共感</button>
-          <button class="btn btn-ghost" onclick="record(false)">未中</button>
-        </div>
-        <button class="btn btn-primary" id="drawBtn" onclick="draw()">開始儀式</button>
+        <button class="btn" id="nextBtn" type="button">下一題</button>
       </div>
-
-    </div>
-
-    <!-- Transition overlay between levels -->
-    <div class="overlay" id="transition">
-      <div class="overlay-inner">
-        <!-- Glyph swapped per destination level by JS -->
-        <div id="transitionGlyph">
-          <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M32 6 L36 28 L58 32 L36 36 L32 58 L28 36 L6 32 L28 28 Z" />
-          </svg>
-        </div>
-        <p class="overlay-eyebrow" id="transitionEyebrow">你們進入</p>
-        <p class="overlay-title">第<span class="roman" id="transitionRoman">二</span>階段</p>
-        <p class="overlay-sub" id="transitionSub">升溫</p>
-      </div>
-    </div>
-
-    <!-- Glyph library (hidden — JS clones into transition overlay) -->
-    <div id="glyphLibrary" hidden>
-      <!-- Level 2 — energy ripples (升溫 = warming, energy waves) -->
-      <template id="glyph-l2">
-        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="32" cy="36" r="3" fill="currentColor" stroke="none" />
-          <path d="M18 36 Q18 26 32 26 Q46 26 46 36" />
-          <path d="M12 38 Q12 20 32 20 Q52 20 52 38" />
-          <path d="M6 40 Q6 14 32 14 Q58 14 58 40" />
-        </svg>
-      </template>
-      <!-- Level 3 — hands holding orb (共感 = the held moment) -->
-      <template id="glyph-l3">
-        <svg class="overlay-glyph" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="32" cy="22" r="5" fill="currentColor" stroke="none" />
-          <path d="M16 60 Q12 44 16 32 Q20 18 30 16" />
-          <path d="M20 60 Q18 46 22 34 Q26 22 30 20" />
-          <path d="M48 60 Q52 44 48 32 Q44 18 34 16" />
-          <path d="M44 60 Q46 46 42 34 Q38 22 34 20" />
-        </svg>
-      </template>
-    </div>
-
-    <!-- Finale overlay -->
-    <div class="overlay" id="finale">
-      <div class="overlay-inner">
-        <svg class="overlay-glyph finale-mandala" viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <!-- Outer rays -->
-          <g opacity="0.5">
-            <line x1="40" y1="4" x2="40" y2="14" />
-            <line x1="40" y1="66" x2="40" y2="76" />
-            <line x1="4" y1="40" x2="14" y2="40" />
-            <line x1="66" y1="40" x2="76" y2="40" />
-            <line x1="14" y1="14" x2="20" y2="20" />
-            <line x1="60" y1="60" x2="66" y2="66" />
-            <line x1="66" y1="14" x2="60" y2="20" />
-            <line x1="14" y1="66" x2="20" y2="60" />
-          </g>
-          <!-- Concentric rings -->
-          <circle cx="40" cy="40" r="28" opacity="0.35" />
-          <circle cx="40" cy="40" r="20" opacity="0.6" />
-          <circle cx="40" cy="40" r="12" opacity="0.85" />
-          <!-- Core star -->
-          <path d="M40 30 L42 38 L50 40 L42 42 L40 50 L38 42 L30 40 L38 38 Z" fill="currentColor" stroke="none" />
-        </svg>
-        <p class="overlay-eyebrow">這場儀式完成</p>
-        <p class="finale-count" id="finalCount">0</p>
-        <p class="finale-caption">個共感被你們共同寫下</p>
-        <div class="finale-stars" id="finalStars"></div>
-        <button class="btn btn-ghost" onclick="restart()">再走一次</button>
-      </div>
-    </div>
+    </main>
 
     <footer class="footer-info">
-      <button class="reset" onclick="resetSession()">重置</button>
+      <span id="deckCount"></span>
+      <button class="reset" id="shuffleBtn" type="button">重新洗牌</button>
     </footer>
 
     <script>
-      const BANK = {
-        1: [
-          { q: "寫出 #{n} 首代表香港的歌", n: 3 },
-          { q: "寫出 #{n} 部小時候必看的卡通", n: 3 },
-          { q: "寫出 #{n} 樣最有香港味的茶餐廳食物", n: 3 },
-          { q: "寫出 #{n} 個一定要帶外國朋友去的香港地點", n: 3 },
-          { q: "寫出 #{n} 部最代表香港的電影", n: 3 },
-          { q: "寫出 #{n} 個你覺得最香港的食物", n: 3 },
-          { q: "寫出 #{n} 個讓你哭過的廣告", n: 3 },
-          { q: "寫出 #{n} 個香港人最常用的口頭禪", n: 3 },
-          { q: "寫出 #{n} 首婚禮必播的歌", n: 3 },
-          { q: "寫出 #{n} 個夜深會去吃的宵夜", n: 3 },
-          { q: "寫出 #{n} 個冬天必喝的飲料", n: 3 },
-          { q: "寫出 #{n} 個小時候放學會去的地方", n: 3 },
-          { q: "寫出 #{n} 部 90 年代的港劇", n: 3 },
-          { q: "寫出 #{n} 個香港經典男歌手", n: 3 },
-          { q: "寫出 #{n} 個香港經典女歌手", n: 3 },
-          { q: "寫出 #{n} 個 7-Eleven 必買的零食", n: 3 },
-          { q: "寫出 #{n} 個 KTV 必點的歌", n: 3 },
-          { q: "寫出 #{n} 樣冬日街頭小食", n: 3 },
-          { q: "寫出 #{n} 個港鐵站名", n: 3 },
-          { q: "寫出 #{n} 個小時候的玩具", n: 3 },
-          { q: "寫出 #{n} 樣早餐標配", n: 3 },
-          { q: "寫出 #{n} 個放工後最想做的事", n: 3 },
-          { q: "寫出 #{n} 個會讓人想念童年的味道", n: 3 },
-          { q: "寫出 #{n} 個讓你想起暑假的東西", n: 3 },
-          { q: "寫出 #{n} 個一聽就知道是香港的口頭禪", n: 3 },
-          { q: "寫出 #{n} 種港式麵食", n: 3 },
-          { q: "寫出 #{n} 個小學常做的考試前儀式", n: 3 },
-          { q: "寫出 #{n} 部你會看完還想再看的電影", n: 3 },
-          { q: "寫出 #{n} 個香港人最常點的飲料", n: 3 },
-          { q: "寫出 #{n} 樣媽媽煮過最常的菜", n: 3 },
-        ],
-        2: [
-          { q: "寫出 #{n} 個適合做名字的水果", n: 2 },
-          { q: "寫出 #{n} 個聽起來很貴但其實便宜的東西", n: 2 },
-          { q: "寫出 #{n} 個適合當寵物名字的食物", n: 2 },
-          { q: "寫出 #{n} 個最浪漫的家具", n: 2 },
-          { q: "寫出 #{n} 個最像天氣的情緒", n: 2 },
-          { q: "寫出 #{n} 個最適合做暗號的詞", n: 2 },
-          { q: "寫出 #{n} 個最像愛情的飲料", n: 2 },
-          { q: "寫出 #{n} 個最不該出現在喪禮的歌", n: 2 },
-          { q: "寫出 #{n} 個最像星期一的食物", n: 2 },
-          { q: "寫出 #{n} 種你願意當的動物", n: 2 },
-          { q: "寫出 #{n} 個最像「孤獨」的物件", n: 2 },
-          { q: "寫出 #{n} 個最可能在桌上玩家裡爆紅的人", n: 2 },
-          { q: "寫出 #{n} 個最像貓的桌上玩家", n: 2 },
-          { q: "寫出 #{n} 個會在半夜傳訊息給你的玩家", n: 2 },
-          { q: "寫出 #{n} 個最像深夜便利店的城市", n: 2 },
-          { q: "寫出 #{n} 個最像「失眠」的物件", n: 2 },
-          { q: "寫出 #{n} 個最像「曖昧」的食物", n: 2 },
-          { q: "寫出 #{n} 個最像凌晨四點的聲音", n: 2 },
-          { q: "寫出 #{n} 個最不浪漫的求婚地點", n: 2 },
-          { q: "寫出 #{n} 個放床頭最舒服的東西", n: 2 },
-          { q: "寫出 #{n} 個容易被忽略的小幸福", n: 2 },
-          { q: "寫出 #{n} 個最像「等待」的姿勢", n: 2 },
-          { q: "寫出 #{n} 個最像深秋的食物", n: 2 },
-          { q: "寫出 #{n} 個最讓人放鬆的聲音", n: 2 },
-          { q: "寫出 #{n} 個最像「鄉愁」的物品", n: 2 },
-          { q: "寫出 #{n} 個你不敢公開的小嗜好", n: 2 },
-          { q: "寫出 #{n} 個重複一千次會發瘋的詞", n: 2 },
-          { q: "寫出 #{n} 種會讓你想哭的香氣", n: 2 },
-          { q: "寫出 #{n} 個最像 80 年代的顏色", n: 2 },
-          { q: "寫出 #{n} 個最像「逃避」的行為", n: 2 },
-          { q: "寫出 #{n} 個最像「成長」的時刻", n: 2 },
-          { q: "寫出 #{n} 個最像分手後第一天的東西", n: 2 },
-          { q: "寫出 #{n} 個聽起來像名字的天氣", n: 2 },
-          { q: "寫出 #{n} 個夜裡最想擁抱的物件", n: 2 },
-          { q: "寫出 #{n} 個最像第一次心動的食物", n: 2 },
-        ],
-        3: [
-          { q: "畫一個圖形", n: 1, abstract: true },
-          { q: "寫一個顏色", n: 1, abstract: true },
-          { q: "寫一個動物", n: 1, abstract: true },
-          { q: "寫一個 1 到 10 的數字", n: 1, abstract: true },
-          { q: "寫一個字 代表今晚", n: 1, abstract: true },
-          { q: "寫一個季節", n: 1, abstract: true },
-          { q: "想一個聲音", n: 1, abstract: true },
-          { q: "畫一個你想送給大家的禮物", n: 1, abstract: true },
-          { q: "寫一個讓人想哭的詞", n: 1, abstract: true },
-          { q: "寫一個能形容這群人的字", n: 1, abstract: true },
-          { q: "畫一個你心裡的「家」", n: 1, abstract: true },
-          { q: "寫一個天氣", n: 1, abstract: true },
-          { q: "想一個味道", n: 1, abstract: true },
-          { q: "寫一個動作", n: 1, abstract: true },
-          { q: "畫一個讓世界停下來的瞬間", n: 1, abstract: true },
-          { q: "寫一個讓世界變慢的詞", n: 1, abstract: true },
-          { q: "寫一個最神聖的字", n: 1, abstract: true },
-          { q: "想一個讓你想起媽媽的物件", n: 1, abstract: true },
-          { q: "寫一個能形容愛的字", n: 1, abstract: true },
-          { q: "寫一個能形容寂寞的字", n: 1, abstract: true },
-          { q: "畫一個你做過最美的夢", n: 1, abstract: true },
-          { q: "寫一個你想藏起來的字", n: 1, abstract: true },
-          { q: "寫一個你想留給未來自己的字", n: 1, abstract: true },
-          { q: "寫一個會讓所有人安靜下來的詞", n: 1, abstract: true },
-          { q: "寫一個最像今晚天氣的字", n: 1, abstract: true },
-          { q: "想一個流星劃過時你會許的願", n: 1, abstract: true },
-          { q: "畫一個此刻的心情", n: 1, abstract: true },
-          { q: "想一個能代表這群人的圖騰", n: 1, abstract: true },
-          { q: "寫一個你覺得永恆的東西", n: 1, abstract: true },
-          { q: "寫一個第一次見到海時的感覺", n: 1, abstract: true },
-          { q: "畫一道光", n: 1, abstract: true },
-          { q: "想一個能代替「再見」的詞", n: 1, abstract: true },
-          { q: "寫一個你願意守一輩子的秘密的形狀", n: 1, abstract: true },
-          { q: "畫一條河", n: 1, abstract: true },
-          { q: "寫一個此刻最想對自己說的字", n: 1, abstract: true },
-        ]
-      };
+      // 一題一個答案：全員寫同一個答案就是集體潛意識。
+      // kind 預設 "prompt"（默契題）；"blank" = 填空題，＿ 是空格。
+      const BANK = [
+        // ── 默契題 · 香港 ────────────────────────────
+        { q: "代表香港的一首歌" },
+        { q: "最代表香港的電影" },
+        { q: "最經典的港產片對白" },
+        { q: "90 年代的港劇" },
+        { q: "帶外國朋友去的香港景點" },
+        { q: "遊客最常拍照的地方" },
+        { q: "最難唸對的港鐵站" },
+        { q: "最常見的香港街名" },
+        { q: "最想搬去住的香港地區" },
+        { q: "最能代表香港的味道" },
+        { q: "茶餐廳必點的餐" },
+        { q: "茶餐廳伙記最常喊的暗語" },
+        { q: "落單時最常加的一句要求" },
+        { q: "飲茶必叫的點心" },
+        { q: "港式早餐的標配" },
+        { q: "冬日街頭小食" },
+        { q: "街邊最常見的糖水" },
+        { q: "香港最好食的一種粥" },
+        { q: "火鍋必點的一味" },
+        { q: "打邊爐最容易被搶的一件" },
+        { q: "燒烤場最先燒的東西" },
+        { q: "一群人吃飯必叫的菜" },
+        { q: "行山之後一定要吃的東西" },
+        { q: "街市阿姐最常講的一句" },
+        { q: "屋企最常煲的湯" },
 
-      const THRESHOLDS = { 1: 3, 2: 2, 3: 1 };  // 每階段需要的淨共感數（難度遞增、次數遞減）
+        // ── 默契題 · 童年 ────────────────────────────
+        { q: "小時候必看的卡通" },
+        { q: "最懷念的兒童節目" },
+        { q: "小時候放學會去的地方" },
+        { q: "小時候最想要的玩具" },
+        { q: "童年最常玩的遊戲機" },
+        { q: "小學旅行必帶的零食" },
+        { q: "學校旅行必去的地方" },
+        { q: "小時候最怕的一科" },
+        { q: "考試前的迷信儀式" },
+        { q: "中學最流行的髮型" },
+        { q: "小時候最想擁有的超能力" },
+        { q: "最想念的童年味道" },
+        { q: "一想起就是暑假的東西" },
+        { q: "最想再看一次的動畫電影" },
+        { q: "第一部擁有的手機牌子" },
+        { q: "最經典的手機鈴聲" },
+
+        // ── 默契題 · 節日與人情 ──────────────────────
+        { q: "婚禮必播的歌" },
+        { q: "婚宴必食的一道菜" },
+        { q: "婚宴上最尷尬的環節" },
+        { q: "求婚最老套的地點" },
+        { q: "拍拖第一次去的地方" },
+        { q: "情人節最常收到的禮物" },
+        { q: "送禮最安全的選擇" },
+        { q: "同事離職最常見的告別禮物" },
+        { q: "生日一定要吃的東西" },
+        { q: "生日會最無聊的遊戲" },
+        { q: "party 最先被食完的零食" },
+        { q: "農曆新年必聽的歌" },
+        { q: "拜年最常聽到的一句" },
+        { q: "利是封上最常見的字" },
+        { q: "過年最怕被問的問題" },
+        { q: "中秋節除了月餅還會做的事" },
+        { q: "除夕倒數會去的地方" },
+        { q: "媽媽最常煮的一道菜" },
+        { q: "最常聽到的媽媽口頭禪" },
+        { q: "阿嫲最常煮的一味" },
+        { q: "爸爸放假最常做的事" },
+        { q: "媽媽用來裝針線的容器" },
+
+        // ── 默契題 · 日常 ────────────────────────────
+        { q: "遲到最常用嘅藉口" },
+        { q: "推掉約會最常用的藉口" },
+        { q: "已讀不回最常見的原因" },
+        { q: "放工後最想做的事" },
+        { q: "開會最常聽到的廢話" },
+        { q: "老細最常講的一句" },
+        { q: "見工最常被問的問題" },
+        { q: "CV 上最沒用的一項技能" },
+        { q: "視像會議最常出的意外" },
+        { q: "手機第一頁一定有的 app" },
+        { q: "最常用的 emoji" },
+        { q: "群組裡最常出現的貼圖" },
+        { q: "訂枱最常報的假名" },
+        { q: "屋企 WiFi 名最常見的寫法" },
+        { q: "最常被寫錯的中文字" },
+        { q: "最常見的英文名" },
+        { q: "寵物最常見的名字" },
+        { q: "通宵溫書的續命飲品" },
+        { q: "冬天必喝的飲料" },
+        { q: "夏天最消暑的甜品" },
+        { q: "最常買的即食麵口味" },
+        { q: "麥當勞必叫的東西" },
+        { q: "7-Eleven 必買的零食" },
+        { q: "最常在便利店買的宵夜" },
+        { q: "夜深會去吃的宵夜" },
+        { q: "一個人吃飯最常去的店" },
+        { q: "入場看電影必買的東西" },
+        { q: "外賣最常忘記的東西" },
+        { q: "屋企雪櫃最舊的一件食物" },
+        { q: "家裡最多備份的日用品" },
+        { q: "家裡一定有但很少用的電器" },
+        { q: "過期都捨不得掉的東西" },
+        { q: "搬屋最先打包的東西" },
+        { q: "行李最後才記得帶的東西" },
+        { q: "到機場最先做的一件事" },
+        { q: "露營最沒用但都會帶的東西" },
+        { q: "最常在巴士上做的事" },
+        { q: "港鐵上最常見的畫面" },
+        { q: "搭電梯最尷尬的一刻" },
+        { q: "塞車時最常做的事" },
+        { q: "的士司機最常講的一句" },
+        { q: "落雨天最麻煩的一件事" },
+        { q: "打風前超市最快賣光的東西" },
+        { q: "打風不用上班會做的事" },
+        { q: "看醫生最常講的一句" },
+        { q: "感冒必飲的東西" },
+        { q: "六合彩最常買的號碼" },
+        { q: "KTV 必點的歌" },
+        { q: "分手時會單曲循環的歌" },
+        { q: "讓你哭過的廣告" },
+        { q: "最經典的廣告歌" },
+        { q: "香港人最常用的口頭禪" },
+        { q: "食飯時電視必開的節目" },
+        { q: "最能代表夏天的聲音" },
+        { q: "最能代表冬天的味道" },
+
+        // ── 填空題 ──────────────────────────────────
+        { q: "＿蛋糕", kind: "blank" },
+        { q: "＿糖", kind: "blank" },
+        { q: "＿茶", kind: "blank" },
+        { q: "＿麵", kind: "blank" },
+        { q: "＿飯", kind: "blank" },
+        { q: "＿粥", kind: "blank" },
+        { q: "＿包", kind: "blank" },
+        { q: "＿雪糕", kind: "blank" },
+        { q: "＿咖啡", kind: "blank" },
+        { q: "＿汁", kind: "blank" },
+        { q: "＿湯", kind: "blank" },
+        { q: "＿菜", kind: "blank" },
+        { q: "＿餅", kind: "blank" },
+        { q: "＿酒", kind: "blank" },
+        { q: "＿奶", kind: "blank" },
+        { q: "綠＿", kind: "blank" },
+        { q: "紅＿", kind: "blank" },
+        { q: "白＿", kind: "blank" },
+        { q: "黑＿", kind: "blank" },
+        { q: "金＿", kind: "blank" },
+        { q: "藍＿", kind: "blank" },
+        { q: "黃＿", kind: "blank" },
+        { q: "＿廣場", kind: "blank" },
+        { q: "＿街", kind: "blank" },
+        { q: "＿道", kind: "blank" },
+        { q: "＿公園", kind: "blank" },
+        { q: "＿山", kind: "blank" },
+        { q: "＿灣", kind: "blank" },
+        { q: "＿城", kind: "blank" },
+        { q: "＿橋", kind: "blank" },
+        { q: "＿村", kind: "blank" },
+        { q: "＿邨", kind: "blank" },
+        { q: "＿站", kind: "blank" },
+        { q: "＿角", kind: "blank" },
+        { q: "＿時間", kind: "blank" },
+        { q: "＿日", kind: "blank" },
+        { q: "＿夜", kind: "blank" },
+        { q: "＿季", kind: "blank" },
+        { q: "＿年", kind: "blank" },
+        { q: "＿月", kind: "blank" },
+        { q: "＿書", kind: "blank" },
+        { q: "＿歌", kind: "blank" },
+        { q: "＿戲", kind: "blank" },
+        { q: "＿夢", kind: "blank" },
+        { q: "＿信", kind: "blank" },
+        { q: "＿故事", kind: "blank" },
+        { q: "＿電影", kind: "blank" },
+        { q: "大＿", kind: "blank" },
+        { q: "小＿", kind: "blank" },
+        { q: "老＿", kind: "blank" },
+        { q: "超級＿", kind: "blank" },
+        { q: "半＿", kind: "blank" },
+        { q: "真＿", kind: "blank" },
+        { q: "假＿", kind: "blank" },
+        { q: "無＿", kind: "blank" },
+        { q: "＿之王", kind: "blank" },
+        { q: "＿人", kind: "blank" },
+        { q: "＿手", kind: "blank" },
+        { q: "＿星", kind: "blank" },
+        { q: "＿神", kind: "blank" },
+        { q: "＿王", kind: "blank" },
+        { q: "＿貓", kind: "blank" },
+        { q: "＿狗", kind: "blank" },
+        { q: "＿魚", kind: "blank" },
+        { q: "＿鳥", kind: "blank" },
+        { q: "＿虎", kind: "blank" },
+        { q: "＿馬", kind: "blank" },
+        { q: "＿水", kind: "blank" },
+        { q: "＿花", kind: "blank" },
+        { q: "＿風", kind: "blank" },
+        { q: "＿雨", kind: "blank" },
+        { q: "＿光", kind: "blank" },
+        { q: "＿火", kind: "blank" },
+        { q: "＿雲", kind: "blank" },
+        { q: "＿海", kind: "blank" },
+        { q: "＿石", kind: "blank" },
+        { q: "夜＿", kind: "blank" },
+        { q: "心＿", kind: "blank" },
+        { q: "天＿", kind: "blank" },
+        { q: "太＿", kind: "blank" },
+        { q: "＿車", kind: "blank" },
+        { q: "＿機", kind: "blank" },
+        { q: "＿門", kind: "blank" },
+        { q: "＿房", kind: "blank" },
+        { q: "＿床", kind: "blank" },
+        { q: "＿袋", kind: "blank" },
+        { q: "＿鞋", kind: "blank" },
+        { q: "＿衫", kind: "blank" },
+      ];
+
+      const KIND_LABEL = { prompt: "默契題", blank: "填空題" };
+      const KIND_HINT = {
+        prompt: "各自寫一個答案",
+        blank: "各自填一個詞"
+      };
+      const FILTERS = [
+        { k: "all",    label: "全部" },
+        { k: "prompt", label: "默契題" },
+        { k: "blank",  label: "填空題" },
+      ];
+
+      const kindOf = p => (p.kind === "blank" ? "blank" : "prompt");
 
       // --- Procedural symbol generator (Matisse cutout style) ---------
       function rng(seed) {
@@ -1043,29 +650,22 @@
         const type = Math.floor(r() * 5);
 
         if (type === 0) {
-          // Single irregular bloom
-          const baseR = 28 + r() * 8;
-          paths.push(blobPath(cx, cy, baseR, 7 + Math.floor(r() * 5), 0.25 + r() * 0.3, r));
+          paths.push(blobPath(cx, cy, 28 + r() * 8, 7 + Math.floor(r() * 5), 0.25 + r() * 0.3, r));
         } else if (type === 1) {
-          // Burst — high irregularity, more lobes
           paths.push(blobPath(cx, cy, 26 + r() * 6, 10 + Math.floor(r() * 4), 0.55 + r() * 0.3, r));
         } else if (type === 2) {
-          // Pair — two overlapping forms
           const dx = 8 + r() * 6, dy = 6 + r() * 5;
           paths.push(blobPath(cx - dx, cy - dy, 18 + r() * 4, 8, 0.3 + r() * 0.2, r));
           paths.push(blobPath(cx + dx, cy + dy, 14 + r() * 4, 7, 0.35 + r() * 0.2, r));
         } else if (type === 3) {
-          // Cluster of small bodies orbiting
           const count = 3 + Math.floor(r() * 3);
           const orbit = 18 + r() * 6;
           for (let i = 0; i < count; i++) {
             const ang = (i / count) * Math.PI * 2 + r() * 0.4;
-            const cxx = cx + Math.cos(ang) * orbit;
-            const cyy = cy + Math.sin(ang) * orbit;
-            paths.push(blobPath(cxx, cyy, 7 + r() * 5, 6 + Math.floor(r() * 3), 0.25 + r() * 0.25, r));
+            paths.push(blobPath(cx + Math.cos(ang) * orbit, cy + Math.sin(ang) * orbit,
+                                7 + r() * 5, 6 + Math.floor(r() * 3), 0.25 + r() * 0.25, r));
           }
         } else {
-          // Big body + small companion
           paths.push(blobPath(cx - 6, cy + 2, 24 + r() * 5, 8, 0.3 + r() * 0.2, r));
           paths.push(blobPath(cx + 18, cy - 16, 6 + r() * 4, 7, 0.4, r));
         }
@@ -1073,281 +673,214 @@
         const inner = paths.map(d => `<path d="${d}" fill="currentColor" />`).join("");
         return `<svg viewBox="0 0 ${VB} ${VB}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${inner}</svg>`;
       }
-      const ROMAN = { 1: "一", 2: "二", 3: "三" };
-      const PHASE_NAMES = { 1: "暖身", 2: "升溫", 3: "共感" };
-      const STORAGE_KEY = "deskwalk-session-v7";
 
-      function freshSession() {
-        return {
-          level: 1,
-          net: { 1: 0, 2: 0, 3: 0 },  // net 共感 per level (wins - fails, floored)
-          used: { 1: [], 2: [], 3: [] }, // indices of questions already drawn this session
-          done: false,
-          started: false
+      // --- Deck ---------------------------------------------------------
+      const deckEl   = document.getElementById("deck");
+      const hintEl   = document.getElementById("hint");
+      const kindEl   = document.getElementById("kindLabel");
+      const countEl  = document.getElementById("deckCount");
+      const pillsEl  = document.getElementById("pills");
+
+      let filter = "all";
+      let pool = [];      // 未抽的題目，抽完自動重洗
+      let drawn = 0;      // 這副牌已抽的題數
+      let order = [...deckEl.querySelectorAll(".card")];  // order[0] = 面頂那張
+      let onDeck = null;  // 已經寫喺 order[1] 度、下一張會上場的題目
+      let busy = false;
+
+      const inFilter = p => filter === "all" || kindOf(p) === filter;
+
+      function shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+      function refill() {
+        pool = shuffle(BANK.filter(inFilter).slice());
+        drawn = 0;
+      }
+      function renderCount() {
+        const total = BANK.filter(inFilter).length;
+        countEl.textContent = `${drawn} / ${total}`;
+      }
+
+      FILTERS.forEach(f => {
+        const n = f.k === "all" ? BANK.length : BANK.filter(p => kindOf(p) === f.k).length;
+        const b = document.createElement("button");
+        b.className = "pill";
+        b.type = "button";
+        b.dataset.k = f.k;
+        b.setAttribute("aria-pressed", String(f.k === filter));
+        b.innerHTML = `${f.label}<span class="n">${n}</span>`;
+        b.onclick = () => {
+          if (filter === f.k) return;
+          filter = f.k;
+          [...pillsEl.children].forEach(el =>
+            el.setAttribute("aria-pressed", String(el.dataset.k === filter)));
+          refill();
+          preload();     // 換咗題型，牌堆下一張要即刻換返啱
+          renderCount();
+          next();
         };
-      }
-      function totalNet() {
-        return session.net[1] + session.net[2] + session.net[3];
-      }
-      function loadSession() {
-        try {
-          const raw = sessionStorage.getItem(STORAGE_KEY);
-          return raw ? { ...freshSession(), ...JSON.parse(raw) } : freshSession();
-        } catch { return freshSession(); }
-      }
-      function saveSession() { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session)); }
+        pillsEl.appendChild(b);
+      });
 
-      let session = loadSession();
-      let lastQuestion = null;
-      let pendingLevel = null;  // level of currently-shown question (waiting for verdict)
-      let busy = false;         // suppress interactions during transitions
-
-      // --- Render -------------------------------------------------------
-      function renderCounter() {
-        document.getElementById("totalCount").textContent = totalNet();
+      function faceHTML(pick) {
+        const kind = kindOf(pick);
+        const body = kind === "blank"
+          ? pick.q.replace(/＿/g, '<span class="blank"></span>')
+          : pick.q;
+        return `<div class="face${kind === "blank" ? " blank-face" : ""}">
+              <div class="card-symbol" aria-hidden="true">${generateSymbolSVG()}</div>
+              <div class="card-divider" aria-hidden="true"></div>
+              <p class="question">${body}</p>
+            </div>`;
       }
-      function renderDots() {
-        [1, 2, 3].forEach(lv => {
-          const leg = document.querySelector(`.leg[data-level="${lv}"]`);
-          const dots = leg.querySelectorAll(".dot");
-          const filled = session.net[lv];
-          dots.forEach((d, i) => {
-            d.classList.remove("win", "current");
-            if (i < filled) {
-              d.classList.add("win");
-            } else if (lv === session.level && i === filled && !session.done) {
-              d.classList.add("current");
-            }
-          });
+
+      function applyRoles() {
+        order.forEach((c, i) => {
+          c.dataset.pos = i;
+          if (i === 0) {
+            c.setAttribute("role", "button");
+            c.setAttribute("tabindex", "0");
+            c.setAttribute("aria-label", "下一題");
+            c.removeAttribute("aria-hidden");
+          } else {
+            c.removeAttribute("role");
+            c.removeAttribute("tabindex");
+            c.removeAttribute("aria-label");
+            c.setAttribute("aria-hidden", "true");
+          }
         });
       }
-      function renderThreshold() {
-        const tEl = document.getElementById("thresholdText");
-        if (session.done) { tEl.textContent = "儀式完成"; return; }
-        const lv = session.level;
-        const need = THRESHOLDS[lv] - session.net[lv];
-        const nextPhase = lv < 3 ? `第${ROMAN[lv + 1]}階段` : "儀式終局";
-        if (need <= 0) {
-          tEl.textContent = "即將進入下一階段";
-        } else if (lv === 3) {
-          tEl.textContent = `再 ${need} 個共感 完成儀式`;
-        } else {
-          tEl.textContent = `再 ${need} 個共感 進入${nextPhase}`;
-        }
-      }
-      function renderPhaseLabel() {
-        document.getElementById("phaseLabel").textContent =
-          `第${ROMAN[session.level]}階段 · ${PHASE_NAMES[session.level]}`;
-      }
-      function renderAll() {
-        renderCounter(); renderDots(); renderThreshold(); renderPhaseLabel();
-        document.getElementById("stage").dataset.level = session.level;
+
+      // 下一題預先寫喺牌堆第二張度，所以一掃開面頂張牌就見到，
+      // 唔使等放手先 render。
+      function preload() {
+        if (!pool.length) refill();
+        onDeck = pool.pop();
+        order[1].innerHTML = faceHTML(onDeck);
       }
 
-      // --- Draw ---------------------------------------------------------
-      function showReadyState() {
-        const qEl = document.getElementById("question");
-        const bubble = document.getElementById("bubble");
-        const symEl = document.getElementById("cardSymbol");
-        qEl.classList.add("placeholder");
-        qEl.textContent = "準備好了嗎";
-        document.getElementById("hint").textContent = "全員圍坐，按下方開始";
-        symEl.innerHTML = "";
-        bubble.classList.remove("exit", "enter");
-        document.getElementById("verdict").classList.remove("show");
-        document.getElementById("drawBtn").style.display = "";
-        pendingLevel = null;
-      }
-
-      function draw() {
-        if (busy || session.done) return;
-        session.started = true;
-
-        const bank = BANK[session.level];
-        const used = session.used[session.level];
-        let pool = [];
-        for (let i = 0; i < bank.length; i++) {
-          if (!used.includes(i)) pool.push(i);
-        }
-        if (pool.length === 0) {
-          session.used[session.level] = [];
-          for (let i = 0; i < bank.length; i++) pool.push(i);
-        }
-        const idx = pool[Math.floor(Math.random() * pool.length)];
-        session.used[session.level].push(idx);
-        const pick = bank[idx];
-        lastQuestion = pick;
-        saveSession();
-
-        const qEl = document.getElementById("question");
-        const bubble = document.getElementById("bubble");
-        const hintEl = document.getElementById("hint");
-        const symEl = document.getElementById("cardSymbol");
-        document.getElementById("drawBtn").style.display = "none";
-        document.getElementById("verdict").classList.remove("show");
-
-        const isFirstDraw = qEl.classList.contains("placeholder");
-
-        const renderContent = () => {
-          qEl.classList.remove("placeholder");
-          if (pick.abstract) {
-            qEl.innerHTML = pick.q;
-            hintEl.textContent = "全員寫一樣才算成立";
-          } else {
-            qEl.innerHTML = pick.q.replace("#{n}", `<span class="count">${pick.n}</span>`);
-            hintEl.textContent = pick.n === 1
-              ? "全員寫一樣才算成立"
-              : `寫 ${pick.n} 個 · 至少 1 個全員都寫了的`;
-          }
-          symEl.innerHTML = generateSymbolSVG();
-        };
-
-        if (isFirstDraw) {
-          // First card slides up from the deck
-          bubble.classList.add("enter");
-          renderContent();
-          requestAnimationFrame(() => {
-            bubble.classList.remove("enter");
-            setTimeout(() => {
-              pendingLevel = session.level;
-              document.getElementById("verdict").classList.add("show");
-            }, 480);
-          });
-        } else {
-          // Top card flies off, next card slides up from deck
-          bubble.classList.add("exit");
-          setTimeout(() => {
-            renderContent();
-            bubble.classList.remove("exit");
-            bubble.classList.add("enter");
-            requestAnimationFrame(() => {
-              bubble.classList.remove("enter");
-              setTimeout(() => {
-                pendingLevel = session.level;
-                document.getElementById("verdict").classList.add("show");
-              }, 480);
-            });
-          }, 420);
-        }
-      }
-
-      // --- Record (after a question is answered) -----------------------
-      function record(achieved) {
-        if (pendingLevel == null || busy || session.done) return;
-        const lv = pendingLevel;
-        pendingLevel = null;
-        document.getElementById("verdict").classList.remove("show");
-
-        if (achieved) {
-          session.net[lv] = Math.min(THRESHOLDS[lv], session.net[lv] + 1);
-          pulseCount("win");
-        } else {
-          if (session.net[lv] > 0) {
-            session.net[lv] -= 1;
-            pulseCount("loss");
-          }
-          // if already at 0, fail is absorbed silently
-        }
-        saveSession();
-        renderCounter();
-        renderDots();
-        renderThreshold();
-
-        // Threshold check: advance to next level or finale
-        if (session.net[lv] >= THRESHOLDS[lv]) {
-          if (lv < 3) {
-            showTransition(lv + 1);
-          } else {
-            showFinale();
-          }
-          return;
-        }
-
-        // Auto-flow: next question after a brief beat for feedback
-        setTimeout(() => { if (!busy && !session.done) draw(); }, 750);
-      }
-
-      function pulseCount(kind) {
-        const num = document.getElementById("totalCount");
-        num.classList.remove("pop", "drop");
-        void num.offsetWidth;
-        num.classList.add(kind === "loss" ? "drop" : "pop");
-        setTimeout(() => num.classList.remove("pop", "drop"), 700);
-      }
-
-      // --- Transitions --------------------------------------------------
-      function showTransition(nextLevel) {
+      // 抽下一題：面頂那張飛走，下面牌堆嗰張（已經寫好題目）升上嚟。
+      // ux / uy = 飛走方向（掃出嘅向量），預設向上。
+      function next(ux = 0, uy = -1) {
+        if (busy) return;
+        if (!onDeck) preload();
+        const pick = onDeck;
+        drawn++;
         busy = true;
-        document.getElementById("qBlock").classList.add("dim");
-        document.getElementById("transitionEyebrow").textContent = "你們進入";
-        document.getElementById("transitionRoman").textContent = ROMAN[nextLevel];
-        document.getElementById("transitionSub").textContent = PHASE_NAMES[nextLevel];
-        // Swap glyph by destination level
-        const glyphHost = document.getElementById("transitionGlyph");
-        const tpl = document.getElementById("glyph-l" + nextLevel);
-        if (tpl) {
-          glyphHost.innerHTML = "";
-          glyphHost.appendChild(tpl.content.cloneNode(true));
-        }
-        const overlay = document.getElementById("transition");
-        overlay.classList.add("show");
+
+        const outgoing = order[0];
+
+        const kind = kindOf(pick);
+        kindEl.textContent = KIND_LABEL[kind];
+        hintEl.textContent = KIND_HINT[kind];
+
+        const len = Math.hypot(ux, uy) || 1;
+        const dist = Math.max(deckEl.offsetWidth, deckEl.offsetHeight) * 1.5;
+        outgoing.classList.remove("dragging");
+        outgoing.classList.add("gone");
+        outgoing.style.transform =
+          `translate3d(${(ux / len * dist).toFixed(0)}px, ${(uy / len * dist).toFixed(0)}px, 0)` +
+          ` rotate(${(ux / len * 16 - 4).toFixed(1)}deg) scale(1.02)`;
+
+        order = [order[1], order[2], order[0]];
+        applyRoles();
+        renderCount();
+
+        // 面頂換咗之後，即刻再排定下一題喺第二張牌
+        onDeck = null;
+        preload();
+
+        const wait = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 480;
         setTimeout(() => {
-          overlay.classList.remove("show");
-          setTimeout(() => {
-            session.level = nextLevel;
-            saveSession();
-            renderAll();
-            document.getElementById("qBlock").classList.remove("dim");
-            busy = false;
-            // auto-draw first question of new level
-            draw();
-          }, 600);
-        }, 2400);
+          // 飛走那張洗返落牌堆底
+          outgoing.classList.add("no-anim");
+          outgoing.classList.remove("gone");
+          outgoing.style.transform = "";
+          ["--dx", "--dy", "--tilt"].forEach(v => outgoing.style.removeProperty(v));
+          outgoing.innerHTML = "";
+          void outgoing.offsetWidth;
+          outgoing.classList.remove("no-anim");
+          busy = false;
+        }, wait);
       }
 
-      // --- Finale -------------------------------------------------------
-      function showFinale() {
-        session.done = true;
-        saveSession();
-        renderAll();
-        const t = totalNet();
-        document.getElementById("finalCount").textContent = t;
-        const starsEl = document.getElementById("finalStars");
-        starsEl.innerHTML = "";
-        const starSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.5 7.2 7.5.4-5.8 4.8 2 7.3L12 17.7 5.8 21.7l2-7.3L2 9.6l7.5-.4z" /></svg>';
-        for (let i = 0; i < t; i++) {
-          const wrap = document.createElement("span");
-          wrap.innerHTML = starSvg;
-          const svg = wrap.firstChild;
-          svg.style.animationDelay = (i * 0.08) + "s";
-          starsEl.appendChild(svg);
+      // --- 點一下 / 掃一下都是下一題 --------------------------------
+      const SWIPE = 52;   // 掃夠這個距離就抽牌
+      const SLOP  = 8;    // 超過這個距離就當作掃，不再當作點擊
+      let drag = null;
+
+      function setDrag(card, dx, dy) {
+        card.style.setProperty("--dx", dx.toFixed(1) + "px");
+        card.style.setProperty("--dy", dy.toFixed(1) + "px");
+        card.style.setProperty("--tilt", (dx / 26).toFixed(2) + "deg");
+      }
+      const onTop = t => order[0] === t || order[0].contains(t);
+
+      deckEl.addEventListener("pointerdown", e => {
+        if (busy || e.button > 0 || !onTop(e.target)) return;
+        const card = order[0];
+        drag = { x: e.clientX, y: e.clientY, id: e.pointerId, card, moved: false };
+        try { card.setPointerCapture(e.pointerId); } catch {}
+        card.classList.add("dragging");
+      });
+
+      deckEl.addEventListener("pointermove", e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const dx = e.clientX - drag.x;
+        const dy = e.clientY - drag.y;
+        if (Math.abs(dx) > SLOP || Math.abs(dy) > SLOP) drag.moved = true;
+        setDrag(drag.card, dx * 0.85, dy * 0.5);
+      });
+
+      deckEl.addEventListener("pointerup", e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const dx = e.clientX - drag.x;
+        const dy = e.clientY - drag.y;
+        const card = drag.card;
+        deckEl.dataset.swiped = drag.moved ? "1" : "";
+        drag = null;
+        card.classList.remove("dragging");
+        if (Math.hypot(dx, dy) >= SWIPE) {
+          next(dx, dy);              // 沿住掃出方向飛走
+        } else {
+          setDrag(card, 0, 0);       // 未夠距離就彈返原位
         }
-        document.getElementById("finale").classList.add("show");
-      }
+      });
 
-      function restart() {
-        session = freshSession();
-        saveSession();
-        document.getElementById("finale").classList.remove("show");
-        renderAll();
-        showReadyState();
-      }
+      deckEl.addEventListener("pointercancel", e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const card = drag.card;
+        drag = null;
+        card.classList.remove("dragging");
+        setDrag(card, 0, 0);
+      });
 
-      function resetSession() {
-        if (!confirm("清空這場的共感紀錄？")) return;
-        restart();
-      }
+      deckEl.addEventListener("click", e => {
+        if (!onTop(e.target)) return;
+        if (deckEl.dataset.swiped) { deckEl.dataset.swiped = ""; return; }  // 掃完唔好再抽多張
+        next();
+      });
+      deckEl.addEventListener("keydown", e => {
+        if (e.target !== order[0]) return;
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); }
+      });
 
-      // --- Init ---------------------------------------------------------
-      renderAll();
-      if (session.done) {
-        showFinale();
-      } else if (!session.started) {
-        showReadyState();
-      } else {
-        // Mid-session: auto-resume by drawing a new question
-        draw();
-      }
+      document.getElementById("nextBtn").addEventListener("click", () => next());
+      document.getElementById("shuffleBtn").addEventListener("click", () => {
+        refill();
+        preload();
+        renderCount();
+        next();
+      });
+
+      refill();
+      preload();
+      renderCount();
     </script>
   </body>
 </html>
