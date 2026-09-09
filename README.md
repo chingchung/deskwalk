@@ -17,6 +17,7 @@
 - **[MECHANICS.md](MECHANICS.md)** — ⭐ 主戰場。機制素材池，邊想邊丟，每個機制標狀態（發想 / 想試 / 原型中 / 驗證 / 淘汰）。
 - **[CONCEPTS.md](CONCEPTS.md)** — 主題與包裝方向（SoulQuest、身心靈塔羅、貓塔羅…）。決定「外殼長怎樣」，機制從 MECHANICS 取。
 - **[QUESTIONS.md](QUESTIONS.md)** — 題型庫。好用的句型 / 結構（內容彈藥，次要）。
+- **[HEADLINER-CARDS.md](HEADLINER-CARDS.md)** — Headliner · 頭條人物的規則 v2 與題目卡（A/B/C 三題一卡）。
 
 ## 原型 Demo
 
