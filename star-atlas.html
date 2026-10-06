@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f2eee4">
+<title>星圖拾光 · deskwalk</title>
+<link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="proto-mono.css"><link rel="stylesheet" href="star-atlas.css">
+<script defer src="star-atlas-engine.js"></script><script defer src="star-atlas-art.js"></script><script defer src="star-atlas.js"></script>
+</head>
+<body>
+<header class="topbar"><a href="index.html" class="wordmark">deskwalk<span>桌遊散步</span></a><div class="edition">PLAY LAB <span>02 / 星圖拾光</span></div><button id="rules-toggle" class="quiet" aria-expanded="false" aria-controls="rules">點樣玩 <span aria-hidden="true">↗</span></button></header>
+<main>
+<section id="rules" class="rules" hidden>
+<div class="section-title"><h2>先拼出一幅，想留下來的星空。</h2><button id="rules-close" class="quiet">收起規則 ×</button></div>
+<ol><li><strong>三張公開牌，揀一張。</strong>大家同機輪流，每回合揀一張，可以旋轉。選一個虛線落點，再確認放牌。</li><li><strong>星線接星線，空白接空白。</strong>新牌至少貼住一張牌嘅邊。打開「顯示牌邊」會見到接口，方便拼接；空白邊亦可以接出另一片星群。</li><li><strong>接成一個環，發現一個星座。</strong>外面嘅分支可以繼續生長，唔需要收起所有線頭。大家可以為發現嘅星座起名。</li><li><strong>完成後，留下你們的星圖。</strong>每人完成相同回合後結束，也可以一起決定提早收筆。進入「欣賞星圖」，改個作品名，再儲存圖片。</li></ol>
+<p>呢一版先試拼砌體驗：沒有個人目標、搶分或勝負。觀星者共享三張公開牌；如果三張都不能放，會自動換牌，不消耗回合。</p>
+<p>欣賞模式會藏起牌邊，未接上的星線會留在末端小星星，保留自然分支。星圖可以隨時預覽，返回後繼續拼。</p>
+</section>
+<section id="setup" class="setup">
+<div class="intro"><p class="eyebrow">A SKY WE MAKE TOGETHER</p><h1>星圖拾光<span>Star Atlas</span></h1><p class="lead">三片星光，揀一片。<br>讓星線相遇，慢慢長成你們的星空。</p><div id="cover-art" class="cover-art" aria-hidden="true"></div><div class="intro-meta"><span>2–6 位觀星者</span><span>同機輪流</span><span>一起留下成品</span></div></div>
+<form id="setup-form" class="setup-form">
+<p class="eyebrow">今晚有幾位觀星者？</p><fieldset class="player-count"><legend class="sr-only">玩家人數</legend><div id="count-options"></div></fieldset>
+<div id="player-names" class="name-grid"></div>
+<label class="field-label" for="length">今晚想拼幾耐？</label><select id="length"><option value="standard">慢慢拼一幅星圖</option><option value="quick">先試手感 · 每人 6 回合</option></select><p id="length-note" class="fine"></p>
+<details class="seed-settings"><summary>固定牌序，方便再試</summary><label class="field-label" for="seed">牌序代碼（留空會隨機產生）</label><input id="seed" maxlength="40" placeholder="例如：star-night-01" autocomplete="off"></details>
+<button class="primary start" type="submit">一起開始拼 <span aria-hidden="true">↗</span></button>
+<button id="resume" class="secondary wide" type="button" hidden>繼續上次嘅星空</button>
+<button id="demo" class="quiet wide" type="button">先試拼成一個環 →</button>
+<p class="fine setup-note">拼砌原型 v0.2<br>先享受一起拼星座，完成後儲存你們的作品。</p>
+</form>
+</section>
+<section id="game" hidden>
+<div class="game-heading"><div><p class="eyebrow">ONE TABLE · ONE OPEN SKY</p><h1>星圖拾光</h1></div><div class="heading-actions"><span id="turn-progress"></span><button id="new-game" class="quiet">另開一幅</button></div></div>
+<div id="players" class="players" aria-label="觀星者與目前回合"></div>
+<div class="game-layout">
+<section class="tabletop" aria-label="公共星空">
+<div class="board-toolbar"><span class="board-label">我們的星空 <span id="sky-count"></span></span><div class="zoom-controls"><button id="zoom-out" aria-label="縮小星圖">−</button><button id="zoom-in" aria-label="放大星圖">＋</button><button id="fit" class="quiet">看全圖</button></div></div>
+<div id="board-scroll" class="board-scroll"><div id="board" class="board" aria-label="星空牌與可放置位置"></div></div>
+<div class="board-footer"><button id="grid-toggle" class="quiet small" aria-pressed="false">顯示牌邊</button><span class="board-tip">捲動探索 · R 旋轉</span><button id="view-art" class="quiet small">欣賞星圖 ↗</button></div>
+<div id="receipt" class="receipt" role="status" aria-live="polite"></div>
+</section>
+<aside class="play-panel">
+<div id="turn-title" class="turn-title"></div>
+<div id="play-controls"><div class="section-title"><h2>揀一片星光</h2><span id="supply" class="fine"></span></div><div id="market" class="market"></div>
+<div class="rotation-row"><span id="tile-label" class="fine"></span><button id="rotate" class="secondary" title="快捷鍵 R">↻ 旋轉 90°</button></div>
+<div class="placement-section"><div class="section-title"><h2>接入星空</h2><button id="hint" class="quiet small">搵個落點</button></div><p id="placement-hint" class="placement-hint" aria-live="polite"></p><div id="preview-event" class="preview-event"></div><button id="confirm" class="primary wide" disabled>確認放牌</button><button id="undo" class="quiet wide" disabled>↶ 退回上一步</button></div></div>
+<div id="result" class="result" hidden></div>
+<div class="finish-section"><p class="fine">覺得星空已經剛剛好？</p><button id="finish" class="secondary wide">完成這幅星圖</button></div>
+</aside>
+</div>
+<section class="journal"><div class="section-title"><div><p class="eyebrow">OUR FIELD NOTES</p><h2>一起發現嘅星座 <span id="constellation-count">0</span></h2></div><div class="export-actions"><button id="journal-art" class="secondary">欣賞與儲存星圖</button><button id="export-log" class="quiet">匯出試玩紀錄</button></div></div><div id="constellations" class="constellations"></div>
+<details class="session-details"><summary>試玩資料與回合紀錄</summary><p id="session-stats" class="fine"></p><div id="move-log"></div></details></section>
+</section>
+<section id="artwork" class="artwork" hidden>
+<div class="artwork-heading"><button id="back-to-game" class="quiet">← 返回星空</button><p id="artwork-status" class="eyebrow">MADE TOGETHER</p></div>
+<div class="artwork-layout"><figure id="poster" class="atlas-poster" aria-label="你們一起拼成的星圖"></figure><aside class="artwork-panel"><p class="eyebrow">A MOMENT WORTH KEEPING</p><h1>今晚的星空，<br>屬於你們。</h1><p id="artwork-meta" class="artwork-meta"></p><label class="field-label" for="atlas-title">為這幅星圖起個名</label><input id="atlas-title" maxlength="32" placeholder="我們的星圖" autocomplete="off"><div class="artwork-downloads"><button id="export-png" class="primary wide">儲存圖片 <span aria-hidden="true">↓</span></button><button id="export-svg" class="secondary wide">儲存 SVG 原圖</button></div><p class="fine">PNG 適合分享，SVG 可以放大印製。<br>牌邊與操作提示會留在畫面外。</p><div class="artwork-again"><button id="art-new-game" class="quiet">再拼另一片星空 ↗</button></div></aside></div>
+</section>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+</main><footer class="page-footer">deskwalk play lab <span>拼好一片星空，再為佢起個名。</span></footer>
+</body></html>
