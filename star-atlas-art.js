@@ -1,18 +1,29 @@
 /* 星圖拾光 · deterministic constellation drawing and self-contained SVG prints. */
 (function (root) {
   'use strict';
-  const SKY = '#2b2926';
+  const ENGINE=typeof module!=='undefined'&&module.exports?require('./star-atlas-engine.js'):root.StarAtlas;
+  const LAB=typeof module!=='undefined'&&module.exports?require('./star-atlas-visual-lab.js'):root.AtlasVisualLab;
+  const THEMES = {
+    diagonal: {name:'A · 斜角星路', sky:'#222827', ink:'#e9eeea', line:'#c7d0cb', accent:'#f4f6ef', mode:'night'},
+    night: {name:'00 · 夜航 / Night Atlas', sky:'#252a29', ink:'#e9eeea', line:'#c7d0cb', accent:'#f4f6ef', mode:'night'},
+    noir: {name:'01 · 墨光 / Ink & Light', sky:'#f1eee6', ink:'#242321', line:'#46423e', accent:'#242321', mode:'sculpted'},
+    cobalt: {name:'02 · 日光藍 / Solar Blue', sky:'#0866d9', ink:'#fff1ae', line:'#fff5cd', accent:'#ffe16b', mode:'ribbon'},
+    chalk: {name:'03 · 星跡 / Chalk Orbit', sky:'#eee1c5', ink:'#159dcc', line:'#262c32', accent:'#159dcc', mode:'sketch'}
+  };
+  let theme = 'diagonal', SKY = THEMES.diagonal.sky;
+  const setTheme = value => {theme = THEMES[value] ? value : 'noir'; SKY = THEMES[theme].sky; return THEMES[theme];};
+  const OWNER_COLORS = ['#ef967a','#8eaff1','#abd294','#de9ac6','#edcd77','#75cec9'];
   const PAPER = '#f2eee4';
   const INK = '#39352f';
-  const PORTS = [[50, 0], [100, 50], [50, 100], [0, 50]];
+  const PORTS = ENGINE.PORTS.map(p=>p.map(n=>n*50));
   const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];
-  const SHAPES = { end: [0], bend: [0, 1], straight: [0, 2], fork: [0, 1, 3], cross: [0, 1, 2, 3] };
+  const SHAPES = ENGINE.SHAPES;
   const COLORS = { blue: '#b8d1dc', gold: '#e5cd94', white: '#f3ece0' };
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const f = n => Math.round(n * 100) / 100;
   const key = (x, y) => `${x},${y}`;
   const rotation = t => ((Number(t.rotation) || 0) % 4 + 4) % 4;
-  const ports = t => (SHAPES[t.shape] || SHAPES.end).map(d => (d + rotation(t)) % 4);
+  const ports = t => ENGINE.ports(t);
 
   function random(seed) {
     let h = 2166136261;
@@ -26,73 +37,135 @@
   }
 
   function geometry(t) {
-    const rand = random(`atlas-art:${t.id ?? t.shape}:${t.color}`);
-    const x = 27 + rand() * 46, y = 27 + rand() * 46;
-    const directions = SHAPES[t.shape] || SHAPES.end;
-    const core = { x, y, radius: 1.9 + rand() * 1.45, rays: rand() > .62 };
-    const arms = directions.map(d => {
-      const [px, py] = PORTS[d], fraction = .42 + rand() * .26;
-      // Each terminal is placed well inside the card. It becomes a real endpoint
-      // when the open edge is hidden, rather than leaving a line cut in mid-air.
-      const sx = x + (px - x) * fraction;
-      const sy = y + (py - y) * fraction;
-      const bend = (rand() - .5) * 12;
-      return {
-        d, px, py,
-        x: d % 2 ? sx : sx + bend,
-        y: d % 2 ? sy + bend : sy,
-        star: true, radius: 1.05 + rand() * .7,
-      };
-    });
-    return { core, arms };
+    const rand=random(`atlas-art:${t.id ?? t.shape}:${t.color}`);
+    const core={x:24+rand()*52,y:24+rand()*52,radius:3.4+rand()*.9,rays:true};
+    const nodes=[core];
+    if(!['end','bend','straight','fork','cross'].includes(t.shape)&&rand()>.55){
+      let second;for(let i=0;i<20;i++){second={x:24+rand()*52,y:24+rand()*52,radius:2.3+rand()*.8,rays:true};if(Math.hypot(core.x-second.x,core.y-second.y)>26)break;}nodes.push(second);
+    }
+    const arms=(SHAPES[t.shape]||SHAPES.end).map(d=>{const [px,py]=PORTS[d],node=nodes.reduce((a,b)=>Math.hypot(a.x-px,a.y-py)<Math.hypot(b.x-px,b.y-py)?a:b);return {d,px,py,node};});
+    return {core,nodes,arms};
+  }
+  function quietSky(t,shape,color){
+    if(!LAB)return '';
+    const c={id:t.id,cx:50,cy:50,poly:[{x:0,y:0},{x:100,y:0},{x:100,y:100},{x:0,y:100}],nodes:shape.nodes.map(n=>({...n,size:2})),lines:shape.arms.map(a=>[a.node,{x:a.px,y:a.py}])};
+    if(shape.nodes.length>1)c.lines.push(shape.nodes);
+    const o=LAB.ornaments({type:'diagonal',seed:t.id},c);
+    let out='<g class="decorative-sky" aria-hidden="true" pointer-events="none">';
+    for(const chain of o.chains){out+='<path d="'+chain.map((p,i)=>(i?'L':'M')+f(p.x)+' '+f(p.y)).join(' ')+'" stroke="'+color+'" stroke-width=".45" opacity=".16" fill="none"/>';for(const p of chain)out+='<circle cx="'+f(p.x)+'" cy="'+f(p.y)+'" r=".75" fill="'+color+'" opacity=".26"/>';}
+    for(const p of o.dots)out+='<circle cx="'+f(p.x)+'" cy="'+f(p.y)+'" r="'+f(p.size*.7)+'" fill="'+color+'" opacity=".3"/>';
+    return out+'</g>';
   }
 
   function star(x, y, radius, color, rays = false) {
-    let s = `<circle cx="${f(x)}" cy="${f(y)}" r="${f(radius * 2.35)}" fill="${color}" opacity=".065"/>`;
-    if (rays) {
-      const a = radius * 2.8, b = radius * .36;
-      s += `<path d="M${f(x)} ${f(y-a)}L${f(x+b)} ${f(y-b)}L${f(x+a)} ${f(y)}L${f(x+b)} ${f(y+b)}L${f(x)} ${f(y+a)}L${f(x-b)} ${f(y+b)}L${f(x-a)} ${f(y)}L${f(x-b)} ${f(y-b)}Z" fill="${color}" opacity=".8"/>`;
+    const p = THEMES[theme], r = radius * (rays ? 3.5 : 1.5);
+
+    const rand = random(x+':'+y), angle = -24 + rand()*48;
+    if(p.mode==='night'){
+      const size=1.65+rand()*1.5;
+      const glow='<circle cx="'+f(x)+'" cy="'+f(y)+'" r="'+f(size*2.7)+'" fill="'+color+'" opacity=".055"/>';
+      const rays=rand()>.65?'<path d="M'+f(x-size*3.4)+' '+f(y)+'H'+f(x+size*3.4)+'M'+f(x)+' '+f(y-size*3.4)+'V'+f(y+size*3.4)+'" stroke="'+color+'" stroke-width=".5" opacity=".65"/>':'';
+      return glow+rays+'<circle cx="'+f(x)+'" cy="'+f(y)+'" r="'+f(size)+'" fill="'+color+'"/>';
     }
-    return s + `<circle cx="${f(x)}" cy="${f(y)}" r="${f(radius)}" fill="${color}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(radius * .42)}" fill="#fff8ed" opacity=".75"/>`;
+    let path;
+    if (p.mode === 'sketch') {
+      const points = Array.from({length:16},(_,i)=>{const a=i*Math.PI/8;const d=i%2?r*.15:r*(.65+rand()*.85);return f(Math.cos(a)*d)+','+f(Math.sin(a)*d);});
+      path='<polygon points="'+points.join(' ')+'" fill="'+color+'"/>';
+    } else {
+      path='<path d="M0 '+f(-r*1.35)+' Q'+f(r*.10)+' '+f(-r*.12)+' '+f(r*1.6)+' '+f(-r*.2)+' Q'+f(r*.16)+' '+f(r*.13)+' '+f(r*.1)+' '+f(r)+' Q'+f(-r*.14)+' '+f(r*.16)+' '+f(-r*1.1)+' '+f(r*.18)+' Q'+f(-r*.12)+' '+f(-r*.16)+' 0 '+f(-r*1.35)+'Z" fill="'+color+'"/>';
+    }
+    return '<g transform="translate('+f(x)+' '+f(y)+') rotate('+f(angle)+')">'+path+'</g>';
   }
 
   function tileContent(t, { frame = true, connections = null, highlight = false, finished = false } = {}) {
-    const shape = geometry(t), turn = rotation(t), color = COLORS[t.color] || COLORS.white;
-    const connected = connections === null ? null : new Set(connections);
-    const paths = [], stars = [];
-    let content = '';
-    if (frame) content += `<rect x=".6" y=".6" width="98.8" height="98.8" rx="2" fill="${SKY}" stroke="${highlight ? '#d9c294' : '#70665a'}" stroke-opacity="${highlight ? '.9' : '.42'}" stroke-width="${highlight ? '1.5' : '.7'}"/>`;
-    for (const arm of shape.arms) {
-      const open = connected !== null && !connected.has((arm.d + turn) % 4);
-      const terminal = arm.star || (finished && open);
-      const mid = terminal ? `L${f(arm.x)} ${f(arm.y)}` : '';
-      if (finished && open) {
-        paths.push(`<path d="M${f(shape.core.x)} ${f(shape.core.y)}${mid}"/>`);
-      } else {
-        paths.push(`<path d="M${f(shape.core.x)} ${f(shape.core.y)}${mid}L${arm.px} ${arm.py}"${open ? ' opacity=".55"' : ''}/>`);
-      }
-      if (terminal) stars.push(star(arm.x, arm.y, arm.radius, color));
-      if (frame && open) content += `<circle cx="${PORTS[(arm.d + turn) % 4][0]}" cy="${PORTS[(arm.d + turn) % 4][1]}" r="1.2" fill="#d4bea0" opacity=".65"/>`;
+    const shape=geometry(t), turn=rotation(t), p=THEMES[theme], rand=random('surface:'+t.id);
+    const connected=connections===null?null:new Set(connections);
+    let content=frame?'<rect x=".4" y=".4" width="99.2" height="99.2" fill="'+p.sky+'" stroke="'+p.line+'" stroke-opacity=".22" stroke-width=".8"/>':'';
+    // Deterministic print grain: independent of connectivity and rotation.
+    if(p.mode!=='sculpted') for(let i=0;i<68;i++)content+='<circle cx="'+f(rand()*100)+'" cy="'+f(rand()*100)+'" r="'+f(.12+rand()*.22)+'" fill="'+p.ink+'" opacity=".14"/>';
+    let lines='',dots='';
+    if(shape.nodes.length>1)lines+='<path class="star-link" d="M'+f(shape.nodes[0].x)+' '+f(shape.nodes[0].y)+'L'+f(shape.nodes[1].x)+' '+f(shape.nodes[1].y)+'"/>';
+    for(const arm of shape.arms){
+      const direction=arm.d<4?(arm.d+turn)%4:4+(arm.d-4+turn)%4;
+      if(finished&&connected&&!connected.has(direction))continue;
+      lines+='<path class="star-link" d="M'+f(arm.node.x)+' '+f(arm.node.y)+'L'+arm.px+' '+arm.py+'"/>';
+      const r=p.mode==='night'?1.3:4;
+      const path=arm.d<4?'M'+(50-r)+' 0 A'+r+' '+r+' 0 0 0 '+(50+r)+' 0 Z':'M100 0 L'+(100-r)+' 0 A'+r+' '+r+' 0 0 0 100 '+r+' Z';
+      dots+='<path class="port-dot" data-port="'+arm.d+'" d="'+path+'" transform="rotate('+(arm.d<4?arm.d:arm.d-4)*90+' 50 50)" fill="'+p.ink+'"/>';
     }
-    content += `<g transform="rotate(${turn * 90} 50 50)"><g fill="none" stroke="${highlight ? '#ead5a6' : '#b5ac9d'}" stroke-width=".85" stroke-linejoin="round" stroke-linecap="round" opacity=".79">${paths.join('')}</g>${stars.join('')}${star(shape.core.x, shape.core.y, shape.core.radius, color, shape.core.rays)}</g>`;
-    return content;
+    const decoration=quietSky(t,shape,p.ink);
+    const stars=shape.nodes.map(n=>'<g class="tile-star">'+star(n.x,n.y,n.radius,p.accent,true)+'</g>').join('');
+    return content+'<g transform="rotate('+turn*90+' 50 50)">'+decoration+'<g fill="none" stroke="'+p.ink+'" stroke-width="'+(p.mode==='night'?'.7':'1.2')+'" stroke-linecap="butt">'+lines+'</g>'+dots+stars+'</g>';
+  }
+
+  // Follow the actual drawn star/port path, not tile centres: the latter can
+  // put a marker outside a thin or concave constellation.
+  function ringPolygon(board,ring){
+    const tiles=new Map(board.map(t=>[t.id,t])),polygon=[];
+    const append=p=>{const last=polygon.at(-1);if(!last||Math.hypot(last.x-p.x,last.y-p.y)>1e-6)polygon.push(p);};
+    for(let i=0;i<ring.tileIds.length;i++){
+      const t=tiles.get(ring.tileIds[i]);if(!t)return [];
+      const incoming=ring.junctionIds[(i+ring.tileIds.length-1)%ring.tileIds.length],outgoing=ring.junctionIds[i];
+      const g=geometry(t),turn=rotation(t);
+      const armAt=id=>g.arms.find(a=>ENGINE.joint(t,a.d<4?(a.d+turn)%4:4+(a.d-4+turn)%4)===id);
+      const a=armAt(incoming),b=armAt(outgoing);if(!a||!b)return [];
+      const world=n=>{let x=n.x,y=n.y;for(let j=0;j<turn;j++)[x,y]=[100-y,x];return {x:t.x*100+x,y:t.y*100+y};};
+      append(world({x:a.px,y:a.py}));append(world(a.node));append(world(b.node));append(world({x:b.px,y:b.py}));
+    }
+    if(polygon.length>1&&Math.hypot(polygon[0].x-polygon.at(-1).x,polygon[0].y-polygon.at(-1).y)<1e-6)polygon.pop();
+    return polygon;
+  }
+  function polygonDistance(p,polygon){
+    let inside=false,distance=Infinity;
+    for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
+      const a=polygon[i],b=polygon[j],dx=b.x-a.x,dy=b.y-a.y;
+      if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+      const u=dx||dy?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy))):0;
+      distance=Math.min(distance,Math.hypot(p.x-a.x-u*dx,p.y-a.y-u*dy));
+    }
+    return (inside?1:-1)*distance;
+  }
+  function interiorPoint(polygon,occupied=[]){
+    if(polygon.length<3)return null;
+    const xs=polygon.map(p=>p.x),ys=polygon.map(p=>p.y),minX=Math.min(...xs),minY=Math.min(...ys),maxX=Math.max(...xs),maxY=Math.max(...ys);
+    const size=Math.min(maxX-minX,maxY-minY);if(size<=0)return null;
+    const distance=(x,y)=>Math.min(polygonDistance({x,y},polygon),...occupied.map(p=>Math.hypot(p.x-x,p.y-y)-p.radius));
+    const cell=(x,y,h)=>{const d=distance(x,y);return {x,y,h,d,max:d+h*Math.SQRT2};};
+    const queue=[];for(let x=minX;x<maxX;x+=size)for(let y=minY;y<maxY;y+=size)queue.push(cell(x+size/2,y+size/2,size/2));
+    let best=cell((minX+maxX)/2,(minY+maxY)/2,0);
+    // Branch and bound finds an interior point with room around it, even when
+    // the bounding-box centre or area centroid is outside a concave loop.
+    while(queue.length){queue.sort((a,b)=>a.max-b.max);const c=queue.pop();if(c.d>best.d)best=c;
+      if(c.max-best.d<=.25)continue;
+      const h=c.h/2;for(const dx of [-h,h])for(const dy of [-h,h])queue.push(cell(c.x+dx,c.y+dy,h));
+    }
+    return best.d>0?{x:best.x,y:best.y,clearance:polygonDistance(best,polygon)}:null;
+  }
+  function markerPositions(board,rings){
+    const placed=[];
+    return rings.map(ring=>{
+      const polygon=ringPolygon(board,ring),point=interiorPoint(polygon,placed)||interiorPoint(polygon);
+      if(!point)return null;
+      placed.push({...point,radius:Math.min(18,point.clearance)});return {...point,id:ring.id};
+    });
+  }
+  function markerSvg(c, players=[]) {
+    if(!Number.isInteger(c.owner))return '';
+    const color=OWNER_COLORS[c.owner%OWNER_COLORS.length];
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" role="img"><title>'+esc(players[c.owner]?.name||'玩家 '+(c.owner+1))+' · '+esc(c.name)+'</title><path class="owner-star" d="M15 2 Q17 12 28 15 Q17 17 15 28 Q13 17 2 15 Q13 13 15 2Z" fill="'+color+'" stroke="#222827" stroke-width="1.5"/></svg>';
   }
 
   function tileSvg(t, options = {}) {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">${tileContent(t, options)}</svg>`;
   }
 
-  function connectionsFor(board) {
-    const map = new Map(board.map(t => [key(t.x, t.y), t]));
-    return t => ports(t).filter(d => {
-      const other = map.get(key(t.x + DIRS[d][0], t.y + DIRS[d][1]));
-      return other && ports(other).includes((d + 2) % 4);
-    });
-  }
-
-  function starCount(board) {
-    // Physical stars are permanent: joining an edge never adds or removes one.
-    return board.reduce((total, t) => total + 1 + geometry(t).arms.length, 0);
+  function connectionsFor(board) {return t=>ENGINE.connectedPorts(t,board);}
+  function starCount(board) {return board.reduce((n,t)=>n+geometry(t).nodes.length,0);}
+  function junctionContent(board){
+    const p=THEMES[theme],r=p.mode==='night'?1.3:4;
+    return [...ENGINE.junctions(board)].filter(([,tiles])=>tiles.length>1).map(([joint])=>{
+      const [x,y]=joint.split(',').map(Number);return '<circle cx="'+(x*50)+'" cy="'+(y*50)+'" r="'+r+'" fill="'+p.ink+'"/>';
+    }).join('');
   }
 
   function bounds(board) {
@@ -105,7 +178,7 @@
   function scatter(width, height, seed, amount) {
     const r = random(seed), dots = [];
     for (let i = 0; i < amount; i++) {
-      const x = r() * width, y = r() * height, radius = .35 + r() * .8;
+      const x = r() * width, y = r() * height, radius = THEMES[theme].mode==='night' ? .25+r()*1.1 : .35+r()*.8;
       dots.push(`<circle cx="${f(x)}" cy="${f(y)}" r="${f(radius)}" fill="#ded2bc" opacity="${f(.12 + r() * .21)}"/>`);
     }
     return dots.join('');
@@ -113,7 +186,7 @@
 
   function boardContent(board, showGrid) {
     const connected = connectionsFor(board);
-    return board.map(t => `<g transform="translate(${f(t.x * 100)} ${f(t.y * 100)})">${tileContent(t, { frame: showGrid, connections: connected(t), finished: !showGrid })}</g>`).join('');
+    return board.map(t => `<g transform="translate(${f(t.x * 100)} ${f(t.y * 100)})">${tileContent(t, { frame: showGrid, connections: connected(t), finished: !showGrid })}</g>`).join('')+junctionContent(board);
   }
 
   function mapSvg(board, { title = '我們的星圖', subtitle = '', constellations = [], poster = false, showGrid = false } = {}) {
@@ -123,7 +196,7 @@
     const titleText = esc(rawTitle);
     if (!poster) {
       const pad = 45, width = box.w + pad * 2, height = box.h + pad * 2;
-      return `<svg ${common} viewBox="0 0 ${width} ${height}"><title>${titleText}</title><rect width="${width}" height="${height}" fill="${SKY}"/>${scatter(width, height, 'atlas-preview', Math.round(width * height / 4000))}<g transform="translate(${pad - box.x} ${pad - box.y})">${sky}</g></svg>`;
+      return `<svg ${common} viewBox="0 0 ${width} ${height}"><title>${titleText}</title><rect width="${width}" height="${height}" fill="${SKY}"/>${scatter(width, height, 'atlas-preview', Math.round(width * height / (THEMES[theme].mode==='night'?650:4000)))}<g transform="translate(${pad - box.x} ${pad - box.y})">${sky}</g></svg>`;
     }
 
     const width = 1200;
@@ -187,7 +260,7 @@
 <text x="600" y="164" text-anchor="middle" font-family="${serif}" font-size="${titleSize}" letter-spacing="${titleSpacing}" fill="${INK}">${titleText}</text>
 ${subLines.map((line, i) => `<text x="600" y="${subLines.length === 1 ? 202 : 192 + i * (subSize + 4)}" text-anchor="middle" font-family="${sans}" font-size="${subSize}" letter-spacing=".6" fill="#867b68">${esc(line)}</text>`).join('')}
 <rect x="${chart.x}" y="${chart.y}" width="${chart.w}" height="${chart.h}" fill="${SKY}"/>
-<g transform="translate(${chart.x} ${chart.y})">${scatter(chart.w, chart.h, 'atlas-poster-field', 230)}
+<g transform="translate(${chart.x} ${chart.y})">${scatter(chart.w, chart.h, 'atlas-poster-field', THEMES[theme].mode==='night'?1200:230)}
 <circle cx="518" cy="518" r="462" fill="none" stroke="#cfba90" stroke-width=".65" opacity=".13"/>
 <circle cx="518" cy="518" r="335" fill="none" stroke="#cfba90" stroke-width=".5" stroke-dasharray="2 9" opacity=".1"/>
 <path d="M32 518H1004M518 32V1004" fill="none" stroke="#cfba90" stroke-width=".55" stroke-dasharray="2 10" opacity=".11"/>
@@ -204,7 +277,7 @@ ${legend}
 </svg>`;
   }
 
-  const api = { tileContent, tileSvg, mapSvg, starCount, geometry };
+  const api = { tileContent, tileSvg, mapSvg, starCount, geometry, junctionContent, THEMES, setTheme, markerSvg, markerPositions, ringPolygon, interiorPoint, polygonDistance, OWNER_COLORS };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.StarAtlasArt = api;
 })(typeof window !== 'undefined' ? window : this);
